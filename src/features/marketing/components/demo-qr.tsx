@@ -1,0 +1,75 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useInView } from "motion/react";
+import { QrCode } from "lucide-react";
+
+export function DemoQr() {
+  const ref = useRef<HTMLDivElement>(null);
+  const visible = useInView(ref, { once: true, margin: "200px" });
+  const [src, setSrc] = useState("");
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    if (!visible) return;
+    let cancelled = false;
+    import("qrcode")
+      .then((qr) =>
+        qr.toDataURL(`${location.origin}/?demo=open#demo`, {
+          width: 220,
+          margin: 2,
+          color: { dark: "#303e28", light: "#fffefa" },
+          errorCorrectionLevel: "M",
+        }),
+      )
+      .then((url) => {
+        if (!cancelled) setSrc(url);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [visible]);
+  return (
+    <div ref={ref} className="demo-qr-card">
+      <span className="eyebrow">A LITTLE INVITATION</span>
+      <span className="qr-card-title">
+        Your perspective
+        <br />
+        <em>belongs here.</em>
+      </span>
+      <div className="qr-image">
+        {src ? (
+          <Image
+            src={src}
+            alt="Scan to open the interactive CandidCrowd guest demo"
+            width={160}
+            height={160}
+            unoptimized
+          />
+        ) : (
+          <QrCode
+            size={90}
+            strokeWidth={1}
+            aria-label={
+              failed
+                ? "QR unavailable; use Try without scanning"
+                : "QR code loading"
+            }
+          />
+        )}
+      </div>
+      <p>
+        {failed
+          ? "Use the button below to try the demo."
+          : "Scan with your phone camera"}
+      </p>
+      <span className="qr-card-brand">candidcrowd.</span>
+      <p className="qr-local-note">
+        Use a publicly reachable site URL to scan from another device.
+      </p>
+    </div>
+  );
+}

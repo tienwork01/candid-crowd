@@ -1,0 +1,10 @@
+.next
+node_modules
+pnpm-lock.yaml
+test-results
+playwright-report
+.agents
+design-system
+*.min.js
+*.min.css
+AGENTS.md
