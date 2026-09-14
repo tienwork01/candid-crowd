@@ -11,7 +11,7 @@ import { HeroScene } from "./hero-scene";
 export function Hero() {
   return (
     <section className="hero container" aria-labelledby="hero-title">
-      <div className="hero-copy">
+      <div className="hero__copy">
         <span className="eyebrow">
           <span className="status-dot" /> LITTLE MOMENTS. ALL TOGETHER.
         </span>
@@ -22,11 +22,11 @@ export function Hero() {
           <br />
           <em>already take.</em>
         </h1>
-        <p className="hero-description">
+        <p className="hero__description">
           One QR code gives everyone at your event a simple place to share their
           photos and videos. <strong>No app. No account.</strong>
         </p>
-        <div className="hero-actions">
+        <div className="hero__actions">
           <Link href="/create" className="button">
             Create your event free <ArrowUpRight size={18} aria-hidden="true" />
           </Link>
@@ -34,7 +34,7 @@ export function Hero() {
             See how it works <ArrowRight size={16} aria-hidden="true" />
           </a>
         </div>
-        <div className="hero-trust">
+        <div className="hero__trust">
           <span>
             <Check aria-hidden="true" /> No app
           </span>

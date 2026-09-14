@@ -13,6 +13,7 @@ export function Reveal({
 }) {
   const [seen, setSeen] = useState(false);
   const reduced = useReducedMotion();
+
   return (
     <m.div
       className={className}

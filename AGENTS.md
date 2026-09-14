@@ -474,6 +474,20 @@ Mobile-first responsive web app.
 
 PWA features can be added progressively.
 
+### CSS & Class Naming Conventions (BEM Standard)
+
+All custom CSS classes must strictly adhere to the **BEM (Block Element Modifier)** convention:
+
+- **Block (`block-name`)**: Independent standalone entity (kebab-case).
+  - Examples: `site-header`, `hero`, `guest-demo`, `button`, `plan-card`, `event-form`.
+- **Element (`block-name__element-name`)**: Part of a block that has no standalone meaning, tied to its block with two underscores `__`.
+  - Examples: `site-header__inner`, `site-header__actions`, `hero__copy`, `hero__actions`, `plan-card__price`, `event-form__field`.
+  - **No deep nesting**: Never use `block__elem1__elem2`. Use only `block__element`.
+- **Modifier (`block-name--modifier` or `block-name__element--modifier`)**: State or variation flag, separated with two dashes `--`.
+  - Examples: `button--small`, `button--outline`, `plan-card--featured`, `hero-scene--3d`, `hero-scene__tile--new`.
+- **Global / Utility**: Shared layout classes should remain standard and semantic (e.g., `container`, `section-pad`, `skip-link`, `eyebrow`, `center-heading`).
+- **Feature-first organization**: Component classes should reflect their feature/block context. Do not invent loose, un-scoped ad-hoc class names.
+
 ## Backend
 
 Preferred:

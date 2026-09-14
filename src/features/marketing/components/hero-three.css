@@ -1,3 +1,4 @@
+.hero-scene__canvas,
 .hero-three-canvas {
   position: absolute;
   inset: 0 0 108px;
@@ -5,12 +6,15 @@
   visibility: hidden;
   touch-action: pan-y;
 }
+.hero-scene__canvas canvas,
 .hero-three-canvas canvas {
   display: block;
 }
+.hero-scene--3d .hero-scene__canvas,
 .hero-scene--3d .hero-three-canvas {
   visibility: visible;
 }
+.hero-scene__label,
 .hero-three-label {
   position: absolute;
   top: 0;
@@ -21,10 +25,13 @@
   color: var(--muted);
   pointer-events: none;
 }
+.hero-scene--3d .hero-scene__gallery,
 .hero-scene--3d .scene-gallery,
+.hero-scene--3d .hero-scene__connection,
 .hero-scene--3d .scene-connection {
   visibility: hidden;
 }
+.hero-scene--3d .hero-scene__phone,
 .hero-scene--3d .scene-phone {
   position: absolute;
   top: auto;
@@ -41,15 +48,18 @@
   transform: none;
   z-index: 6;
 }
+.hero-scene--3d .hero-scene__phone > :not(.hero-scene__share),
 .hero-scene--3d .scene-phone > :not(.scene-share) {
   display: none;
 }
+.hero-scene--3d .hero-scene__share,
 .hero-scene--3d .scene-share {
   min-height: 44px;
   min-width: 172px;
   font-size: 13px;
   margin: 0;
 }
+.hero-scene--3d .hero-scene__status,
 .hero-scene--3d .scene-status {
   bottom: 36px;
   right: 0;
@@ -57,22 +67,27 @@
   z-index: 5;
 }
 @media (max-width: 1100px) {
+  .hero-scene--3d .hero-scene__status,
   .hero-scene--3d .scene-status {
     bottom: 94px;
   }
+  .hero-scene__canvas,
   .hero-three-canvas {
     bottom: 145px;
   }
+  .hero-scene--3d .hero-scene__phone,
   .hero-scene--3d .scene-phone {
     left: 20px;
     bottom: 38px;
   }
 }
 @media (max-width: 600px) {
+  .hero-scene__label,
   .hero-three-label {
     left: 4px;
     font-size: 9px;
   }
+  .hero-scene--3d .hero-scene__phone,
   .hero-scene--3d .scene-phone {
     left: 4px;
   }

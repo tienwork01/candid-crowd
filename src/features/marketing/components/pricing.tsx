@@ -5,7 +5,7 @@ import { pricingPlans } from "../data/marketing";
 export function Pricing() {
   return (
     <section
-      className="pricing-section container section-pad"
+      className="pricing container section-pad"
       id="pricing"
       aria-labelledby="pricing-title"
     >
@@ -18,19 +18,19 @@ export function Pricing() {
         </h2>
         <p>Start with the free preview. Find the right fit as we grow.</p>
       </div>
-      <div className="pricing-grid">
+      <div className="pricing__grid">
         {pricingPlans.map((plan) => (
           <article
             key={plan.id}
-            className={`plan-card ${plan.featured ? "plan-featured" : ""}`}
+            className={`plan-card ${plan.featured ? "plan-card--featured" : ""}`}
           >
             <span className="eyebrow">
               {plan.available ? "AVAILABLE TO EXPLORE" : "PLANNED OFFERING"}
             </span>
             <h3>{plan.name}</h3>
             <p>{plan.description}</p>
-            <div className="plan-price">{plan.priceLabel}</div>
-            <span className="plan-billing">{plan.billing}</span>
+            <div className="plan-card__price">{plan.priceLabel}</div>
+            <span className="plan-card__billing">{plan.billing}</span>
             <ul>
               {plan.features.map((feature) => (
                 <li key={feature}>
@@ -41,7 +41,7 @@ export function Pricing() {
             </ul>
             <Link
               href={plan.available ? "/create" : "#demo"}
-              className={`button ${!plan.featured ? "button-outline" : ""}`}
+              className={`button ${!plan.featured ? "button--outline" : ""}`}
             >
               {plan.cta}
               <ArrowUpRight size={17} aria-hidden="true" />

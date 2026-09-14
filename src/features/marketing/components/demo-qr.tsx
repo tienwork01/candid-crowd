@@ -10,9 +10,12 @@ export function DemoQr() {
   const visible = useInView(ref, { once: true, margin: "200px" });
   const [src, setSrc] = useState("");
   const [failed, setFailed] = useState(false);
+
   useEffect(() => {
     if (!visible) return;
+
     let cancelled = false;
+
     import("qrcode")
       .then((qr) =>
         qr.toDataURL(`${location.origin}/?demo=open#demo`, {
@@ -28,19 +31,21 @@ export function DemoQr() {
       .catch(() => {
         if (!cancelled) setFailed(true);
       });
+
     return () => {
       cancelled = true;
     };
   }, [visible]);
+
   return (
-    <div ref={ref} className="demo-qr-card">
+    <div ref={ref} className="demo-qr">
       <span className="eyebrow">A LITTLE INVITATION</span>
-      <span className="qr-card-title">
+      <span className="demo-qr__title">
         Your perspective
         <br />
         <em>belongs here.</em>
       </span>
-      <div className="qr-image">
+      <div className="demo-qr__image">
         {src ? (
           <Image
             src={src}
@@ -66,8 +71,8 @@ export function DemoQr() {
           ? "Use the button below to try the demo."
           : "Scan with your phone camera"}
       </p>
-      <span className="qr-card-brand">candidcrowd.</span>
-      <p className="qr-local-note">
+      <span className="demo-qr__brand">candidcrowd.</span>
+      <p className="demo-qr__note">
         Use a publicly reachable site URL to scan from another device.
       </p>
     </div>

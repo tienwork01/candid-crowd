@@ -5,7 +5,7 @@ import { Reveal } from "@/components/shared/reveal";
 export function EventLifecycle() {
   return (
     <section
-      className="lifecycle-section section-pad"
+      className="lifecycle section-pad"
       id="event-lifecycle"
       aria-labelledby="lifecycle-title"
     >
@@ -19,10 +19,10 @@ export function EventLifecycle() {
           </h2>
           <p>A place for your memories, whenever they’re ready to be shared.</p>
         </div>
-        <Reveal className="lifecycle-grid">
+        <Reveal className="lifecycle__grid">
           <article>
-            <div className="lifecycle-art before-art">
-              <div className="mini-invitation">
+            <div className="lifecycle-card__art lifecycle-card__art--before">
+              <div className="lifecycle-card__mini-invitation">
                 <span>WITH OUR FAVORITE PEOPLE</span>
                 <strong>
                   Let’s make
@@ -32,7 +32,7 @@ export function EventLifecycle() {
                 <QrCode size={56} strokeWidth={1.1} aria-hidden="true" />
                 <small>Scan. Share. Celebrate.</small>
               </div>
-              <span className="placement-tag">
+              <span className="lifecycle-card__tag">
                 Invitations · Tables · Welcome signs
               </span>
             </div>
@@ -44,11 +44,11 @@ export function EventLifecycle() {
             </p>
           </article>
           <article>
-            <div className="lifecycle-art during-art">
-              <div className="live-wall-label">
+            <div className="lifecycle-card__art lifecycle-card__art--during">
+              <div className="lifecycle-card__live-wall-label">
                 <span className="status-dot" /> LIVE WALL CONCEPT
               </div>
-              <div className="mini-wall">
+              <div className="lifecycle-card__mini-wall">
                 {["couple", "table", "celebration", "flowers"].map((name) => (
                   <div key={name}>
                     <Image
@@ -60,7 +60,7 @@ export function EventLifecycle() {
                   </div>
                 ))}
               </div>
-              <span className="wall-notice">
+              <span className="lifecycle-card__wall-notice">
                 <Heart size={14} aria-hidden="true" /> A new perspective just
                 arrived.
               </span>
@@ -73,20 +73,22 @@ export function EventLifecycle() {
             </p>
           </article>
           <article>
-            <div className="lifecycle-art after-art">
-              <span className="reminder-day">THE MORNING AFTER</span>
-              <div className="reminder-message">
+            <div className="lifecycle-card__art lifecycle-card__art--after">
+              <span className="lifecycle-card__reminder-day">
+                THE MORNING AFTER
+              </span>
+              <div className="lifecycle-card__reminder-message">
                 <span>One more thing…</span>
                 <p>
                   Got photos from last night?
                   <br />
                   Share them here.
                 </p>
-                <span className="reminder-link">
+                <span className="lifecycle-card__reminder-link">
                   Your event link <ArrowRight size={14} aria-hidden="true" />
                 </span>
               </div>
-              <span className="reminder-icon">
+              <span className="lifecycle-card__reminder-icon">
                 <Send size={20} strokeWidth={1.3} aria-hidden="true" />
               </span>
             </div>

@@ -80,6 +80,7 @@ type PricingPlan = {
   available: boolean;
   cta: string;
 };
+
 // Placeholder configuration: no commercial prices, quotas, or paid offers have been approved.
 export const pricingPlans: PricingPlan[] = [
   {

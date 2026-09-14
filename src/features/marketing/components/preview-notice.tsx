@@ -20,14 +20,15 @@ export function PreviewNotice({
   className?: string;
 }) {
   const notice = previewNotices[kind];
+
   return (
     <Dialog>
-      <DialogTrigger className={className ?? "footer-link"}>
+      <DialogTrigger className={className ?? "site-footer__link"}>
         {children}
       </DialogTrigger>
       <DialogContent>
         <span className="eyebrow mb-4">CANDIDCROWD · FIRST CHAPTER</span>
-        <DialogTitle className="notice-title">{notice.title}</DialogTitle>
+        <DialogTitle className="notice__title">{notice.title}</DialogTitle>
         <DialogDescription className="mt-5 text-sm leading-relaxed text-muted-foreground">
           {notice.body}
         </DialogDescription>

@@ -14,3 +14,4 @@ The two automatic design-system searches returned wedding invitation / motion-he
 - Main actions use at least 44px targets. 375px mobile, tablet, landscape, and desktop layouts must remain usable without horizontal overflow.
 - UI copy is English for the first homepage, following the supplied homepage messaging. Event domain remains generic; wedding-specific names are sample content only.
 - Never suggest preview media has been uploaded, that a draft is live, or that unspecified pricing/limits are established product policy.
+- CSS classes follow the BEM (Block Element Modifier) convention: `block`, `block__element`, and `block--modifier` / `block__element--modifier`. Utility classes are reserved for global layout (`container`, `section-pad`, `eyebrow`, `center-heading`).

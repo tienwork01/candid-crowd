@@ -22,6 +22,7 @@ export function HeroScene() {
   const reduced = useReducedMotion();
   const upload = useUploadPreview(inView);
   const done = upload.phase === "success";
+
   return (
     <div
       ref={ref}
@@ -29,27 +30,27 @@ export function HeroScene() {
       data-renderer={threeReady ? "webgl" : "fallback"}
       aria-label="Interactive preview: a guest phone shares a photo into an event gallery"
     >
-      <div className="scene-orbit" aria-hidden="true" />
+      <div className="hero-scene__orbit" aria-hidden="true" />
       <HeroThree
         progress={upload.progress}
         active={inView}
         onReady={setThreeReady}
       />
       {threeReady && (
-        <span className="hero-three-label">
+        <span className="hero-scene__label">
           LIVE 3D PREVIEW · MOVE TO EXPLORE
         </span>
       )}
-      <div className="scene-gallery">
-        <div className="scene-gallery-top">
+      <div className="hero-scene__gallery">
+        <div className="hero-scene__gallery-top">
           <div>
             <span className="eyebrow">THE SHARED GALLERY</span>
             <h2>{sampleEvent.name}</h2>
           </div>
           <LockKeyhole size={14} aria-hidden="true" />
         </div>
-        <div className="scene-gallery-photos">
-          <div className="scene-cover">
+        <div className="hero-scene__gallery-photos">
+          <div className="hero-scene__cover">
             <Image
               src={photos.couple.src}
               alt={photos.couple.alt}
@@ -58,7 +59,7 @@ export function HeroScene() {
               priority
             />
           </div>
-          <div className="scene-tile">
+          <div className="hero-scene__tile">
             <Image
               src={photos.table.src}
               alt={photos.table.alt}
@@ -66,7 +67,7 @@ export function HeroScene() {
               sizes="160px"
             />
           </div>
-          <div className="scene-tile scene-new">
+          <div className="hero-scene__tile hero-scene__tile--new scene-new">
             {done ? (
               <m.div
                 className="image-fill"
@@ -88,17 +89,17 @@ export function HeroScene() {
             )}
           </div>
         </div>
-        <span className="scene-caption">
+        <span className="hero-scene__caption">
           Every guest. A different perspective.
         </span>
       </div>
-      <div className="scene-phone">
-        <div className="phone-speaker" aria-hidden="true" />
-        <div className="phone-topline">
+      <div className="hero-scene__phone">
+        <div className="hero-scene__speaker" aria-hidden="true" />
+        <div className="hero-scene__topline">
           9:41 <span aria-hidden="true">•••</span>
         </div>
         <span className="eyebrow">YOUR GUEST’S PHONE</span>
-        <div className="phone-photo">
+        <div className="hero-scene__phone-photo">
           <Image
             src={photos.celebration.src}
             alt={photos.celebration.alt}
@@ -107,12 +108,12 @@ export function HeroScene() {
             priority
           />
         </div>
-        <div className="phone-action">
+        <div className="hero-scene__phone-action">
           <ImagePlus size={16} aria-hidden="true" />
           <span>One little moment.</span>
         </div>
         <Button
-          className="scene-share"
+          className="hero-scene__share"
           size="sm"
           disabled={upload.phase === "uploading"}
           onClick={done ? upload.reset : upload.start}
@@ -129,18 +130,18 @@ export function HeroScene() {
             </>
           )}
         </Button>
-        <span className="phone-footnote">Interactive preview</span>
+        <span className="hero-scene__phone-footnote">Interactive preview</span>
       </div>
-      <div className="scene-connection" aria-hidden="true">
+      <div className="hero-scene__connection" aria-hidden="true">
         <ArrowRight size={25} strokeWidth={1.3} />
       </div>
       <m.div
-        className="scene-status"
+        className="hero-scene__status"
         initial={false}
         animate={{ scale: !reduced && done ? 1.02 : 1 }}
         role="status"
       >
-        <span className="notification-icon">
+        <span className="hero-scene__notification-icon">
           {done ? (
             <Check size={18} aria-hidden="true" />
           ) : (
@@ -162,7 +163,7 @@ export function HeroScene() {
           </span>
         </div>
       </m.div>
-      <div className="scene-legend">
+      <div className="hero-scene__legend">
         <span>Guest phone</span>
         <ArrowRight aria-hidden="true" />
         <span>Share</span>

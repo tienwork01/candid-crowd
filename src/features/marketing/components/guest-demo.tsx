@@ -33,6 +33,7 @@ export function GuestDemo() {
   const upload = useUploadPreview(inView);
   const busy = upload.phase === "uploading";
   const complete = upload.phase === "success";
+
   useEffect(
     () => () => {
       generation.current++;
@@ -62,13 +63,18 @@ export function GuestDemo() {
     urls.current.forEach(URL.revokeObjectURL);
     urls.current = [];
   }
+
   async function addFiles(files: FileList | null) {
     if (!files?.length || busy || complete || readingRef.current) return;
+
     const currentGeneration = ++generation.current;
+
     readingRef.current = true;
     setReading(true);
+
     const accepted: MarketingPhoto[] = [];
     let rejected = 0;
+
     for (const file of Array.from(files)) {
       if (
         !guestDemo.acceptedTypes.includes(file.type) ||
@@ -78,33 +84,42 @@ export function GuestDemo() {
         rejected++;
         continue;
       }
+
       const src = URL.createObjectURL(file);
       // Validate decodability as well as MIME; no upload request is made.
       const valid = await new Promise<boolean>((resolve) => {
         const image = new window.Image();
         const timeout = window.setTimeout(() => resolve(false), 5000);
+
         image.onload = () => {
           window.clearTimeout(timeout);
           resolve(true);
         };
+
         image.onerror = () => {
           window.clearTimeout(timeout);
           resolve(false);
         };
+
         image.src = src;
       });
+
       if (currentGeneration !== generation.current) {
         URL.revokeObjectURL(src);
+
         return;
       }
+
       if (!valid) {
         URL.revokeObjectURL(src);
         rejected++;
         continue;
       }
+
       urls.current.push(src);
       accepted.push({ id: crypto.randomUUID(), src, alt: file.name });
     }
+
     setSelected((current) =>
       [...current, ...accepted].slice(0, guestDemo.maxPhotos),
     );
@@ -150,8 +165,8 @@ export function GuestDemo() {
           </h2>
           <p>You’re the guest. Try it yourself.</p>
         </div>
-        <div className="guest-demo-layout">
-          <div className="demo-invitation">
+        <div className="guest-demo__layout">
+          <div className="guest-demo__invitation">
             <DemoQr />
             <Button
               variant="outline"
@@ -162,16 +177,18 @@ export function GuestDemo() {
             >
               Try without scanning <ArrowRight aria-hidden="true" />
             </Button>
-            <span className="preview-caption">No sign-up. Just jump in.</span>
+            <span className="guest-demo__caption">
+              No sign-up. Just jump in.
+            </span>
           </div>
           <div className="guest-phone">
-            <div className="phone-speaker" aria-hidden="true" />
-            <div className="guest-phone-intro">
+            <div className="guest-phone__speaker" aria-hidden="true" />
+            <div className="guest-phone__intro">
               <span className="eyebrow">YOU’RE INVITED TO</span>
               <h3>{sampleEvent.name}</h3>
               <p>{sampleEvent.disclosure}</p>
             </div>
-            <ol className="guest-step-indicator" aria-label="Demo progress">
+            <ol className="guest-phone__steps" aria-label="Demo progress">
               {["Open", "Choose", "Share"].map((step, index) => (
                 <li
                   key={step}
@@ -191,10 +208,10 @@ export function GuestDemo() {
                 </li>
               ))}
             </ol>
-            <div className="guest-phone-body">
+            <div className="guest-phone__body">
               {!opened ? (
                 <>
-                  <div className="guest-welcome-photo">
+                  <div className="guest-phone__welcome-photo">
                     <Image
                       src="/images/couple.jpg"
                       alt="A fictional wedding demo gallery"
@@ -212,10 +229,10 @@ export function GuestDemo() {
                 </>
               ) : (
                 <>
-                  <div className="selected-photo-grid">
+                  <div className="guest-phone__photo-grid">
                     {selected.length ? (
                       selected.map((photo) => (
-                        <div key={photo.id} className="selected-photo">
+                        <div key={photo.id} className="guest-phone__photo">
                           <Image
                             src={photo.src}
                             alt={photo.alt}
@@ -225,7 +242,7 @@ export function GuestDemo() {
                           />
                           {!busy && !complete && (
                             <button
-                              className="remove-photo"
+                              className="guest-phone__remove-photo"
                               disabled={reading}
                               aria-label={`Remove ${photo.alt}`}
                               onClick={() =>
@@ -242,7 +259,7 @@ export function GuestDemo() {
                         </div>
                       ))
                     ) : (
-                      <div className="select-placeholder">
+                      <div className="guest-phone__placeholder">
                         <ImagePlus
                           size={30}
                           strokeWidth={1.2}
@@ -312,13 +329,13 @@ export function GuestDemo() {
                     </Button>
                   )}
                   {busy && (
-                    <div className="upload-feedback">
-                      <div className="upload-progress-label">
+                    <div className="guest-phone__upload-feedback">
+                      <div className="guest-phone__progress-label">
                         <span>Sharing your moments</span>
                         <span>{upload.progress}%</span>
                       </div>
                       <div
-                        className="upload-track"
+                        className="guest-phone__upload-track"
                         role="progressbar"
                         aria-label="Simulated photo upload"
                         aria-valuemin={0}
@@ -342,7 +359,7 @@ export function GuestDemo() {
                   )}
                   {complete && (
                     <m.div
-                      className="upload-success"
+                      className="guest-phone__upload-success"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                     >
@@ -358,23 +375,23 @@ export function GuestDemo() {
                     </m.div>
                   )}
                   {error && (
-                    <p role="alert" className="form-error">
+                    <p role="alert" className="guest-phone__error form-error">
                       {error}
                     </p>
                   )}
-                  <p className="guest-phone-status" role="status">
+                  <p className="guest-phone__status" role="status">
                     {status}
                   </p>
                 </>
               )}
             </div>
-            <button className="text-button demo-reset" onClick={reset}>
+            <button className="text-button guest-phone__reset" onClick={reset}>
               <RotateCcw size={14} aria-hidden="true" /> Reset demo
             </button>
           </div>
-          <div id="demo-gallery" className="demo-gallery-wrap">
+          <div id="demo-gallery" className="guest-demo__gallery-wrap">
             <DemoGallery photos={galleryPhotos} />
-            <div className="demo-gallery-note">
+            <div className="guest-demo__gallery-note">
               <ArrowRight size={20} aria-hidden="true" />
               <span>
                 From their phone.
@@ -384,7 +401,7 @@ export function GuestDemo() {
             </div>
           </div>
         </div>
-        <p className="demo-disclosure">
+        <p className="guest-demo__disclosure">
           <LockKeyhole size={14} aria-hidden="true" /> Simulated experience · No
           photos are uploaded · Reloading clears the demo
         </p>

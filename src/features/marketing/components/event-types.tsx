@@ -11,9 +11,10 @@ export function EventTypes() {
   const [active, setActive] = useState<string>(eventTypes[0].id);
   const selected =
     eventTypes.find((item) => item.id === active) ?? eventTypes[0];
+
   return (
     <section
-      className="event-types-section section-pad"
+      className="event-types section-pad"
       id="events"
       aria-labelledby="events-title"
     >
@@ -30,8 +31,8 @@ export function EventTypes() {
             </h2>
           </div>
         </div>
-        <div className="event-types-layout">
-          <div className="event-wedding-photo">
+        <div className="event-types__layout">
+          <div className="event-types__photo">
             <Image
               src="/images/couple.jpg"
               alt="A wedding celebration with the couple surrounded by their guests"
@@ -44,10 +45,10 @@ export function EventTypes() {
               <em>And all the days worth keeping.</em>
             </span>
           </div>
-          <div className="event-type-options">
+          <div className="event-types__options">
             <span className="eyebrow">WHAT ARE YOU CELEBRATING?</span>
             <div
-              className="event-type-buttons"
+              className="event-types__buttons"
               aria-label="Explore event types"
             >
               {eventTypes.map((item) => (

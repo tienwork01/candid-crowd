@@ -10,24 +10,25 @@ import { type MarketingPhoto, sampleEvent, guestDemo } from "../data/marketing";
 export function DemoGallery({ photos }: { photos: MarketingPhoto[] }) {
   const [selected, setSelected] = useState<MarketingPhoto | null>(null);
   const reduced = useReducedMotion();
+
   return (
-    <div className="guest-gallery">
-      <div className="guest-gallery-top">
+    <div className="demo-gallery">
+      <div className="demo-gallery__top">
         <div>
           <span className="eyebrow">THE SHARED GALLERY</span>
           <h3>{sampleEvent.name}</h3>
         </div>
         <LockKeyhole size={17} aria-hidden="true" />
       </div>
-      <div className="guest-gallery-label">
+      <div className="demo-gallery__label">
         <span>Our memories</span>
         <span>{photos.length} photos · Demo</span>
       </div>
-      <div className="guest-gallery-grid">
+      <div className="demo-gallery__grid">
         {photos.map((photo) => (
           <m.button
             key={photo.id}
-            className="demo-photo"
+            className="demo-gallery__photo demo-photo"
             initial={
               guestDemo.initialPhotos.some((item) => item.id === photo.id)
                 ? false
@@ -44,13 +45,15 @@ export function DemoGallery({ photos }: { photos: MarketingPhoto[] }) {
               sizes="(max-width: 600px) 40vw, 180px"
               unoptimized={photo.src.startsWith("blob:")}
             />
-            <span className="photo-expand">
+            <span className="demo-gallery__expand">
               <Plus size={16} aria-hidden="true" />
             </span>
           </m.button>
         ))}
       </div>
-      <p className="gallery-caption">A whole day, seen through their eyes.</p>
+      <p className="demo-gallery__caption">
+        A whole day, seen through their eyes.
+      </p>
       <Dialog
         open={selected !== null}
         onOpenChange={(open) => {
@@ -61,7 +64,7 @@ export function DemoGallery({ photos }: { photos: MarketingPhoto[] }) {
           <DialogTitle className="sr-only">Photo preview</DialogTitle>
           {selected && (
             <>
-              <div className="lightbox-image">
+              <div className="photo-viewer__image">
                 <Image
                   src={selected.src}
                   alt={selected.alt}

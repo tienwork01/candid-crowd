@@ -1,6 +1,7 @@
 "use client";
 
 import { LazyMotion, MotionConfig } from "motion/react";
+
 const loadFeatures = () =>
   import("./motion-features").then((module) => module.default);
 

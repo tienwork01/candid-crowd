@@ -5,6 +5,7 @@ test("homepage hierarchy, accessibility and responsive widths", async ({
   page,
 }) => {
   const errors: string[] = [];
+
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
@@ -36,6 +37,7 @@ test("homepage hierarchy, accessibility and responsive widths", async ({
         .analyze()
     ).violations,
   ).toEqual([]);
+
   for (const width of [375, 390, 430, 768, 1024, 1440, 1920]) {
     await page.setViewportSize({ width, height: 900 });
     expect(
@@ -45,6 +47,7 @@ test("homepage hierarchy, accessibility and responsive widths", async ({
       `overflow at ${width}px`,
     ).toBe(true);
   }
+
   await page.setViewportSize({ width: 812, height: 375 });
   expect(
     await page.evaluate(
@@ -58,20 +61,24 @@ test("hero illustrates a memory joining the gallery and can replay", async ({
   page,
 }) => {
   await page.goto("/");
+
   const hero = page.locator(".hero-scene");
+
   await hero.getByRole("button", { name: "Share a memory" }).click();
   await expect(hero.getByRole("status")).toContainText(
     "A new memory, together.",
     { timeout: 12000 },
   );
+
   if ((await hero.getAttribute("data-renderer")) === "webgl") {
-    await expect(hero.locator(".hero-three-canvas")).toHaveAttribute(
+    await expect(hero.locator(".hero-scene__canvas")).toHaveAttribute(
       "data-progress",
       "1",
     );
   } else {
-    await expect(hero.locator(".scene-new img")).toBeVisible();
+    await expect(hero.locator(".hero-scene__tile--new img")).toBeVisible();
   }
+
   await hero.getByRole("button", { name: "Try again" }).click();
   await expect(
     hero.getByRole("button", { name: "Share a memory" }),
@@ -82,15 +89,18 @@ test("guest simulation selects, uploads, retries, views and resets without reque
   page,
 }) => {
   const writes: string[] = [];
+
   page.on("request", (request) => {
     if (["POST", "PUT", "PATCH"].includes(request.method()))
       writes.push(request.url());
   });
   await page.goto("/#demo");
+
   const demo = page.locator("#demo");
+
   await demo.getByRole("button", { name: "Try without scanning" }).click();
   await demo.getByRole("button", { name: "Use sample photos" }).click();
-  await expect(demo.locator(".demo-photo")).toHaveCount(3);
+  await expect(demo.locator(".demo-gallery__photo")).toHaveCount(3);
   await demo.getByRole("button", { name: "Upload 2 photos" }).click();
   await expect(page.getByRole("progressbar")).toBeVisible();
   await demo.getByRole("button", { name: "Simulate an interruption" }).click();
@@ -99,20 +109,22 @@ test("guest simulation selects, uploads, retries, views and resets without reque
   await expect(demo.getByRole("status")).toContainText("2 photos added", {
     timeout: 12000,
   });
-  await expect(demo.locator(".demo-photo")).toHaveCount(5);
-  await demo.locator(".demo-photo").first().click();
+  await expect(demo.locator(".demo-gallery__photo")).toHaveCount(5);
+  await demo.locator(".demo-gallery__photo").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).not.toBeVisible();
   await demo.getByRole("button", { name: "Reset demo" }).click();
-  await expect(demo.locator(".demo-photo")).toHaveCount(3);
+  await expect(demo.locator(".demo-gallery__photo")).toHaveCount(3);
   await expect(demo.getByRole("button", { name: "Open event" })).toBeVisible();
   expect(writes).toEqual([]);
 });
 
 test("real local photo validation and upload preview", async ({ page }) => {
   await page.goto("/?demo=open#demo");
+
   const demo = page.locator("#demo");
+
   await expect(
     demo.getByRole("button", { name: "Add photos", exact: true }),
   ).toBeVisible();
@@ -132,18 +144,20 @@ test("real local photo validation and upload preview", async ({ page }) => {
   await expect(demo.getByRole("status")).toContainText("1 photo added", {
     timeout: 12000,
   });
-  await expect(demo.locator(".demo-photo")).toHaveCount(4);
+  await expect(demo.locator(".demo-gallery__photo")).toHaveCount(4);
 });
 
 test("reset during upload cancels completion", async ({ page }) => {
   await page.goto("/?demo=open#demo");
+
   const demo = page.locator("#demo");
+
   await demo.getByRole("button", { name: "Use sample photos" }).click();
   await demo.getByRole("button", { name: "Upload 2 photos" }).click();
   await demo.getByRole("button", { name: "Reset demo" }).click();
   await expect(demo.getByRole("button", { name: "Open event" })).toBeVisible();
   await page.waitForTimeout(2500);
-  await expect(demo.locator(".demo-photo")).toHaveCount(3);
+  await expect(demo.locator(".demo-gallery__photo")).toHaveCount(3);
 });
 
 test("navigation, preview dialogs and event types work with keyboard", async ({
@@ -167,7 +181,9 @@ test("navigation, preview dialogs and event types work with keyboard", async ({
   await expect(page.locator("#event-description")).toContainText(
     "Another year.",
   );
+
   const privacy = page.getByRole("button", { name: "Privacy", exact: true });
+
   await privacy.click();
   await expect(page.getByRole("dialog")).toContainText("not uploaded");
   expect(
@@ -188,6 +204,7 @@ test("navigation, preview dialogs and event types work with keyboard", async ({
 
 test("reduced motion and text zoom preserve usability", async ({ page }) => {
   const errors: string[] = [];
+
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
   });
@@ -199,10 +216,12 @@ test("reduced motion and text zoom preserve usability", async ({ page }) => {
       () => getComputedStyle(document.documentElement).scrollBehavior,
     ),
   ).toBe("auto");
+
   const cta = page
-    .locator(".hero-copy")
+    .locator(".hero__copy")
     .getByRole("link", { name: "Create your event free" });
   const bounds = await cta.boundingBox();
+
   expect(bounds && bounds.y + bounds.height < 812).toBeTruthy();
   await page.addStyleTag({ content: "html { font-size: 200%; }" });
   expect(

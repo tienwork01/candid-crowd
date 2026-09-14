@@ -19,7 +19,7 @@ export function ProblemSection() {
         <p>At every table. In every hug. On every corner of the dance floor.</p>
       </div>
       <Reveal>
-        <div className="perspectives-grid">
+        <div className="problem-section__grid">
           {[
             {
               photo: photos.table,
@@ -56,12 +56,12 @@ export function ProblemSection() {
             </figure>
           ))}
         </div>
-        <div className="perspective-tags">
+        <div className="problem-section__tags">
           <span>Dance-floor videos</span>
           <span>Group selfies</span>
           <span>One more unforgettable moment</span>
         </div>
-        <div className="memories-together">
+        <div className="problem-section__summary">
           <ArrowDown size={30} strokeWidth={1} aria-hidden="true" />
           <span>
             <Aperture size={23} strokeWidth={1.3} aria-hidden="true" /> All

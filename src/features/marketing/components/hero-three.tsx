@@ -16,6 +16,7 @@ export function HeroThree({
   const host = useRef<HTMLDivElement>(null);
   const renderer = useRef<HeroRenderer | null>(null);
   const latest = useRef({ progress, active });
+
   useEffect(() => {
     const element = host.current!;
     const abort = new AbortController();
@@ -26,13 +27,16 @@ export function HeroThree({
     };
     let timer: ReturnType<typeof setTimeout>;
     let generation = 0;
+
     function stop() {
       renderer.current?.dispose();
       renderer.current = null;
       onReady(false);
     }
+
     function initialize() {
       const current = ++generation;
+
       clearTimeout(timer);
       stop();
       if (
@@ -45,17 +49,22 @@ export function HeroThree({
       timer = setTimeout(async () => {
         try {
           const { createHeroRenderer } = await import("./hero-three-renderer");
+
           if (abort.signal.aborted || media.matches || current !== generation)
             return;
+
           const instance = await createHeroRenderer(
             element,
             abort.signal,
             stop,
           );
+
           if (abort.signal.aborted || media.matches || current !== generation) {
             instance.dispose();
+
             return;
           }
+
           renderer.current = instance;
           instance.update(latest.current.progress / 100, latest.current.active);
           onReady(true);
@@ -64,8 +73,10 @@ export function HeroThree({
         }
       }, 700);
     }
+
     initialize();
     media.addEventListener("change", initialize);
+
     return () => {
       abort.abort();
       clearTimeout(timer);
@@ -77,5 +88,12 @@ export function HeroThree({
     latest.current = { progress, active };
     renderer.current?.update(progress / 100, active);
   }, [progress, active]);
-  return <div ref={host} className="hero-three-canvas" aria-hidden="true" />;
+
+  return (
+    <div
+      ref={host}
+      className="hero-scene__canvas hero-three-canvas"
+      aria-hidden="true"
+    />
+  );
 }

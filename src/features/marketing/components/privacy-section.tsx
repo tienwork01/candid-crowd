@@ -1,4 +1,5 @@
 import { Check, LockKeyhole } from "lucide-react";
+
 const assurances = [
   "No guest account",
   "No app installation",
@@ -7,6 +8,7 @@ const assurances = [
   "Host controls the event",
   "Modern iPhone & Android browsers",
 ];
+
 export function PrivacySection() {
   return (
     <section
@@ -14,7 +16,7 @@ export function PrivacySection() {
       className="privacy-section container section-pad"
       aria-labelledby="privacy-title"
     >
-      <div className="privacy-intro">
+      <div className="privacy-section__intro">
         <LockKeyhole size={30} strokeWidth={1.2} aria-hidden="true" />
         <div>
           <span className="eyebrow">YOUR PEOPLE. YOUR MOMENTS.</span>
@@ -31,7 +33,7 @@ export function PrivacySection() {
         </div>
       </div>
       <div>
-        <ul className="privacy-list">
+        <ul className="privacy-section__list">
           {assurances.map((item) => (
             <li key={item}>
               <Check size={16} aria-hidden="true" /> {item}

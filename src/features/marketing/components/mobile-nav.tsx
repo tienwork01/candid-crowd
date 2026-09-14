@@ -10,15 +10,19 @@ import { PreviewNotice } from "./preview-notice";
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     const breakpoint = matchMedia("(min-width: 1024px)");
     const close = () => setOpen(false);
+
     breakpoint.addEventListener("change", close);
+
     return () => breakpoint.removeEventListener("change", close);
   }, []);
+
   return (
     <div
-      className="mobile-navigation"
+      className="mobile-nav"
       onKeyDown={(event) => {
         if (event.key === "Escape") {
           setOpen(false);
@@ -40,7 +44,7 @@ export function MobileNav() {
       {open && (
         <nav
           id="mobile-nav"
-          className="mobile-menu"
+          className="mobile-nav__menu"
           aria-label="Mobile navigation"
         >
           {navigation.map((item) => (
@@ -48,7 +52,7 @@ export function MobileNav() {
               {item.label}
             </a>
           ))}
-          <PreviewNotice kind="login" className="mobile-login">
+          <PreviewNotice kind="login" className="mobile-nav__login">
             Log in
           </PreviewNotice>
           <Link

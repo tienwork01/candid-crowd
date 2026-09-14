@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Aperture, ArrowUpRight } from "lucide-react";
+
 export function FinalCta() {
   return (
     <section className="final-cta" aria-labelledby="final-title">

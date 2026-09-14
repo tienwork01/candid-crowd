@@ -26,7 +26,7 @@ export default function CreatePage() {
           <br />
           <em>has a story.</em>
         </h1>
-        <p className="intro">
+        <p className="create-page__intro">
           Start with the essentials. This preview saves a draft on this device
           so you can explore the experience.
         </p>

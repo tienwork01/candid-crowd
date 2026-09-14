@@ -24,7 +24,7 @@ const steps = [
 export function HowItWorks() {
   return (
     <section
-      className="how-section section-pad"
+      className="how-it-works section-pad"
       id="how-it-works"
       aria-labelledby="how-title"
     >
@@ -44,16 +44,16 @@ export function HowItWorks() {
             from first scan to last dance.
           </p>
         </div>
-        <div className="how-grid">
+        <div className="how-it-works__grid">
           {steps.map(({ title, description, detail, Icon }, index) => (
             <article className="how-step" key={title}>
-              <div className="step-top">
+              <div className="how-step__top">
                 <span>0{index + 1}</span>
                 <Icon size={29} strokeWidth={1.2} aria-hidden="true" />
               </div>
               <h3>{title}</h3>
               <p>{description}</p>
-              <span className="step-detail">{detail}</span>
+              <span className="how-step__detail">{detail}</span>
             </article>
           ))}
         </div>

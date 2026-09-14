@@ -11,12 +11,15 @@ export function EventDraftForm() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const resultHeading = useRef<HTMLHeadingElement>(null);
+
   useEffect(() => {
     // Browser storage is unavailable during SSR; restore once after hydration.
     try {
       const raw = localStorage.getItem(EVENT_DRAFT_KEY);
+
       if (raw) {
         const value: unknown = JSON.parse(raw);
+
         // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from browser-only storage
         if (isEventDraft(value)) setDraft(value);
       }
@@ -30,15 +33,19 @@ export function EventDraftForm() {
 
   function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     const form = new FormData(event.currentTarget);
     const name = String(form.get("name") ?? "").trim();
+
     if (!name) {
       setError("Please enter an event name, not just spaces.");
       event.currentTarget
         .querySelector<HTMLInputElement>("#event-name")
         ?.focus();
+
       return;
     }
+
     const next: EventDraft = {
       id: draft?.id ?? crypto.randomUUID(),
       name,
@@ -47,10 +54,13 @@ export function EventDraftForm() {
       expectedGuests: Number(form.get("guests")),
       createdAt: draft?.createdAt ?? new Date().toISOString(),
     };
+
     if (!isEventDraft(next)) {
       setError("Please check your event details and try again.");
+
       return;
     }
+
     try {
       localStorage.setItem(EVENT_DRAFT_KEY, JSON.stringify(next));
       setDraft(next);
@@ -66,7 +76,7 @@ export function EventDraftForm() {
   if (saved && draft)
     return (
       <section className="draft-result">
-        <span className="success-icon">
+        <span className="draft-result__icon">
           <Check aria-hidden="true" />
         </span>
         <h2 ref={resultHeading} tabIndex={-1}>
@@ -104,7 +114,7 @@ export function EventDraftForm() {
 
   return (
     <form className="event-form" onSubmit={save} key={draft?.id ?? "new"}>
-      <div className="field">
+      <div className="event-form__field">
         <label htmlFor="event-name">Event name</label>
         <input
           id="event-name"
@@ -116,8 +126,8 @@ export function EventDraftForm() {
           aria-describedby={error ? "form-error" : undefined}
         />
       </div>
-      <div className="form-row">
-        <div className="field">
+      <div className="event-form__row">
+        <div className="event-form__field">
           <label htmlFor="event-date">Event date</label>
           <input
             id="event-date"
@@ -127,7 +137,7 @@ export function EventDraftForm() {
             required
           />
         </div>
-        <div className="field">
+        <div className="event-form__field">
           <label htmlFor="event-type">What are we celebrating?</label>
           <select
             id="event-type"
@@ -140,7 +150,7 @@ export function EventDraftForm() {
           </select>
         </div>
       </div>
-      <div className="field">
+      <div className="event-form__field">
         <label htmlFor="event-guests">Expected guests</label>
         <input
           id="event-guests"
@@ -154,14 +164,14 @@ export function EventDraftForm() {
         />
       </div>
       {error && (
-        <p id="form-error" role="alert" className="form-error">
+        <p id="form-error" role="alert" className="event-form__error">
           {error}
         </p>
       )}
       <button className="button" type="submit">
         Save my event draft <ArrowRight size={17} aria-hidden="true" />
       </button>
-      <p className="form-note">
+      <p className="event-form__note">
         Free preview · Stored only in this browser · No account required
       </p>
     </form>
