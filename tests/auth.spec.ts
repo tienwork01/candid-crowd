@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+import { expect, test } from "@playwright/test";
 
 test("auth routes are accessible and link to each other", async ({ page }) => {
   await page.goto("/login");
@@ -11,14 +11,12 @@ test("auth routes are accessible and link to each other", async ({ page }) => {
     "autocomplete",
     "current-password",
   );
-  await page.getByRole("button", { name: "Forgot password?" }).click();
-  await expect(page.getByRole("dialog")).toContainText(
-    "No email has been sent",
-  );
-  await page.keyboard.press("Escape");
+  await page.getByRole("link", { name: "Forgot password?" }).click();
+  await expect(page).toHaveURL(/\/forgot-password$/);
   await expect(
-    page.getByRole("button", { name: "Forgot password?" }),
-  ).toBeFocused();
+    page.getByRole("heading", { name: "Find your way back." }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Log in" }).click();
   expect(
     (
       await new AxeBuilder({ page })
@@ -36,19 +34,30 @@ test("auth routes are accessible and link to each other", async ({ page }) => {
         .analyze()
     ).violations,
   ).toEqual([]);
-  await page.getByRole("link", { name: "Log in", exact: true }).click();
-  await expect(page).toHaveURL(/\/login$/);
 });
 
-test("registration validates consent and keeps credentials local to the form", async ({
+test("registration sends consent to Better Auth and stores no credentials", async ({
   page,
 }) => {
-  const mutations: string[] = [];
+  let registration: Record<string, unknown> | undefined;
 
-  page.on("request", (request) => {
-    if (["POST", "PUT", "PATCH"].includes(request.method()))
-      mutations.push(request.url());
+  await page.route("**/api/auth/sign-up/email", async (route) => {
+    registration = route.request().postDataJSON() as Record<string, unknown>;
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        token: null,
+        user: {
+          id: "better-auth-test-user",
+          name: "Jamie Morgan",
+          email: "jamie@example.com",
+          emailVerified: false,
+        },
+      }),
+    });
   });
+
   await page.goto("/register");
   await page.getByLabel("Full name").fill("Jamie Morgan");
   await page.getByLabel("Email address").fill("jamie@example.com");
@@ -57,37 +66,56 @@ test("registration validates consent and keeps credentials local to the form", a
   await expect(page.locator("#password")).toHaveAttribute("type", "text");
   await page.getByRole("button", { name: "Hide password" }).click();
   await expect(page.locator("#password")).toHaveAttribute("type", "password");
-  await page
-    .getByRole("button", { name: "Create account", exact: true })
-    .click();
+  await page.getByRole("button", { name: "Create account" }).click();
   await expect(page.locator("#terms")).toBeFocused();
-  await expect(page.locator(".auth-form__feedback")).toBeEmpty();
-  await page
-    .getByRole("button", { name: "Terms of service", exact: true })
-    .click();
-  await expect(page.getByRole("dialog")).toContainText("being finalized");
-  await page.keyboard.press("Escape");
   await page.locator("#terms").check();
-  await page
-    .getByRole("button", { name: "Create account", exact: true })
-    .click();
-  await expect(page.getByRole("status")).toContainText("not been saved");
+  await page.getByRole("button", { name: "Create account" }).click();
 
-  for (const provider of ["Google", "Apple"]) {
-    await page
-      .getByRole("button", { name: `Continue with ${provider}` })
-      .click();
-    await expect(page.getByRole("status")).toContainText(
-      `${provider} sign-in is not available`,
-    );
-  }
-
-  expect(mutations).toEqual([]);
+  await expect(page).toHaveURL(/\/verify-email\?email=jamie%40example.com$/);
+  expect(registration).toMatchObject({
+    name: "Jamie Morgan",
+    email: "jamie@example.com",
+    termsVersion: "2026-01",
+    privacyVersion: "2026-01",
+  });
+  await expect(
+    page.getByRole("button", { name: "Continue with Google" }),
+  ).toBeHidden();
+  await expect(
+    page.getByRole("button", { name: "Continue with Apple" }),
+  ).toBeHidden();
   expect(
     await page.evaluate(() =>
       JSON.stringify({ ...localStorage, ...sessionStorage }),
     ),
   ).not.toContain("sample-only-password");
-  await page.reload();
+  await page.goto("/register");
   await expect(page.locator("#password")).toHaveValue("");
+});
+
+test("login calls Better Auth and honors only a safe relative redirect", async ({
+  page,
+}) => {
+  await page.route("**/api/auth/sign-in/email", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        redirect: false,
+        token: "opaque-session-token",
+        user: {
+          id: "better-auth-test-user",
+          name: "Jamie Morgan",
+          email: "jamie@example.com",
+          emailVerified: true,
+        },
+      }),
+    });
+  });
+
+  await page.goto("/login?next=//attacker.example");
+  await page.getByLabel("Email address").fill("jamie@example.com");
+  await page.locator("#password").fill("sample-only-password");
+  await page.getByRole("button", { name: "Log in" }).click();
+  await expect(page).toHaveURL(/\/create$/);
 });

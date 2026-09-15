@@ -24,6 +24,11 @@ export function Pricing() {
             key={plan.id}
             className={`plan-card ${plan.featured ? "plan-card--featured" : ""}`}
           >
+            {plan.featured ? (
+              <span className="plan-card__recommendation">
+                Most loved for a full celebration
+              </span>
+            ) : null}
             <span className="eyebrow">
               {plan.available ? "AVAILABLE TO EXPLORE" : "PLANNED OFFERING"}
             </span>
@@ -31,6 +36,11 @@ export function Pricing() {
             <p>{plan.description}</p>
             <div className="plan-card__price">{plan.priceLabel}</div>
             <span className="plan-card__billing">{plan.billing}</span>
+            {plan.featured ? (
+              <p className="plan-card__note">
+                The essentials for bringing every guest perspective together.
+              </p>
+            ) : null}
             <ul>
               {plan.features.map((feature) => (
                 <li key={feature}>

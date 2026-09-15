@@ -34,8 +34,8 @@ export function EventTypes() {
         <div className="event-types__layout">
           <div className="event-types__photo">
             <Image
-              src="/images/couple.jpg"
-              alt="A wedding celebration with the couple surrounded by their guests"
+              src="/images/wedding-sunset.webp"
+              alt="A bride and groom smiling at each other in warm sunset light"
               fill
               sizes="(max-width: 768px) 90vw, 580px"
             />

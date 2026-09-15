@@ -18,13 +18,13 @@ export const photos = {
   },
   celebration: {
     id: "celebration",
-    src: "/images/celebration.jpg",
-    alt: "A wedding bouquet held close in warm evening light",
+    src: "/images/wedding-sunset.webp",
+    alt: "A bride and groom smiling at each other in warm sunset light",
   },
   couple: {
     id: "couple",
-    src: "/images/couple.jpg",
-    alt: "Newlyweds releasing balloons with their guests",
+    src: "/images/wedding-meadow.webp",
+    alt: "A bride and groom in ivory wedding attire in a sunlit meadow",
   },
   table: {
     id: "table",

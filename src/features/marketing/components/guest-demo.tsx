@@ -213,7 +213,7 @@ export function GuestDemo() {
                 <>
                   <div className="guest-phone__welcome-photo">
                     <Image
-                      src="/images/couple.jpg"
+                      src="/images/wedding-meadow.webp"
                       alt="A fictional wedding demo gallery"
                       fill
                       sizes="260px"

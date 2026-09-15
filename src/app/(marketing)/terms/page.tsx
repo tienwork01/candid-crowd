@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ShieldCheck,
-  Calendar,
-  RotateCcw,
-  Mail,
-  ArrowLeft,
-  ExternalLink,
-} from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import { Header } from "@/features/marketing/components/header";
 import { Footer } from "@/features/marketing/components/footer";
 import {

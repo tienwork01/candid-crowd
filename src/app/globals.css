@@ -130,10 +130,15 @@
     font: inherit;
   }
   button,
-  a,
-  input,
-  select {
+  a {
     touch-action: manipulation;
+  }
+  input,
+  select,
+  textarea {
+    touch-action: auto;
+    -webkit-user-select: text;
+    user-select: text;
   }
   button,
   a {
@@ -413,6 +418,44 @@
 }
 .mobile-nav {
   display: none;
+}
+.mobile-nav__trigger {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-nav__trigger::-webkit-details-marker {
+  display: none;
+}
+.mobile-nav__trigger:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+.mobile-nav__trigger:active {
+  background: var(--sage);
+}
+.mobile-nav__icon {
+  width: 22px;
+  height: 22px;
+}
+.mobile-nav__icon--close {
+  display: none;
+}
+.mobile-nav[open] .mobile-nav__icon--open {
+  display: none;
+}
+.mobile-nav[open] .mobile-nav__icon--close {
+  display: block;
 }
 .mobile-nav__menu {
   position: absolute;
@@ -1670,16 +1713,71 @@
   margin-top: 50px;
 }
 .plan-card {
+  position: relative;
   border: 1px solid var(--line);
   background: var(--surface);
   border-radius: 12px;
   padding: 30px;
   display: flex;
   flex-direction: column;
+  transition:
+    border-color 200ms,
+    box-shadow 200ms,
+    transform 200ms;
 }
 .plan-card--featured {
-  border-color: var(--primary);
-  background: var(--soft);
+  z-index: 1;
+  border: 0;
+  background: var(--primary);
+  box-shadow: var(--primitive-shadow-floating);
+  color: var(--on-primary);
+  transform: translateY(-14px);
+}
+.plan-card__recommendation {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  transform: translateY(-50%);
+  padding: 7px 12px;
+  background: var(--sage);
+  border: 1px solid var(--surface);
+  border-radius: var(--radius-full);
+  color: var(--primary-active);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.45px;
+  line-height: 1.3;
+  text-align: center;
+}
+.plan-card--featured > .eyebrow,
+.plan-card--featured > p,
+.plan-card--featured .plan-card__billing {
+  color: var(--on-dark-muted);
+}
+.plan-card--featured h3,
+.plan-card--featured .plan-card__price {
+  color: var(--on-primary);
+}
+.plan-card--featured .plan-card__billing {
+  min-height: 0;
+}
+.plan-card__note {
+  margin-top: 14px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.plan-card--featured .plan-card__note {
+  color: var(--on-primary);
+}
+.plan-card:hover {
+  border-color: var(--line-hover);
+  box-shadow: var(--primitive-shadow-card);
+  transform: translateY(-4px);
+}
+.plan-card--featured:hover {
+  border-color: transparent;
+  box-shadow: var(--primitive-shadow-hero);
+  transform: translateY(-18px);
 }
 .plan-card > .eyebrow {
   font-size: 9px;
@@ -1715,6 +1813,9 @@
   border-top: 1px solid var(--line);
   flex: 1;
 }
+.plan-card--featured ul {
+  border-color: rgba(255, 254, 250, 0.24);
+}
 .plan-card li {
   display: flex;
   gap: 8px;
@@ -1727,11 +1828,24 @@
   margin-top: 3px;
   color: var(--primary);
 }
+.plan-card--featured li svg {
+  color: var(--sage);
+}
 .plan-card .button {
   width: 100%;
   font-size: 13px;
   justify-content: space-between;
   gap: 10px;
+}
+.plan-card--featured .button {
+  background: var(--surface);
+  border-color: var(--surface);
+  color: var(--primary-active);
+}
+.plan-card--featured .button:hover {
+  background: var(--sage);
+  border-color: var(--sage);
+  box-shadow: none;
 }
 .final-cta {
   text-align: center;
@@ -2380,6 +2494,9 @@
   .plan-card {
     padding: 22px;
   }
+  .plan-card--featured {
+    transform: translateY(-10px);
+  }
   .plan-card > .eyebrow {
     font-size: 8px;
     letter-spacing: 1px;
@@ -2789,6 +2906,15 @@
   }
   .plan-card {
     padding: 28px;
+  }
+  .plan-card--featured {
+    transform: none;
+  }
+  .plan-card--featured:hover {
+    transform: translateY(-4px);
+  }
+  .plan-card__recommendation {
+    right: 20px;
   }
   .plan-card > .eyebrow {
     font-size: 10px;

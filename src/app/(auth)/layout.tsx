@@ -42,8 +42,8 @@ export default function AuthLayout({
           <div className="auth-page__polaroid">
             <div className="auth-page__polaroid-media">
               <Image
-                src="/images/celebration.jpg"
-                alt="Intimate wedding bouquet candid"
+                src="/images/wedding-sunset.webp"
+                alt="A bride and groom smiling at each other in warm sunset light"
                 fill
                 sizes="240px"
                 quality={85}

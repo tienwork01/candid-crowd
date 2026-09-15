@@ -14,7 +14,10 @@ function reducer(state: State, action: Action): State {
   if (action === "interrupt") return { ...state, phase: "error" };
   if (state.phase !== "uploading") return state;
 
-  const progress = Math.min(state.progress + 10, 100);
+  // Small, frequent milestones give the WebGL renderer a steady target to
+  // interpolate toward. Large, slow steps made the flying photo visibly catch
+  // up to its target between ticks.
+  const progress = Math.min(state.progress + 4, 100);
 
   return { progress, phase: progress === 100 ? "success" : "uploading" };
 }
@@ -36,7 +39,7 @@ export function useUploadPreview(inView: boolean) {
   useEffect(() => {
     if (state.phase !== "uploading" || !visible || !inView) return;
 
-    const timer = window.setInterval(() => dispatch("tick"), 220);
+    const timer = window.setInterval(() => dispatch("tick"), 55);
 
     return () => window.clearInterval(timer);
   }, [state.phase, visible, inView]);

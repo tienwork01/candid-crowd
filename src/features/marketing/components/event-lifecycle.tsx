@@ -49,10 +49,15 @@ export function EventLifecycle() {
                 <span className="status-dot" /> LIVE WALL CONCEPT
               </div>
               <div className="lifecycle-card__mini-wall">
-                {["couple", "table", "celebration", "flowers"].map((name) => (
+                {[
+                  "wedding-meadow.webp",
+                  "table.jpg",
+                  "wedding-sunset.webp",
+                  "flowers.jpg",
+                ].map((name) => (
                   <div key={name}>
                     <Image
-                      src={`/images/${name}.jpg`}
+                      src={`/images/${name}`}
                       alt="An illustrative photo in a sample event wall"
                       fill
                       sizes="160px"

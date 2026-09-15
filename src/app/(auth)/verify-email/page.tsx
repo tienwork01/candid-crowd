@@ -1,0 +1,17 @@
+import type { Metadata } from "next";
+import { AccountRecovery } from "@/features/auth/components/account-recovery";
+
+export const metadata: Metadata = { title: "Verify email - CandidCrowd" };
+
+export default async function VerifyEmailPage({
+  searchParams,
+}: PageProps<"/verify-email">) {
+  const { email } = await searchParams;
+
+  return (
+    <AccountRecovery
+      mode="verify-email"
+      email={typeof email === "string" ? email : undefined}
+    />
+  );
+}

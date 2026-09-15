@@ -2,36 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight, Check } from "lucide-react";
-import { EVENT_DRAFT_KEY, isEventDraft } from "@/features/event/lib/validation";
 import { eventTypes, type EventDraft } from "@/features/event/types/event";
+import { APIError, apiFetch } from "@/lib/api-client";
 
 export function EventDraftForm() {
   const [draft, setDraft] = useState<EventDraft | null>(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const resultHeading = useRef<HTMLHeadingElement>(null);
+  const router = useRouter();
 
-  useEffect(() => {
-    // Browser storage is unavailable during SSR; restore once after hydration.
-    try {
-      const raw = localStorage.getItem(EVENT_DRAFT_KEY);
-
-      if (raw) {
-        const value: unknown = JSON.parse(raw);
-
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- one-time hydration from browser-only storage
-        if (isEventDraft(value)) setDraft(value);
-      }
-    } catch {
-      /* Form remains usable if storage is unavailable. */
-    }
-  }, []);
   useEffect(() => {
     if (saved) resultHeading.current?.focus();
   }, [saved]);
 
-  function save(event: React.FormEvent<HTMLFormElement>) {
+  async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const form = new FormData(event.currentTarget);
@@ -46,29 +33,58 @@ export function EventDraftForm() {
       return;
     }
 
-    const next: EventDraft = {
-      id: draft?.id ?? crypto.randomUUID(),
-      name,
-      date: String(form.get("date")),
-      type: String(form.get("type")) as EventDraft["type"],
-      expectedGuests: Number(form.get("guests")),
-      createdAt: draft?.createdAt ?? new Date().toISOString(),
-    };
-
-    if (!isEventDraft(next)) {
-      setError("Please check your event details and try again.");
-
-      return;
-    }
-
     try {
-      localStorage.setItem(EVENT_DRAFT_KEY, JSON.stringify(next));
+      const response = await apiFetch("/api/v1/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          event_date: `${String(form.get("date"))}T00:00:00Z`,
+          event_type: String(form.get("type")),
+          expected_guest_count: Number(form.get("guests")),
+        }),
+      });
+      const created = (await response.json()) as {
+        id: string;
+        created_at: string;
+      };
+      const next: EventDraft = {
+        id: created.id,
+        name,
+        date: String(form.get("date")),
+        type: String(form.get("type")) as EventDraft["type"],
+        expectedGuests: Number(form.get("guests")),
+        createdAt: created.created_at,
+      };
+
       setDraft(next);
       setError("");
       setSaved(true);
-    } catch {
+    } catch (caught) {
+      if (caught instanceof APIError && caught.status === 401) {
+        router.push("/login?next=/create");
+
+        return;
+      }
+
+      if (caught instanceof APIError && caught.code === "email_unverified") {
+        router.push("/verify-email");
+
+        return;
+      }
+
+      if (caught instanceof APIError && caught.code === "consent_required") {
+        setError(
+          "Please accept the current Terms and Privacy Policy before creating an event.",
+        );
+
+        return;
+      }
+
       setError(
-        "Your browser couldn’t save this draft. Allow site storage, then try again. Your details are still here.",
+        caught instanceof APIError
+          ? caught.message
+          : "We couldn’t create your event. Please try again.",
       );
     }
   }
@@ -84,7 +100,7 @@ export function EventDraftForm() {
           <br />
           <em>{draft.name}.</em>
         </h2>
-        <p>Your event draft is saved on this device.</p>
+        <p>Your event is live and ready for guests.</p>
         <dl>
           <dt>Event type</dt>
           <dd>{draft.type}</dd>
@@ -100,8 +116,8 @@ export function EventDraftForm() {
           <dd>{draft.expectedGuests}</dd>
         </dl>
         <p>
-          This draft isn’t a live event yet. Guest links, QR codes, cloud
-          uploads, and host accounts will be available in a future release.
+          Your event is securely stored in CandidCrowd. Guest links and uploads
+          are now tied to your host account.
         </p>
         <Link href="/#demo" className="button">
           Try the guest experience <ArrowRight size={17} aria-hidden="true" />
@@ -171,9 +187,7 @@ export function EventDraftForm() {
       <button className="button" type="submit">
         Save my event draft <ArrowRight size={17} aria-hidden="true" />
       </button>
-      <p className="event-form__note">
-        Free preview · Stored only in this browser · No account required
-      </p>
+      <p className="event-form__note">Private event · Secure host account</p>
     </form>
   );
 }

@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  Lock,
-  EyeOff,
-  ShieldCheck,
-  Mail,
-  Database,
-  Server,
-} from "lucide-react";
+import { Lock } from "lucide-react";
 import { Header } from "@/features/marketing/components/header";
 import { Footer } from "@/features/marketing/components/footer";
 import {

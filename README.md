@@ -1,6 +1,6 @@
 # CandidCrowd frontend
 
-Public marketing homepage and local product prototype. Wedding-first messaging, generic event domain.
+Next.js frontend, Better Auth host identity provider, and the public marketing/product skeleton. Messaging is wedding-first while the event domain remains generic.
 
 ## Run
 
@@ -8,18 +8,21 @@ Requires Node.js 22 (`nvm use`) and pnpm 11.25.0.
 
 ```sh
 pnpm install --frozen-lockfile
+cp .env.example .env.local
+pnpm migrate:auth
 pnpm dev
 ```
 
-Open http://localhost:3000. Production: `pnpm build` then `pnpm start`.
+Start the backend PostgreSQL, Redis, and Mailpit dependencies first. Open http://localhost:3000; local verification/reset email is visible at http://localhost:8025. Production: run the auth migration during deployment, then `pnpm build` and `pnpm start`.
 
 ## Included
 
 - Twelve-part responsive homepage: header, interactive hero, guest demo, problem, how it works, participation concept, event lifecycle, privacy, event types, pricing, final CTA and footer.
 - Functional QR pointing to the current origin’s guest demo, with a no-scan alternative. Cross-device scanning requires a deployed or network-accessible origin; localhost only works on the originating device.
 - Local guest preview: choose up to six JPG/PNG/WebP photos, 10 MB per file; validate decoded images; simulate progress, interruption and retry; view the updated gallery and lightbox; reset. Object URLs are released on reset/unmount. Photos never leave the browser and disappear on reload. Video upload is not implemented.
-- `/create` saves one editable generic event draft in localStorage. This is not a live event or host account.
-- `/login` and `/register` provide host authentication UI: email/password, full name and required terms on registration, password visibility, and Google/Apple buttons. Actions show availability notices only; no credentials are sent or saved. Better Auth integration is deferred.
+- `/create` is protected by the Better Auth session and creates a generic event through the authenticated Gin API.
+- `/login`, `/register`, `/verify-email`, `/forgot-password`, and `/reset-password` use Better Auth. Passwords and session management never pass through Gin. Google/Apple controls are enabled only when their credentials and public feature flags are configured.
+- The browser exchanges its HttpOnly Better Auth session for a short-lived JWT just before calling Gin. The JWT stays in memory and is not written to localStorage/sessionStorage.
 - Keyboard navigation, Base UI focus-managed dialogs, reduced motion and responsive layouts. Simulated upload timers pause when offscreen or the tab is hidden.
 
 ## Architecture and dependencies
@@ -30,15 +33,18 @@ The hero now uses real Three.js geometry, lighting and a perspective camera. Mov
 
 ```text
 src/app/(marketing)/page.tsx       Homepage composition
-src/app/create/                   Local event draft route
-src/app/(auth)/                   Login/register routes and shared photo layout
-src/features/auth/components/     UI-only auth form and BEM styles
+src/app/create/                   Authenticated event creation route
+src/app/(auth)/                   Host auth, verification and recovery routes
+src/app/api/auth/                 Better Auth route handler
+src/features/auth/components/     Auth/recovery forms and BEM styles
 src/features/marketing/components/Section components and previews
 src/features/marketing/data/      Photos, copy, plans, illustrative metrics
 src/features/marketing/hooks/     Simulated upload state machine
 src/components/ui/                Base UI / shadcn-compatible primitives
 src/components/shared/            Lazy motion and reveal
-src/lib/                          Generic event validation and utilities
+src/lib/auth.ts                   Better Auth server and JWT/JWKS configuration
+src/lib/api-client.ts             In-memory JWT bridge to the Gin API
+src/lib/                          Event validation and shared utilities
 design-system/candidcrowd/        Reviewed design system and page overrides
 public/images/                    Locally served illustrative photography
 tests/                            Playwright and axe checks
@@ -55,15 +61,15 @@ pnpm exec playwright install chromium
 pnpm test:e2e
 ```
 
-Browser tests cover desktop/mobile interactions, seven widths (375–1920px), landscape, axe WCAG checks, reduced motion, 200% text scaling, validation, retry/reset and draft persistence. These checks do not constitute a complete accessibility certification or field performance measurement.
+Browser tests cover desktop/mobile interactions, responsive layouts, axe WCAG checks, registration consent, safe redirects, credential-storage safety, email-link verification, and password recovery. These checks do not constitute a complete accessibility certification or field performance measurement.
 
-## Explicit prototype boundaries
+## Current boundaries
 
-English copy; fictional sample event; illustrative participation numbers. Free means local preview. Essential and Plus are configuration-driven planned tiers, without approved prices or checkout. Login opens the UI-only authentication page. Privacy, terms and password reset use availability notices, not published legal documents or working account services.
+English copy; fictional sample event; illustrative participation numbers. Essential and Plus are configuration-driven planned tiers, without approved prices or checkout. Privacy and terms require legal review before launch.
 
-No backend, public event creation, authentication, payment, R2 storage, cloud gallery, moderation, realtime or downloads. Privacy/original-quality claims describe the intended product, not a connected production service. No secrets or environment variables are needed for this prototype.
+Host email/password authentication, verification, reset, logout, JWT exchange, Gin profile sync, consent audit, and event creation are connected. QA still needs injected domain, SMTP, Google, and Apple credentials; none are hard-coded. Payment and the complete guest gallery/moderation/realtime/download UI remain outside this milestone.
 
-Next: host authentication → generic event API → anonymous guest session → authorized browser-to-private-R2 presigned PUT upload → completion verification → gallery. Keep storage behind an interface, validate and authorize on the server, and never store expiring URLs as media metadata. Pricing, legal copy and production security need review before launch.
+The backend already exposes anonymous guest sessions and authorized browser-to-private-R2 presigned uploads. The next frontend milestone is the guest event/upload/gallery experience. Keep expiring URLs out of durable media metadata; pricing, legal copy, OAuth provider setup, and production security still need deployment review.
 
 ## Image sources
 

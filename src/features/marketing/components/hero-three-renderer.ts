@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { photos } from "../data/marketing";
 
 export type HeroRenderer = {
   update: (progress: number, active: boolean, angle: number) => void;
@@ -13,10 +14,10 @@ export async function createHeroRenderer(
   onFailure: () => void,
 ): Promise<HeroRenderer> {
   const images = await Promise.all(
-    ["celebration", "couple", "table"].map(async (name) => {
+    [photos.celebration, photos.couple, photos.table].map(async (photo) => {
       const image = new Image();
 
-      image.src = `/images/${name}.jpg`;
+      image.src = photo.src;
       await image.decode();
 
       return image;
@@ -28,13 +29,16 @@ export async function createHeroRenderer(
   const renderer = new THREE.WebGLRenderer({
     alpha: true,
     antialias: true,
-    powerPreference: "low-power",
+    // The scene is opt-in and already bypassed on constrained devices. Give
+    // its short, user-triggered transfer enough GPU headroom to stay smooth.
+    powerPreference: "high-performance",
   });
 
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
   renderer.setClearColor(0x000000, 0);
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.VSMShadowMap;
+  // PCFSoft keeps the physical depth cue without VSM's extra blur pass.
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   host.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
@@ -50,7 +54,7 @@ export async function createHeroRenderer(
 
   light.position.set(-2, 3, 10);
   light.castShadow = true;
-  light.shadow.mapSize.set(512, 512);
+  light.shadow.mapSize.set(384, 384);
   Object.assign(light.shadow.camera, {
     left: -5,
     right: 5,
@@ -61,7 +65,6 @@ export async function createHeroRenderer(
   });
   light.shadow.bias = -0.002;
   light.shadow.radius = 4;
-  light.shadow.blurSamples = 8;
   scene.add(light);
 
   const shadow = new THREE.Mesh(
@@ -462,7 +465,7 @@ export async function createHeroRenderer(
     prints.visible = !compact;
     renderer.shadowMap.enabled = !compact;
     shadow.visible = !compact;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, compact ? 1.25 : 1.5));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, compact ? 1 : 1.25));
     renderer.setSize(width, height);
     camera.aspect = width / height;
     camera.position.z = Math.max(

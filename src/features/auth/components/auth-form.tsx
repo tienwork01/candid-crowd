@@ -1,45 +1,100 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { FormEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Brand } from "@/components/shared/brand";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { authClient } from "@/lib/auth-client";
 
-const notices = {
-  terms: {
-    title: "Terms of service",
-    body: "Our terms of service are being finalized. Account creation is not available yet.",
-  },
-  privacy: {
-    title: "Privacy policy",
-    body: "Our privacy policy is being finalized. Information entered on this page is not sent or saved.",
-  },
-  reset: {
-    title: "Reset your password",
-    body: "Password reset is not available yet. No email has been sent.",
-  },
-};
-
-const subscribe = () => () => undefined;
-
-export function AuthForm({ mode }: { mode: "login" | "register" }) {
-  // Keep the UI-only form from submitting credentials before hydration.
-  const interactive = useSyncExternalStore(
-    subscribe,
-    () => true,
-    () => false,
-  );
+export function AuthForm({
+  mode,
+  nextPath,
+}: {
+  mode: "login" | "register";
+  nextPath?: string;
+}) {
   const register = mode === "register";
   const [showPassword, setShowPassword] = useState(false);
-  const [notice, setNotice] = useState<keyof typeof notices | null>(null);
+  const [feedback, setFeedback] = useState("");
+  const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
+  const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
+  const appleEnabled = process.env.NEXT_PUBLIC_APPLE_AUTH_ENABLED === "true";
+  const socialEnabled = googleEnabled || appleEnabled;
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setFeedback("");
+    setIsPending(true);
+
+    const data = new FormData(event.currentTarget);
+    const email = String(data.get("email") ?? "").trim();
+    const password = String(data.get("password") ?? "");
+
+    if (register) {
+      const result = await authClient.signUp.email({
+        name: String(data.get("name") ?? "").trim(),
+        email,
+        password,
+        termsVersion: process.env.NEXT_PUBLIC_TERMS_VERSION || "2026-01",
+        privacyVersion: process.env.NEXT_PUBLIC_PRIVACY_VERSION || "2026-01",
+        callbackURL: "/create",
+      });
+
+      setIsPending(false);
+
+      if (result.error) {
+        setFeedback(result.error.message || "We couldn’t create your account.");
+
+        return;
+      }
+
+      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+
+      return;
+    }
+
+    const result = await authClient.signIn.email({
+      email,
+      password,
+      callbackURL: "/create",
+    });
+
+    setIsPending(false);
+
+    if (result.error) {
+      setFeedback(result.error.message || "Email or password is incorrect.");
+
+      return;
+    }
+
+    router.push(
+      nextPath?.startsWith("/") && !nextPath.startsWith("//")
+        ? nextPath
+        : "/create",
+    );
+  }
+
+  async function social(provider: "google" | "apple") {
+    setFeedback("");
+
+    const result = await authClient.signIn.social({
+      provider,
+      callbackURL: "/create",
+      additionalData: {
+        termsVersion: process.env.NEXT_PUBLIC_TERMS_VERSION || "2026-01",
+        privacyVersion: process.env.NEXT_PUBLIC_PRIVACY_VERSION || "2026-01",
+      },
+    });
+
+    if (result.error)
+      setFeedback(
+        result.error.message || `Couldn’t continue with ${provider}.`,
+      );
+  }
 
   return (
     <section className="auth-form" aria-labelledby="auth-heading">
@@ -66,48 +121,55 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         </p>
       </div>
 
-      {/* ── Social login — prominent full-width buttons ── */}
-      <div
-        className="auth-form__social"
-        role="group"
-        aria-label={
-          register ? "Sign up with a provider" : "Log in with a provider"
-        }
-      >
-        <button
-          type="button"
-          className="auth-form__social-btn auth-form__social-btn--google"
-          aria-label="Continue with Google"
-        >
-          <Image src="/icons/google.svg" alt="" width={20} height={20} />
-          Google
-        </button>
-        <button
-          type="button"
-          className="auth-form__social-btn auth-form__social-btn--apple"
-          aria-label="Continue with Apple"
-        >
-          <Image
-            src="/icons/apple.svg"
-            alt=""
-            width={20}
-            height={20}
-            style={{ filter: "invert(1)" }}
-          />
-          Apple
-        </button>
-      </div>
+      {socialEnabled && (
+        <>
+          <div
+            className="auth-form__social"
+            role="group"
+            aria-label={
+              register ? "Sign up with a provider" : "Log in with a provider"
+            }
+          >
+            {googleEnabled && (
+              <button
+                type="button"
+                className="auth-form__social-btn auth-form__social-btn--google"
+                aria-label="Continue with Google"
+                onClick={() => void social("google")}
+              >
+                <Image src="/icons/google.svg" alt="" width={20} height={20} />
+                Google
+              </button>
+            )}
+            {appleEnabled && (
+              <button
+                type="button"
+                className="auth-form__social-btn auth-form__social-btn--apple"
+                aria-label="Continue with Apple"
+                onClick={() => void social("apple")}
+              >
+                <Image
+                  src="/icons/apple.svg"
+                  alt=""
+                  width={20}
+                  height={20}
+                  style={{ filter: "invert(1)" }}
+                />
+                Apple
+              </button>
+            )}
+          </div>
+          <p className="auth-form__social-consent">
+            By continuing, you agree to our <Link href="/terms">Terms</Link> and{" "}
+            <Link href="/privacy">Privacy Policy</Link>.
+          </p>
+          <div className="auth-form__divider">
+            <span>or with email</span>
+          </div>
+        </>
+      )}
 
-      <div className="auth-form__divider">
-        <span>or with email</span>
-      </div>
-
-      <form
-        className="auth-form__fields"
-        onSubmit={(event) => {
-          event.preventDefault();
-        }}
-      >
+      <form className="auth-form__fields" onSubmit={submit}>
         {register && (
           <div className="auth-form__field">
             <label htmlFor="full-name">Full name</label>
@@ -139,13 +201,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           <div className="auth-form__label-row">
             <label htmlFor="password">Password</label>
             {!register && (
-              <button
-                className="auth-form__text-button"
-                type="button"
-                onClick={() => setNotice("reset")}
-              >
+              <Link className="auth-form__text-button" href="/forgot-password">
                 Forgot password?
-              </button>
+              </Link>
             )}
           </div>
           <div className="auth-form__password">
@@ -210,12 +268,15 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             </label>
           </div>
         )}
+        <p className="auth-form__feedback" role="status" aria-live="polite">
+          {feedback}
+        </p>
         <Button
           className="auth-form__submit"
           type="submit"
-          disabled={!interactive}
+          disabled={isPending}
         >
-          {register ? "Create account" : "Log in"}
+          {isPending ? "Please wait…" : register ? "Create account" : "Log in"}
           <ArrowRight aria-hidden="true" className="auth-form__submit-arrow" />
         </Button>
       </form>
@@ -226,21 +287,6 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           {register ? "Log in" : "Create an account"}
         </Link>
       </p>
-      <Dialog
-        open={notice !== null}
-        onOpenChange={(open) => {
-          if (!open) setNotice(null);
-        }}
-      >
-        <DialogContent>
-          <DialogTitle className="auth-form__notice-title">
-            {notice ? notices[notice].title : ""}
-          </DialogTitle>
-          <DialogDescription className="auth-form__notice-body">
-            {notice ? notices[notice].body : ""}
-          </DialogDescription>
-        </DialogContent>
-      </Dialog>
     </section>
   );
 }

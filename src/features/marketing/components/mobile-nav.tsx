@@ -3,70 +3,83 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { navigation } from "../data/marketing";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
-  const trigger = useRef<HTMLButtonElement>(null);
+  const menu = useRef<HTMLDetailsElement>(null);
+  const trigger = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const breakpoint = matchMedia("(min-width: 1024px)");
-    const close = () => setOpen(false);
 
-    breakpoint.addEventListener("change", close);
+    const close = () => {
+      if (menu.current) menu.current.open = false;
+      setOpen(false);
+    };
 
-    return () => breakpoint.removeEventListener("change", close);
+    if (breakpoint.addEventListener) {
+      breakpoint.addEventListener("change", close);
+
+      return () => breakpoint.removeEventListener("change", close);
+    }
+
+    breakpoint.addListener(close);
+
+    return () => breakpoint.removeListener(close);
   }, []);
 
+  function close() {
+    if (menu.current) menu.current.open = false;
+    setOpen(false);
+  }
+
   return (
-    <div
+    <details
+      ref={menu}
       className="mobile-nav"
+      onToggle={(event) => setOpen(event.currentTarget.open)}
       onKeyDown={(event) => {
         if (event.key === "Escape") {
-          setOpen(false);
+          close();
           trigger.current?.focus();
         }
       }}
     >
-      <Button
+      <summary
         ref={trigger}
-        variant="ghost"
-        size="icon"
+        className="mobile-nav__trigger"
+        role="button"
         aria-label={open ? "Close navigation" : "Open navigation"}
         aria-expanded={open}
         aria-controls="mobile-nav"
-        onClick={() => setOpen((value) => !value)}
       >
-        {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
-      </Button>
-      {open && (
-        <nav
-          id="mobile-nav"
-          className="mobile-nav__menu"
-          aria-label="Mobile navigation"
-        >
-          {navigation.map((item) => (
-            <a key={item.href} href={item.href} onClick={() => setOpen(false)}>
-              {item.label}
-            </a>
-          ))}
-          <Link
-            href="/login"
-            className="mobile-nav__login"
-            onClick={() => setOpen(false)}
-          >
-            Log in
-          </Link>
-          <Link
-            className="button"
-            href="/create"
-            onClick={() => setOpen(false)}
-          >
-            Create free event
-          </Link>
-        </nav>
-      )}
-    </div>
+        <Menu
+          className="mobile-nav__icon mobile-nav__icon--open"
+          aria-hidden="true"
+        />
+        <X
+          className="mobile-nav__icon mobile-nav__icon--close"
+          aria-hidden="true"
+        />
+      </summary>
+      <nav
+        id="mobile-nav"
+        className="mobile-nav__menu"
+        aria-label="Mobile navigation"
+      >
+        {navigation.map((item) => (
+          <a key={item.href} href={item.href} onClick={close}>
+            {item.label}
+          </a>
+        ))}
+        <Link href="/login" className="mobile-nav__login" onClick={close}>
+          Log in
+        </Link>
+        <Link className="button" href="/create" onClick={close}>
+          Create free event
+        </Link>
+      </nav>
+    </details>
   );
 }
