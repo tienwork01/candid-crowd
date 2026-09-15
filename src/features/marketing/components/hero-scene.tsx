@@ -9,6 +9,7 @@ import {
   ImagePlus,
   LockKeyhole,
   RotateCcw,
+  RotateCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { photos, sampleEvent } from "../data/marketing";
@@ -18,6 +19,7 @@ import { HeroThree } from "./hero-three";
 export function HeroScene() {
   const ref = useRef<HTMLDivElement>(null);
   const [threeReady, setThreeReady] = useState(false);
+  const [angle, setAngle] = useState(0);
   const inView = useInView(ref, { amount: 0.2 });
   const reduced = useReducedMotion();
   const upload = useUploadPreview(inView);
@@ -34,12 +36,36 @@ export function HeroScene() {
       <HeroThree
         progress={upload.progress}
         active={inView}
+        angle={angle}
         onReady={setThreeReady}
       />
       {threeReady && (
-        <span className="hero-scene__label">
-          LIVE 3D PREVIEW · MOVE TO EXPLORE
-        </span>
+        <div
+          className="hero-scene__view-controls"
+          role="group"
+          aria-label="Gallery view"
+        >
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Rotate view left"
+            title="Rotate view left"
+            disabled={angle <= -0.4}
+            onClick={() => setAngle((value) => Math.max(-0.4, value - 0.4))}
+          >
+            <RotateCcw aria-hidden="true" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            aria-label="Rotate view right"
+            title="Rotate view right"
+            disabled={angle >= 0.4}
+            onClick={() => setAngle((value) => Math.min(0.4, value + 0.4))}
+          >
+            <RotateCw aria-hidden="true" />
+          </Button>
+        </div>
       )}
       <div className="hero-scene__gallery">
         <div className="hero-scene__gallery-top">

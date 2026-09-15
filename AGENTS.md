@@ -969,6 +969,11 @@ The first product hypothesis to validate is:
 
 Everything else comes after that.
 
+# Package and Library Utilization Rule
+
+- **Proactively use optimized existing libraries**: Do not reinvent the wheel or write custom boilerplate for features that already have mature, battle-tested, and performant libraries (e.g., shadcn/ui components, Lucide icons, Framer Motion, date-fns, zod, browser image compression, etc.).
+- **Autonomous installation**: You are explicitly authorized and encouraged to automatically download and install needed npm packages (e.g. `npm install ...` or `npx ...`) to ensure fast, optimal, and reliable implementation instead of writing custom low-level replacements.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

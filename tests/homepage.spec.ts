@@ -196,10 +196,11 @@ test("navigation, preview dialogs and event types work with keyboard", async ({
   await page.keyboard.press("Escape");
   await expect(privacy).toBeFocused();
   await page.getByRole("button", { name: "Open navigation" }).click();
-  await page.getByRole("button", { name: "Log in", exact: true }).click();
-  await expect(page.getByRole("dialog")).toContainText(
-    "Host accounts aren’t available",
-  );
+  await page.getByRole("link", { name: "Log in", exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(
+    page.getByRole("heading", { name: "Welcome back." }),
+  ).toBeVisible();
 });
 
 test("reduced motion and text zoom preserve usability", async ({ page }) => {

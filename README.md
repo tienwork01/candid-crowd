@@ -19,6 +19,7 @@ Open http://localhost:3000. Production: `pnpm build` then `pnpm start`.
 - Functional QR pointing to the current origin’s guest demo, with a no-scan alternative. Cross-device scanning requires a deployed or network-accessible origin; localhost only works on the originating device.
 - Local guest preview: choose up to six JPG/PNG/WebP photos, 10 MB per file; validate decoded images; simulate progress, interruption and retry; view the updated gallery and lightbox; reset. Object URLs are released on reset/unmount. Photos never leave the browser and disappear on reload. Video upload is not implemented.
 - `/create` saves one editable generic event draft in localStorage. This is not a live event or host account.
+- `/login` and `/register` provide host authentication UI: email/password, full name and required terms on registration, password visibility, and Google/Apple buttons. Actions show availability notices only; no credentials are sent or saved. Better Auth integration is deferred.
 - Keyboard navigation, Base UI focus-managed dialogs, reduced motion and responsive layouts. Simulated upload timers pause when offscreen or the tab is hidden.
 
 ## Architecture and dependencies
@@ -30,6 +31,8 @@ The hero now uses real Three.js geometry, lighting and a perspective camera. Mov
 ```text
 src/app/(marketing)/page.tsx       Homepage composition
 src/app/create/                   Local event draft route
+src/app/(auth)/                   Login/register routes and shared photo layout
+src/features/auth/components/     UI-only auth form and BEM styles
 src/features/marketing/components/Section components and previews
 src/features/marketing/data/      Photos, copy, plans, illustrative metrics
 src/features/marketing/hooks/     Simulated upload state machine
@@ -56,7 +59,7 @@ Browser tests cover desktop/mobile interactions, seven widths (375–1920px), la
 
 ## Explicit prototype boundaries
 
-English copy; fictional sample event; illustrative participation numbers. Free means local preview. Essential and Plus are configuration-driven planned tiers, without approved prices or checkout. Login, privacy and terms open clearly labeled placeholder notices, not implemented authentication or legal documents.
+English copy; fictional sample event; illustrative participation numbers. Free means local preview. Essential and Plus are configuration-driven planned tiers, without approved prices or checkout. Login opens the UI-only authentication page. Privacy, terms and password reset use availability notices, not published legal documents or working account services.
 
 No backend, public event creation, authentication, payment, R2 storage, cloud gallery, moderation, realtime or downloads. Privacy/original-quality claims describe the intended product, not a connected production service. No secrets or environment variables are needed for this prototype.
 

@@ -37,6 +37,23 @@ Generated through the installed UI UX Pro Max CLI on 2026-09-14, then reviewed a
 
 ## Requested 3D enhancement
 
+### More visible depth and interaction
+
+- Review finding: the old gallery used one flat texture, small pointer angles and no entrance, so the scene was easy to mistake for a static illustration. Replace the two gallery photos with individually raised paper meshes and increase the transfer's depth and rotation.
+- A single 1.6-second unfolding entrance makes depth apparent when the scene first enters view. This is an intentional exception to the earlier 200-400ms guideline for small transitions. The upload itself remains user-triggered; there is no looping animation. Starting an upload or rotating the view completes the entrance immediately.
+- Add bounded left/right rotation controls using the existing Base UI Button, Lucide icons, accessible labels and hover titles. They work with touch and keyboard, use 44px targets, and disappear with the WebGL fallback.
+- Use one 512px shadow map with restrained soft shadows on desktop; disable shadows and extra prints on compact scenes. Phone screen feedback follows the sharing state. Keep the shared requestAnimationFrame lifecycle and explicit GPU disposal.
+- Skill searches: `animation entrance duration` supports context-specific timing and avoiding infinite decorative loops; `shadow performance mobile` supplies selective shadow guidance. Broad 3D style suggestions do not fit the photographic brand, so retain existing tokens and typography. Reference: [Three.js shadow tradeoffs](https://threejs.org/manual/en/shadows.html).
+- Verification now covers entrance completion, view controls including keyboard activation, idle settling, offscreen pause, context loss and reduced motion. Visual audit captures entrance, resting, rotated, in-flight and completed views at all seven widths, checks canvas pixels and detects horizontal overflow.
+- Narrower `3D hyperrealism` style search supports layered depth, photographic textures and lighting; retain the project's existing palette and avoid the suggested immersive full-site treatment. Final validation: 20 Playwright tests, lint and TypeScript pass. Seven-width pixel/screenshot audit passes; left and right rotation screenshots reviewed on desktop and mobile emulation.
+
+- Additional effects: pointer-driven depth offsets on the two paper prints, restrained directional-light movement, a small lift during photo transfer and a brief settling motion at arrival. All effects share the demand-rendered loop, stop offscreen/hidden and use the existing reduced-motion fallback. Reset removes the transferred photo immediately instead of flying it backwards.
+
+- Follow-up review: reran the design-system, style, typography, color, reduced-motion and Three.js searches. Broad system/color results still do not match the product; preserve the reviewed MASTER instead of persisting unrelated generated palettes. Serif/sans hierarchy and demand rendering remain applicable.
+- Add two photographic paper prints and a backing sheet for physical depth. Hide the extra prints below 480px scene width and cap compact DPR at 1.25. No looping motion; the phone progress bar and transfer move only during the share interaction.
+- Resolve the destination from gallery-local coordinates so the transferred print rests over the receiving tile. Use elapsed frame time for consistent settling across refresh rates.
+- Follow-up validation: lint and TypeScript pass; all four desktop/mobile WebGL lifecycle and reduced-motion tests pass. `node scripts/hero-three-audit.mjs` checks nonblank canvas pixels, changed pixels after sharing, screenshots and horizontal overflow at 375, 390, 430, 768, 1024, 1440 and 1920px. Outputs: ignored `test-results/hero-three/`. Desktop and mobile screenshots reviewed; physical-device performance remains unmeasured.
+
 - Focused UI UX Pro Max query: `render demand dispose textures --stack threejs`. Adopt explicit texture/geometry/material disposal and requestAnimationFrame rendering only while changes settle.
 - Import Three.js after the initial hero paints; reserve the existing scene height. Texture canvases are at most 1024px; DPR capped at 1.5; no post-processing, continuous spin or external models.
 - Offscreen/hidden scenes stop rendering. Reduced motion, Save-Data, detected low-memory/low-core devices, module/image errors or context loss keep the DOM fallback and working share button.

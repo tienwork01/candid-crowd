@@ -5,6 +5,7 @@ Source of product direction: AGENTS.md. Reviewed with the ui-ux-pro-max skill.
 The two automatic design-system searches returned wedding invitation / motion-heavy photography recommendations. These do not fully match this product, so their palettes and styles were not persisted as authoritative guidance. The following decisions are explicitly derived from the repository's editorial photography and premium consumer direction, with the skill's relevant accessibility and performance rules.
 
 - Warm ivory background, dark olive text, moss green primary actions, soft sage secondary surfaces. Semantic tokens are defined in src/app/globals.css.
+- Three-layer token architecture is documented in [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) (Primitives → Semantics → Components).
 - Cormorant Garamond display type, DM Sans product UI. Serif italic is reserved for emotional emphasis and photo captions.
 - Spacious layouts; thin separators; restrained card use. Hero photography uses paper-like framing; product UI uses subtle 6–12px radii.
 - Photography is primary. No generic SaaS gradients, fabricated metrics/testimonials, or heavy motion.

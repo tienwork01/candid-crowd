@@ -3,7 +3,6 @@ import { ArrowUpRight } from "lucide-react";
 import { Brand } from "@/components/shared/brand";
 import { navigation } from "../data/marketing";
 import { MobileNav } from "./mobile-nav";
-import { PreviewNotice } from "./preview-notice";
 
 export function Header() {
   return (
@@ -18,9 +17,9 @@ export function Header() {
           ))}
         </nav>
         <div className="site-header__actions">
-          <PreviewNotice kind="login" className="site-header__login">
+          <Link href="/login" className="site-header__login">
             Log in
-          </PreviewNotice>
+          </Link>
           <Link className="button button--small" href="/create">
             Create free event <ArrowUpRight size={16} aria-hidden="true" />
           </Link>

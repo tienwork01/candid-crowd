@@ -1,6 +1,6 @@
+import Link from "next/link";
 import { Brand } from "@/components/shared/brand";
 import { navigation } from "../data/marketing";
-import { PreviewNotice } from "./preview-notice";
 
 export function Footer() {
   return (
@@ -35,13 +35,15 @@ export function Footer() {
           </a>
         ))}
       </nav>
-      <nav aria-label="Legal preview notices">
+      <nav aria-label="Legal policies">
         <h2>The essentials</h2>
-        <PreviewNotice kind="privacy">Privacy</PreviewNotice>
-        <PreviewNotice kind="terms">Terms</PreviewNotice>
-        <span className="site-footer__preview-label">
-          Policies in preparation
-        </span>
+        <Link className="site-footer__link" href="/privacy">
+          Privacy Policy
+        </Link>
+        <Link className="site-footer__link" href="/terms">
+          Terms of Service
+        </Link>
+        <span className="site-footer__preview-label">Official policies</span>
       </nav>
       <div className="site-footer__bottom">
         <span>© {new Date().getFullYear()} CandidCrowd</span>

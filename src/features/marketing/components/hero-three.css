@@ -6,6 +6,17 @@
   visibility: hidden;
   touch-action: pan-y;
 }
+.hero-scene--3d .hero-scene__orbit {
+  display: none;
+}
+.hero-scene__view-controls {
+  position: absolute;
+  bottom: 36px;
+  right: 4px;
+  z-index: 6;
+  display: flex;
+  gap: 8px;
+}
 .hero-scene__canvas canvas,
 .hero-three-canvas canvas {
   display: block;
@@ -61,7 +72,7 @@
 }
 .hero-scene--3d .hero-scene__status,
 .hero-scene--3d .scene-status {
-  bottom: 36px;
+  bottom: 98px;
   right: 0;
   max-width: 240px;
   z-index: 5;

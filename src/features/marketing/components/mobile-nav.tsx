@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { navigation } from "../data/marketing";
-import { PreviewNotice } from "./preview-notice";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -52,9 +51,13 @@ export function MobileNav() {
               {item.label}
             </a>
           ))}
-          <PreviewNotice kind="login" className="mobile-nav__login">
+          <Link
+            href="/login"
+            className="mobile-nav__login"
+            onClick={() => setOpen(false)}
+          >
             Log in
-          </PreviewNotice>
+          </Link>
           <Link
             className="button"
             href="/create"

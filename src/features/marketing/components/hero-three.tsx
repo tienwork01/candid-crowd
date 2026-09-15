@@ -7,15 +7,17 @@ import "./hero-three.css";
 export function HeroThree({
   progress,
   active,
+  angle,
   onReady,
 }: {
   progress: number;
   active: boolean;
+  angle: number;
   onReady: (ready: boolean) => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const renderer = useRef<HeroRenderer | null>(null);
-  const latest = useRef({ progress, active });
+  const latest = useRef({ progress, active, angle });
 
   useEffect(() => {
     const element = host.current!;
@@ -66,7 +68,11 @@ export function HeroThree({
           }
 
           renderer.current = instance;
-          instance.update(latest.current.progress / 100, latest.current.active);
+          instance.update(
+            latest.current.progress / 100,
+            latest.current.active,
+            latest.current.angle,
+          );
           onReady(true);
         } catch {
           if (!abort.signal.aborted) stop();
@@ -85,9 +91,9 @@ export function HeroThree({
     };
   }, [onReady]);
   useEffect(() => {
-    latest.current = { progress, active };
-    renderer.current?.update(progress / 100, active);
-  }, [progress, active]);
+    latest.current = { progress, active, angle };
+    renderer.current?.update(progress / 100, active, angle);
+  }, [progress, active, angle]);
 
   return (
     <div
