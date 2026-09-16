@@ -1,8 +1,17 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { authClient } from "@/lib/auth-client";
+import { getCurrentRelativePath, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
 
 const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+function redirectToLogin(): void {
+  if (typeof window !== "undefined") {
+    window.location.assign(
+      withAuthRedirect("/login", getCurrentRelativePath()),
+    );
+  }
+}
 
 export class APIError extends Error {
   constructor(
@@ -116,6 +125,7 @@ privateClient.interceptors.request.use(
       const token = await getAuthToken();
 
       if (!token) {
+        redirectToLogin();
         throw new APIError(
           401,
           "unauthenticated",
@@ -160,7 +170,11 @@ privateClient.interceptors.response.use(
       }
     }
 
-    return Promise.reject(normalizeAxiosError(error));
+    const normalizedError = normalizeAxiosError(error);
+
+    if (normalizedError.status === 401) redirectToLogin();
+
+    return Promise.reject(normalizedError);
   },
 );
 
@@ -189,6 +203,7 @@ export async function apiFetch(
   const token = await getAuthToken();
 
   if (!token) {
+    redirectToLogin();
     throw new APIError(
       401,
       "unauthenticated",
@@ -217,7 +232,11 @@ export async function apiFetch(
 
     const code = body?.error?.code || body?.code || "request_failed";
 
-    throw new APIError(response.status, code, getErrorMessage(code));
+    const apiError = new APIError(response.status, code, getErrorMessage(code));
+
+    if (apiError.status === 401) redirectToLogin();
+
+    throw apiError;
   }
 
   return response;

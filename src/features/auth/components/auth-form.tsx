@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
 import { Brand } from "@/components/shared";
 import { Button } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
+import { getSafeAuthRedirect, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
 
 export function AuthForm({
@@ -25,6 +26,7 @@ export function AuthForm({
   const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === "true";
   const appleEnabled = process.env.NEXT_PUBLIC_APPLE_AUTH_ENABLED === "true";
   const socialEnabled = googleEnabled || appleEnabled;
+  const safeNextPath = getSafeAuthRedirect(nextPath);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,7 +44,7 @@ export function AuthForm({
         password,
         termsVersion: process.env.NEXT_PUBLIC_TERMS_VERSION || "2026-01",
         privacyVersion: process.env.NEXT_PUBLIC_PRIVACY_VERSION || "2026-01",
-        callbackURL: "/events/new",
+        callbackURL: safeNextPath,
       });
 
       setIsPending(false);
@@ -58,7 +60,13 @@ export function AuthForm({
         return;
       }
 
-      router.push(`/verify-email?email=${encodeURIComponent(email)}`);
+      const verifyUrl = new URLSearchParams({ email });
+
+      if (safeNextPath !== "/events/new") {
+        verifyUrl.set("next", safeNextPath);
+      }
+
+      router.replace(`/verify-email?${verifyUrl.toString()}`);
 
       return;
     }
@@ -66,7 +74,7 @@ export function AuthForm({
     const result = await authClient.signIn.email({
       email,
       password,
-      callbackURL: "/events/new",
+      callbackURL: safeNextPath,
     });
 
     setIsPending(false);
@@ -82,32 +90,31 @@ export function AuthForm({
       return;
     }
 
-    router.push(
-      nextPath?.startsWith("/") && !nextPath.startsWith("//")
-        ? nextPath
-        : "/events/new",
-    );
+    router.replace(safeNextPath);
   }
 
   async function social(provider: "google" | "apple") {
     setFeedback("");
+    setIsPending(true);
 
     const result = await authClient.signIn.social({
       provider,
-      callbackURL: "/events/new",
+      callbackURL: safeNextPath,
       additionalData: {
         termsVersion: process.env.NEXT_PUBLIC_TERMS_VERSION || "2026-01",
         privacyVersion: process.env.NEXT_PUBLIC_PRIVACY_VERSION || "2026-01",
       },
     });
 
-    if (result.error)
+    if (result.error) {
       setFeedback(
         getErrorMessage(
           result.error.code,
           `Couldn’t continue with ${provider}. Please try again.`,
         ),
       );
+      setIsPending(false);
+    }
   }
 
   return (
@@ -149,6 +156,7 @@ export function AuthForm({
                 type="button"
                 className="auth-form__social-btn auth-form__social-btn--google"
                 aria-label="Continue with Google"
+                disabled={isPending}
                 onClick={() => void social("google")}
               >
                 <Image src="/icons/google.svg" alt="" width={20} height={20} />
@@ -160,6 +168,7 @@ export function AuthForm({
                 type="button"
                 className="auth-form__social-btn auth-form__social-btn--apple"
                 aria-label="Continue with Apple"
+                disabled={isPending}
                 onClick={() => void social("apple")}
               >
                 <Image
@@ -215,7 +224,10 @@ export function AuthForm({
           <div className="auth-form__label-row">
             <label htmlFor="password">Password</label>
             {!register && (
-              <Link className="auth-form__text-button" href="/forgot-password">
+              <Link
+                className="auth-form__text-button"
+                href={withAuthRedirect("/forgot-password", safeNextPath)}
+              >
                 Forgot password?
               </Link>
             )}
@@ -297,7 +309,12 @@ export function AuthForm({
 
       <p className="auth-form__switch">
         {register ? "Already have an account?" : "New to CandidCrowd?"}{" "}
-        <Link href={register ? "/login" : "/register"}>
+        <Link
+          href={withAuthRedirect(
+            register ? "/login" : "/register",
+            safeNextPath,
+          )}
+        >
           {register ? "Log in" : "Create an account"}
         </Link>
       </p>

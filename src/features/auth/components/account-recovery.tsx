@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -14,6 +14,7 @@ import {
 import { Brand } from "@/components/shared";
 import { Button } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
+import { getSafeAuthRedirect, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
 
 type RecoveryMode = "forgot-password" | "reset-password" | "verify-email";
@@ -46,10 +47,12 @@ export function AccountRecovery({
   mode,
   email,
   token,
+  nextPath,
 }: {
   mode: RecoveryMode;
   email?: string;
   token?: string;
+  nextPath?: string;
 }) {
   const [complete, setComplete] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -57,7 +60,9 @@ export function AccountRecovery({
   const [passwordError, setPasswordError] = useState("");
   const [notice, setNotice] = useState("");
   const [isPending, setIsPending] = useState(false);
+  const confirmPasswordRef = useRef<HTMLInputElement>(null);
   const page = content[mode];
+  const safeNextPath = getSafeAuthRedirect(nextPath);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -70,7 +75,7 @@ export function AccountRecovery({
     if (mode === "forgot-password") {
       await authClient.requestPasswordReset({
         email: String(data.get("email")),
-        redirectTo: "/reset-password",
+        redirectTo: withAuthRedirect("/reset-password", safeNextPath),
       });
     }
 
@@ -79,7 +84,7 @@ export function AccountRecovery({
         setPasswordError(
           "Passwords do not match. Check both fields and try again.",
         );
-        document.querySelector<HTMLInputElement>("#confirm-password")?.focus();
+        confirmPasswordRef.current?.focus();
         setIsPending(false);
 
         return;
@@ -120,7 +125,7 @@ export function AccountRecovery({
 
       const result = await authClient.sendVerificationEmail({
         email,
-        callbackURL: "/events/new",
+        callbackURL: safeNextPath,
       });
 
       if (result.error) {
@@ -149,14 +154,21 @@ export function AccountRecovery({
     <section className="recovery-form" aria-labelledby="recovery-heading">
       <div className="recovery-form__top">
         <Brand />
-        <Link href="/login" className="recovery-form__back">
+        <Link
+          href={withAuthRedirect("/login", safeNextPath)}
+          className="recovery-form__back"
+        >
           <ArrowLeft size={15} aria-hidden="true" />
           Log in
         </Link>
       </div>
 
       {complete ? (
-        <RecoverySuccess mode={mode} onReset={() => setComplete(false)} />
+        <RecoverySuccess
+          mode={mode}
+          nextPath={safeNextPath}
+          onReset={() => setComplete(false)}
+        />
       ) : (
         <>
           <div className="recovery-form__heading">
@@ -205,6 +217,7 @@ export function AccountRecovery({
                   }
                   describedBy={passwordError ? "password-error" : undefined}
                   invalid={Boolean(passwordError)}
+                  inputRef={confirmPasswordRef}
                 />
                 {passwordError && (
                   <p
@@ -268,6 +281,7 @@ function PasswordField({
   onVisibilityChange,
   describedBy,
   invalid = false,
+  inputRef,
 }: {
   id: string;
   label: string;
@@ -276,6 +290,7 @@ function PasswordField({
   onVisibilityChange: () => void;
   describedBy?: string;
   invalid?: boolean;
+  inputRef?: React.RefObject<HTMLInputElement | null>;
 }) {
   return (
     <div className="recovery-form__field">
@@ -290,6 +305,7 @@ function PasswordField({
           minLength={8}
           aria-describedby={describedBy}
           aria-invalid={invalid}
+          ref={inputRef}
           required
         />
         <Button
@@ -318,9 +334,11 @@ function PasswordField({
 
 function RecoverySuccess({
   mode,
+  nextPath,
   onReset,
 }: {
   mode: RecoveryMode;
+  nextPath: string;
   onReset: () => void;
 }) {
   const forgot = mode === "forgot-password";
@@ -351,7 +369,10 @@ function RecoverySuccess({
           Try another email
         </button>
       ) : (
-        <Link href="/login" className="button recovery-form__success-action">
+        <Link
+          href={withAuthRedirect("/login", nextPath)}
+          className="button recovery-form__success-action"
+        >
           Continue to log in <ArrowRight aria-hidden="true" />
         </Link>
       )}

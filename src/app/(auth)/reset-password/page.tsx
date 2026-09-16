@@ -6,12 +6,13 @@ export const metadata: Metadata = { title: "Reset password - CandidCrowd" };
 export default async function ResetPasswordPage({
   searchParams,
 }: PageProps<"/reset-password">) {
-  const { token } = await searchParams;
+  const { token, next } = await searchParams;
 
   return (
     <AccountRecovery
       mode="reset-password"
       token={typeof token === "string" ? token : undefined}
+      nextPath={typeof next === "string" ? next : undefined}
     />
   );
 }
