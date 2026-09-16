@@ -203,6 +203,68 @@ test("navigation, preview dialogs and event types work with keyboard", async ({
   ).toBeVisible();
 });
 
+test("marketing navigation returns from legal pages to homepage sections", async ({
+  page,
+}) => {
+  for (const route of ["/terms", "/privacy"]) {
+    await page.goto(route);
+    await page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "Pricing" })
+      .click();
+    await expect(page).toHaveURL(/\/#pricing$/);
+    await expect(page.locator("#pricing")).toBeInViewport();
+  }
+});
+
+test("homepage anchors leave a consistent header clearance", async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/#demo");
+
+    const position = await page.evaluate(() => {
+      const header = document.querySelector(".site-header")!;
+      const demo = document.querySelector("#demo")!;
+
+      return {
+        headerBottom: header.getBoundingClientRect().bottom,
+        demoTop: demo.getBoundingClientRect().top,
+      };
+    });
+
+    expect(position.demoTop - position.headerBottom).toBeGreaterThanOrEqual(-2);
+    expect(position.demoTop - position.headerBottom).toBeLessThanOrEqual(2);
+  }
+});
+
+test("pricing cards give a restrained hover response", async ({ page }) => {
+  await page.goto("/#pricing");
+
+  const card = page.locator(".plan-card").first();
+  const motionTarget = page.locator(".plan-card__motion").first();
+
+  await motionTarget.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(350);
+
+  const rest = await card.boundingBox();
+
+  await motionTarget.hover();
+  await page.waitForTimeout(350);
+
+  const hovered = await card.boundingBox();
+  const arrowTransform = await card
+    .locator(".button svg")
+    .evaluate((icon) => getComputedStyle(icon).transform);
+
+  expect(rest && hovered && rest.y - hovered.y).toBeCloseTo(6, 0);
+  expect(arrowTransform).not.toBe("none");
+});
+
 test("reduced motion and text zoom preserve usability", async ({ page }) => {
   const errors: string[] = [];
 
@@ -237,20 +299,36 @@ test("reduced motion and text zoom preserve usability", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("event draft persists and remains editable", async ({ page }) => {
-  await page.goto("/create");
-  await page.getByLabel("Event name").fill("Family reunion");
-  await page.getByLabel("Event date").fill("2027-05-21");
-  await page.getByLabel("What are we celebrating?").selectOption("Reunion");
-  await page.getByLabel("Expected guests").fill("80");
-  await page.getByRole("button", { name: "Save my event draft" }).click();
+test("host workspace keeps event creation focused on the essentials", async ({
+  page,
+}) => {
+  await page.goto("/events/new");
+
   await expect(
-    page.getByText("Your event draft is saved on this device."),
+    page.getByRole("link", { name: "Events", exact: true }),
   ).toBeVisible();
-  await expect(page.locator(".draft-result h2")).toBeFocused();
-  await page.reload();
-  await expect(page.getByLabel("Event name")).toHaveValue("Family reunion");
-  await expect(page.getByLabel("Expected guests")).toHaveValue("80");
+  await expect(page.getByLabel("Create a new event")).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+
+  const accountMenu = page.locator('summary[aria-label="Open account menu"]');
+
+  await expect(accountMenu).toBeVisible();
+  await accountMenu.click();
+  await expect(page.getByRole("link", { name: "Profile" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Plan & billing" }),
+  ).toBeVisible();
+  await page.getByLabel("Event name").fill("Family reunion");
+  await page.getByLabel("When is it?").fill("2027-05-21");
+  await page.getByLabel("Event type").selectOption("Reunion");
+  await expect(
+    page.getByRole("heading", { name: "Family reunion" }),
+  ).toBeVisible();
+  await expect(page.getByText("May 21, 2027")).toBeVisible();
+  await page.getByRole("button", { name: "Create event" }).click();
+  await expect(page.getByText("EVENT PREVIEW")).toBeVisible();
   expect(
     (
       await new AxeBuilder({ page })

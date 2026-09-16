@@ -69,14 +69,14 @@ export function MobileNav() {
         aria-label="Mobile navigation"
       >
         {navigation.map((item) => (
-          <a key={item.href} href={item.href} onClick={close}>
+          <Link key={item.href} href={item.href} onClick={close}>
             {item.label}
-          </a>
+          </Link>
         ))}
         <Link href="/login" className="mobile-nav__login" onClick={close}>
           Log in
         </Link>
-        <Link className="button" href="/create" onClick={close}>
+        <Link className="button" href="/events/new" onClick={close}>
           Create free event
         </Link>
       </nav>

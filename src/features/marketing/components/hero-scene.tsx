@@ -19,6 +19,9 @@ import { HeroThree } from "./hero-three";
 export function HeroScene() {
   const ref = useRef<HTMLDivElement>(null);
   const [threeReady, setThreeReady] = useState(false);
+  const [threeFallbackReason, setThreeFallbackReason] = useState<string | null>(
+    null,
+  );
   const [angle, setAngle] = useState(0);
   const inView = useInView(ref, { amount: 0.2 });
   const reduced = useReducedMotion();
@@ -30,6 +33,9 @@ export function HeroScene() {
       ref={ref}
       className={`hero-scene${threeReady ? " hero-scene--3d" : ""}`}
       data-renderer={threeReady ? "webgl" : "fallback"}
+      data-fallback-reason={
+        threeReady ? undefined : (threeFallbackReason ?? undefined)
+      }
       aria-label="Interactive preview: a guest phone shares a photo into an event gallery"
     >
       <div className="hero-scene__orbit" aria-hidden="true" />
@@ -38,6 +44,7 @@ export function HeroScene() {
         active={inView}
         angle={angle}
         onReady={setThreeReady}
+        onFallback={setThreeFallbackReason}
       />
       {threeReady && (
         <div

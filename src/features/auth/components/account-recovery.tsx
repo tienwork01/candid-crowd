@@ -14,6 +14,7 @@ import {
 import { Brand } from "@/components/shared/brand";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { getErrorMessage } from "@/lib/errors";
 
 type RecoveryMode = "forgot-password" | "reset-password" | "verify-email";
 
@@ -98,7 +99,10 @@ export function AccountRecovery({
 
       if (result.error) {
         setPasswordError(
-          result.error.message || "This reset link is invalid or expired.",
+          getErrorMessage(
+            result.error.code,
+            "This reset link is invalid or expired.",
+          ),
         );
         setIsPending(false);
 
@@ -116,12 +120,15 @@ export function AccountRecovery({
 
       const result = await authClient.sendVerificationEmail({
         email,
-        callbackURL: "/create",
+        callbackURL: "/events/new",
       });
 
       if (result.error) {
         setNotice(
-          result.error.message || "We couldn’t send the verification email.",
+          getErrorMessage(
+            result.error.code,
+            "We couldn’t send the verification email. Please try again.",
+          ),
         );
         setIsPending(false);
 

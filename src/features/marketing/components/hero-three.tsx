@@ -9,11 +9,13 @@ export function HeroThree({
   active,
   angle,
   onReady,
+  onFallback,
 }: {
   progress: number;
   active: boolean;
   angle: number;
   onReady: (ready: boolean) => void;
+  onFallback: (reason: string | null) => void;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const renderer = useRef<HeroRenderer | null>(null);
@@ -36,18 +38,41 @@ export function HeroThree({
       onReady(false);
     }
 
+    function fallback(reason: string) {
+      stop();
+      onFallback(reason);
+    }
+
     function initialize() {
       const current = ++generation;
 
       clearTimeout(timer);
       stop();
-      if (
-        media.matches ||
-        device.connection?.saveData ||
-        (device.deviceMemory && device.deviceMemory <= 2) ||
-        navigator.hardwareConcurrency <= 2
-      )
+
+      if (media.matches) {
+        onFallback("reduced-motion");
+
         return;
+      }
+
+      if (device.connection?.saveData) {
+        onFallback("save-data");
+
+        return;
+      }
+
+      if (device.deviceMemory && device.deviceMemory <= 2) {
+        onFallback("low-device-memory");
+
+        return;
+      }
+
+      if (navigator.hardwareConcurrency <= 2) {
+        onFallback("low-cpu-concurrency");
+
+        return;
+      }
+
       timer = setTimeout(async () => {
         try {
           const { createHeroRenderer } = await import("./hero-three-renderer");
@@ -55,10 +80,8 @@ export function HeroThree({
           if (abort.signal.aborted || media.matches || current !== generation)
             return;
 
-          const instance = await createHeroRenderer(
-            element,
-            abort.signal,
-            stop,
+          const instance = await createHeroRenderer(element, abort.signal, () =>
+            fallback("webgl-context-lost"),
           );
 
           if (abort.signal.aborted || media.matches || current !== generation) {
@@ -68,14 +91,19 @@ export function HeroThree({
           }
 
           renderer.current = instance;
+          onFallback(null);
           instance.update(
             latest.current.progress / 100,
             latest.current.active,
             latest.current.angle,
           );
           onReady(true);
-        } catch {
-          if (!abort.signal.aborted) stop();
+        } catch (error) {
+          if (!abort.signal.aborted) {
+            const name = error instanceof Error ? error.name : "UnknownError";
+
+            fallback(`initialization-error:${name}`);
+          }
         }
       }, 700);
     }
@@ -89,7 +117,7 @@ export function HeroThree({
       media.removeEventListener("change", initialize);
       stop();
     };
-  }, [onReady]);
+  }, [onFallback, onReady]);
   useEffect(() => {
     latest.current = { progress, active, angle };
     renderer.current?.update(progress / 100, active, angle);

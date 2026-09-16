@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { jwt } from "better-auth/plugins";
+import { dash } from "@better-auth/infra";
 import { Pool } from "pg";
 import { sendAuthEmail } from "@/lib/auth-email";
 
@@ -21,6 +22,14 @@ function origins(value: string): string[] {
 const database = new Pool({
   connectionString: required("BETTER_AUTH_DATABASE_URL"),
 });
+
+// The dashboard is optional in local development. When configured, this
+// server-side plugin lets Better Auth Infrastructure call the app's /api/auth
+// endpoints and receive its auth activity. It must never be exposed via a
+// NEXT_PUBLIC_ environment variable.
+const dashboardPlugin = process.env.BETTER_AUTH_API_KEY
+  ? dash({ apiKey: process.env.BETTER_AUTH_API_KEY })
+  : null;
 
 export const auth = betterAuth({
   database,
@@ -103,6 +112,7 @@ export const auth = betterAuth({
     useSecureCookies: process.env.NODE_ENV === "production",
   },
   plugins: [
+    ...(dashboardPlugin ? [dashboardPlugin] : []),
     jwt({
       jwks: {
         keyPairConfig: { alg: "EdDSA", crv: "Ed25519" },

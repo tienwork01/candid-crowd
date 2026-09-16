@@ -13,7 +13,7 @@ export function FinalCta() {
         <br />
         <em>Bring them together.</em>
       </h2>
-      <Link href="/create" className="button">
+      <Link href="/events/new" className="button">
         Create your event free <ArrowUpRight size={18} aria-hidden="true" />
       </Link>
       <p>No app. No guest account. All the good stuff.</p>

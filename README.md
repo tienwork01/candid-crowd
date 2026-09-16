@@ -69,6 +69,10 @@ English copy; fictional sample event; illustrative participation numbers. Essent
 
 Host email/password authentication, verification, reset, logout, JWT exchange, Gin profile sync, consent audit, and event creation are connected. QA still needs injected domain, SMTP, Google, and Apple credentials; none are hard-coded. Payment and the complete guest gallery/moderation/realtime/download UI remain outside this milestone.
 
+## Better Auth Infrastructure dashboard
+
+The Better Auth dashboard is connected by the server-only `dash()` plugin in `src/lib/auth.ts`. Set a newly generated `BETTER_AUTH_API_KEY` in the deployed Next.js environment, deploy the application, then use the public auth base URL (for example, `https://your-domain/api/auth`) in the Better Auth Infrastructure dashboard. The key is optional locally so local authentication continues to work without the dashboard. It is not the application API/JWT key and is not used by the Gin API; the browser-to-Gin flow continues to use the short-lived JWT issued by Better Auth.
+
 The backend already exposes anonymous guest sessions and authorized browser-to-private-R2 presigned uploads. The next frontend milestone is the guest event/upload/gallery experience. Keep expiring URLs out of durable media metadata; pricing, legal copy, OAuth provider setup, and production security still need deployment review.
 
 ## Image sources

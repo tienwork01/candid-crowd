@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
 import { Brand } from "@/components/shared/brand";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
+import { getErrorMessage } from "@/lib/errors";
 
 export function AuthForm({
   mode,
@@ -41,13 +42,18 @@ export function AuthForm({
         password,
         termsVersion: process.env.NEXT_PUBLIC_TERMS_VERSION || "2026-01",
         privacyVersion: process.env.NEXT_PUBLIC_PRIVACY_VERSION || "2026-01",
-        callbackURL: "/create",
+        callbackURL: "/events/new",
       });
 
       setIsPending(false);
 
       if (result.error) {
-        setFeedback(result.error.message || "We couldn’t create your account.");
+        setFeedback(
+          getErrorMessage(
+            result.error.code,
+            "We couldn’t create your account. Please try again.",
+          ),
+        );
 
         return;
       }
@@ -60,13 +66,18 @@ export function AuthForm({
     const result = await authClient.signIn.email({
       email,
       password,
-      callbackURL: "/create",
+      callbackURL: "/events/new",
     });
 
     setIsPending(false);
 
     if (result.error) {
-      setFeedback(result.error.message || "Email or password is incorrect.");
+      setFeedback(
+        getErrorMessage(
+          result.error.code,
+          "Email or password is incorrect. Please check your credentials.",
+        ),
+      );
 
       return;
     }
@@ -74,7 +85,7 @@ export function AuthForm({
     router.push(
       nextPath?.startsWith("/") && !nextPath.startsWith("//")
         ? nextPath
-        : "/create",
+        : "/events/new",
     );
   }
 
@@ -83,7 +94,7 @@ export function AuthForm({
 
     const result = await authClient.signIn.social({
       provider,
-      callbackURL: "/create",
+      callbackURL: "/events/new",
       additionalData: {
         termsVersion: process.env.NEXT_PUBLIC_TERMS_VERSION || "2026-01",
         privacyVersion: process.env.NEXT_PUBLIC_PRIVACY_VERSION || "2026-01",
@@ -92,7 +103,10 @@ export function AuthForm({
 
     if (result.error)
       setFeedback(
-        result.error.message || `Couldn’t continue with ${provider}.`,
+        getErrorMessage(
+          result.error.code,
+          `Couldn’t continue with ${provider}. Please try again.`,
+        ),
       );
   }
 

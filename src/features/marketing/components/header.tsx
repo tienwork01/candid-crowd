@@ -11,16 +11,16 @@ export function Header() {
         <Brand />
         <nav className="site-header__nav" aria-label="Main navigation">
           {navigation.map((item) => (
-            <a href={item.href} key={item.href}>
+            <Link href={item.href} key={item.href}>
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className="site-header__actions">
           <Link href="/login" className="site-header__login">
             Log in
           </Link>
-          <Link className="button button--small" href="/create">
+          <Link className="button button--small" href="/events/new">
             Create free event <ArrowUpRight size={16} aria-hidden="true" />
           </Link>
         </div>

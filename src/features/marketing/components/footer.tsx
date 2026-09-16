@@ -13,26 +13,22 @@ export function Footer() {
       <nav aria-label="Footer product links">
         <h2>Product</h2>
         {navigation.map((item) => (
-          <a className="site-footer__link" key={item.href} href={item.href}>
+          <Link className="site-footer__link" key={item.href} href={item.href}>
             {item.label}
-          </a>
+          </Link>
         ))}
       </nav>
       <nav aria-label="Footer event links">
         <h2>Events</h2>
         {[
-          { label: "Weddings", href: "weddings" },
-          { label: "Birthdays", href: "birthdays" },
-          { label: "Graduations", href: "graduations" },
-          { label: "Corporate Events", href: "company-events" },
+          { label: "Weddings", href: "/#weddings" },
+          { label: "Birthdays", href: "/#birthdays" },
+          { label: "Graduations", href: "/#graduations" },
+          { label: "Corporate Events", href: "/#company-events" },
         ].map((item) => (
-          <a
-            className="site-footer__link"
-            href={`#${item.href}`}
-            key={item.href}
-          >
+          <Link className="site-footer__link" href={item.href} key={item.href}>
             {item.label}
-          </a>
+          </Link>
         ))}
       </nav>
       <nav aria-label="Legal policies">

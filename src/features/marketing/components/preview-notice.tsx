@@ -33,7 +33,7 @@ export function PreviewNotice({
           {notice.body}
         </DialogDescription>
         {kind === "login" && (
-          <Link href="/create" className="button mt-6">
+          <Link href="/events/new" className="button mt-6">
             Create an event draft
           </Link>
         )}

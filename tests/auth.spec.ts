@@ -117,5 +117,5 @@ test("login calls Better Auth and honors only a safe relative redirect", async (
   await page.getByLabel("Email address").fill("jamie@example.com");
   await page.locator("#password").fill("sample-only-password");
   await page.getByRole("button", { name: "Log in" }).click();
-  await expect(page).toHaveURL(/\/create$/);
+  await expect(page).toHaveURL(/\/events\/new$/);
 });

@@ -1,7 +1,7 @@
 export const navigation = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Demo", href: "#demo" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "Demo", href: "/#demo" },
+  { label: "Pricing", href: "/#pricing" },
 ] as const;
 
 export type MarketingPhoto = { id: string; src: string; alt: string };

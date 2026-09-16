@@ -1,4 +1,5 @@
 import { authClient } from "@/lib/auth-client";
+import { getErrorMessage } from "@/lib/errors";
 
 const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -6,9 +7,10 @@ export class APIError extends Error {
   constructor(
     public readonly status: number,
     public readonly code: string,
-    message: string,
+    message?: string,
   ) {
-    super(message);
+    super(message || getErrorMessage(code));
+    this.name = "APIError";
   }
 }
 
@@ -21,7 +23,7 @@ async function accessToken(): Promise<string> {
     throw new APIError(
       401,
       "unauthenticated",
-      "Your session has expired. Please sign in again.",
+      getErrorMessage("unauthenticated"),
     );
   }
 
@@ -59,13 +61,12 @@ export async function apiFetch(
       .json()
       .catch(() => null)) as {
       error?: { code?: string; message?: string };
+      code?: string;
     } | null;
 
-    throw new APIError(
-      response.status,
-      body?.error?.code || "request_failed",
-      body?.error?.message || "The request could not be completed.",
-    );
+    const code = body?.error?.code || body?.code || "request_failed";
+
+    throw new APIError(response.status, code, getErrorMessage(code));
   }
 
   return response;

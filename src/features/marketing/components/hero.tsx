@@ -27,7 +27,7 @@ export function Hero() {
           photos and videos. <strong>No app. No account.</strong>
         </p>
         <div className="hero__actions">
-          <Link href="/create" className="button">
+          <Link href="/events/new" className="button">
             Create your event free <ArrowUpRight size={18} aria-hidden="true" />
           </Link>
           <a href="#how-it-works" className="inline-action">
