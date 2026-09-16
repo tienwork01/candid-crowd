@@ -3,9 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { List, X } from "@phosphor-icons/react";
-import { navigation } from "../data/marketing";
+import { useTranslations } from "next-intl";
 
-export function MobileNav() {
+export function MobileNav({
+  navigation,
+}: {
+  navigation: ReadonlyArray<{ label: string; href: string }>;
+}) {
+  const t = useTranslations("marketing");
   const [open, setOpen] = useState(false);
   const menu = useRef<HTMLDetailsElement>(null);
   const trigger = useRef<HTMLElement>(null);
@@ -50,7 +55,7 @@ export function MobileNav() {
         ref={trigger}
         className="mobile-nav__trigger"
         role="button"
-        aria-label={open ? "Close navigation" : "Open navigation"}
+        aria-label={open ? t("navigation.close") : t("navigation.open")}
         aria-expanded={open}
         aria-controls="mobile-nav"
       >
@@ -66,7 +71,7 @@ export function MobileNav() {
       <nav
         id="mobile-nav"
         className="mobile-nav__menu"
-        aria-label="Mobile navigation"
+        aria-label={t("navigation.mobile")}
       >
         {navigation.map((item) => (
           <Link key={item.href} href={item.href} onClick={close}>
@@ -74,10 +79,10 @@ export function MobileNav() {
           </Link>
         ))}
         <Link href="/login" className="mobile-nav__login" onClick={close}>
-          Log in
+          {t("header.login")}
         </Link>
         <Link className="button" href="/events/new" onClick={close}>
-          Create free event
+          {t("header.createEvent")}
         </Link>
       </nav>
     </details>

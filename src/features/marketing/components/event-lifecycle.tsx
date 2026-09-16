@@ -5,9 +5,20 @@ import {
   Heart,
   PaperPlaneTilt,
 } from "@phosphor-icons/react/dist/ssr";
+import { getTranslations } from "next-intl/server";
 import { Reveal } from "@/components/shared";
 
-export function EventLifecycle() {
+const WALL_IMAGES = [
+  { name: "wedding-meadow.webp", photoKey: "couple" },
+  { name: "table.jpg", photoKey: "table" },
+  { name: "wedding-sunset.webp", photoKey: "celebration" },
+  { name: "flowers.jpg", photoKey: "flowers" },
+] as const;
+
+export async function EventLifecycle() {
+  const t = await getTranslations("marketing.lifecycle");
+  const tPhotos = await getTranslations("marketing.photos");
+
   return (
     <section
       className="lifecycle section-pad"
@@ -16,54 +27,40 @@ export function EventLifecycle() {
     >
       <div className="container">
         <div className="center-heading">
-          <span className="eyebrow">IT’S MORE THAN ONE DAY</span>
+          <span className="eyebrow">{t("eyebrow")}</span>
           <h2 id="lifecycle-title">
-            Before the first hello.
+            {t("titleLine1")}
             <br />
-            <em>After the last goodbye.</em>
+            <em>{t("titleLine2")}</em>
           </h2>
-          <p>A place for your memories, whenever they’re ready to be shared.</p>
+          <p>{t("subhead")}</p>
         </div>
         <Reveal className="lifecycle__grid">
           <article>
             <div className="lifecycle-card__art lifecycle-card__art--before">
               <div className="lifecycle-card__mini-invitation">
-                <span>WITH OUR FAVORITE PEOPLE</span>
-                <strong>
-                  Let’s make
-                  <br />
-                  <em>memories.</em>
-                </strong>
+                <span>{t("invitationTop")}</span>
+                <strong>{t("invitationHeadline")}</strong>
                 <QrCode size={56} aria-hidden="true" />
-                <small>Scan. Share. Celebrate.</small>
+                <small>{t("invitationScan")}</small>
               </div>
-              <span className="lifecycle-card__tag">
-                Invitations · Tables · Welcome signs
-              </span>
+              <span className="lifecycle-card__tag">{t("invitationTag")}</span>
             </div>
-            <span className="eyebrow">01 — BEFORE</span>
-            <h3>Place the QR anywhere.</h3>
-            <p>
-              On the invitation, your event website, a welcome sign, or every
-              table. Make it easy to find.
-            </p>
+            <span className="eyebrow">{t("beforeEyebrow")}</span>
+            <h3>{t("beforeTitle")}</h3>
+            <p>{t("beforeDescription")}</p>
           </article>
           <article>
             <div className="lifecycle-card__art lifecycle-card__art--during">
               <div className="lifecycle-card__live-wall-label">
-                <span className="status-dot" /> LIVE WALL CONCEPT
+                <span className="status-dot" /> {t("liveWallLabel")}
               </div>
               <div className="lifecycle-card__mini-wall">
-                {[
-                  "wedding-meadow.webp",
-                  "table.jpg",
-                  "wedding-sunset.webp",
-                  "flowers.jpg",
-                ].map((name) => (
+                {WALL_IMAGES.map(({ name, photoKey }) => (
                   <div key={name}>
                     <Image
                       src={`/images/${name}`}
-                      alt="An illustrative photo in a sample event wall"
+                      alt={tPhotos(photoKey)}
                       fill
                       sizes="160px"
                     />
@@ -71,49 +68,40 @@ export function EventLifecycle() {
                 ))}
               </div>
               <span className="lifecycle-card__wall-notice">
-                <Heart size={14} aria-hidden="true" /> A new perspective just
-                arrived.
+                <Heart size={14} aria-hidden="true" /> {t("wallNotice")}
               </span>
             </div>
-            <span className="eyebrow">02 — DURING</span>
-            <h3>Watch your story grow.</h3>
-            <p>
-              Photos find their way into your shared gallery. A future Live Wall
-              brings them into the room.
-            </p>
+            <span className="eyebrow">{t("duringEyebrow")}</span>
+            <h3>{t("duringTitle")}</h3>
+            <p>{t("duringDescription")}</p>
           </article>
           <article>
             <div className="lifecycle-card__art lifecycle-card__art--after">
               <span className="lifecycle-card__reminder-day">
-                THE MORNING AFTER
+                {t("reminderDay")}
               </span>
               <div className="lifecycle-card__reminder-message">
-                <span>One more thing…</span>
+                <span>{t("reminderOneMore")}</span>
                 <p>
-                  Got photos from last night?
+                  {t("reminderPromptLine1")}
                   <br />
-                  Share them here.
+                  {t("reminderPromptLine2")}
                 </p>
                 <span className="lifecycle-card__reminder-link">
-                  Your event link <ArrowRight size={14} aria-hidden="true" />
+                  {t("reminderLink")}{" "}
+                  <ArrowRight size={14} aria-hidden="true" />
                 </span>
               </div>
               <span className="lifecycle-card__reminder-icon">
                 <PaperPlaneTilt size={20} aria-hidden="true" />
               </span>
             </div>
-            <span className="eyebrow">03 — AFTER</span>
-            <h3>The memories keep coming.</h3>
-            <p>
-              Share the link once more. Collect the moments your guests were too
-              busy enjoying to upload.
-            </p>
+            <span className="eyebrow">{t("afterEyebrow")}</span>
+            <h3>{t("afterTitle")}</h3>
+            <p>{t("afterDescription")}</p>
           </article>
         </Reveal>
-        <p className="section-disclosure">
-          Illustrations of the planned experience. Live Wall and reminders are
-          coming later.
-        </p>
+        <p className="section-disclosure">{t("disclosure")}</p>
       </div>
     </section>
   );

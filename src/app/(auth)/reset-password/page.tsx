@@ -1,7 +1,12 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { AccountRecovery } from "@/features/auth/components";
 
-export const metadata: Metadata = { title: "Reset password - CandidCrowd" };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("auth.pages");
+
+  return { title: t("resetPasswordMetaTitle") };
+}
 
 export default async function ResetPasswordPage({
   searchParams,

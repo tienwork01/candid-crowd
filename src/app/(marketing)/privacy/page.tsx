@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Lock } from "@phosphor-icons/react/dist/ssr";
+import { getTranslations } from "next-intl/server";
 import { Header, Footer } from "@/features/marketing/components";
 import {
   TableOfContents,
@@ -10,44 +11,66 @@ import {
 import { siteConfig } from "@/lib/config";
 import "@/features/legal/components/legal.css";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | CandidCrowd",
-  description:
-    "Learn how CandidCrowd protects your privacy, handles event photos and videos, and guarantees no biometric facial scanning by default.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("legal.privacy");
 
-const privacyToc: TocItem[] = [
-  { id: "who-we-are", number: "1", title: "Who We Are" },
-  { id: "information-collected", number: "2", title: "Information We Collect" },
-  { id: "how-we-use", number: "3", title: "How We Use Information" },
-  { id: "legal-bases", number: "4", title: "Legal Bases for Processing" },
-  { id: "other-people", number: "5", title: "Photos of Other People" },
-  {
-    id: "facial-recognition",
-    number: "6",
-    title: "Facial Recognition & Biometrics",
-  },
-  { id: "how-we-share", number: "7", title: "How We Share Information" },
-  { id: "hosts-and-guests", number: "8", title: "Event Hosts and Guests" },
-  { id: "international", number: "9", title: "International Processing" },
-  { id: "retention", number: "10", title: "Data Retention" },
-  { id: "security", number: "11", title: "Security" },
-  { id: "cookies", number: "12", title: "Cookies" },
-  { id: "analytics", number: "13", title: "Analytics" },
-  { id: "ai-processing", number: "14", title: "AI and Uploaded Media" },
-  { id: "privacy-rights", number: "15", title: "Your Privacy Rights" },
-  { id: "removing-media", number: "16", title: "Removing Event Media" },
-  { id: "california-rights", number: "17", title: "California Privacy Rights" },
-  { id: "children", number: "18", title: "Children" },
-  { id: "deletion", number: "19", title: "Account and Event Deletion" },
-  { id: "breaches", number: "20", title: "Data Breaches" },
-  { id: "third-party-links", number: "21", title: "Third-Party Links" },
-  { id: "changes", number: "22", title: "Changes to This Privacy Policy" },
-  { id: "complaints", number: "23", title: "Complaints" },
-  { id: "contact", number: "24", title: "Contact" },
-];
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const t = await getTranslations("legal.privacy");
+  const tToc = await getTranslations("legal.toc");
+
+  const privacyToc: TocItem[] = [
+    { id: "who-we-are", number: "1", title: t("sections.whoWeAre") },
+    {
+      id: "information-collected",
+      number: "2",
+      title: t("sections.informationCollected"),
+    },
+    { id: "how-we-use", number: "3", title: t("sections.howWeUse") },
+    { id: "legal-bases", number: "4", title: t("sections.legalBases") },
+    { id: "other-people", number: "5", title: t("sections.otherPeople") },
+    {
+      id: "facial-recognition",
+      number: "6",
+      title: t("sections.facialRecognition"),
+    },
+    { id: "how-we-share", number: "7", title: t("sections.howWeShare") },
+    {
+      id: "hosts-and-guests",
+      number: "8",
+      title: t("sections.hostsAndGuests"),
+    },
+    { id: "international", number: "9", title: t("sections.international") },
+    { id: "retention", number: "10", title: t("sections.retention") },
+    { id: "security", number: "11", title: t("sections.security") },
+    { id: "cookies", number: "12", title: t("sections.cookies") },
+    { id: "analytics", number: "13", title: t("sections.analytics") },
+    { id: "ai-processing", number: "14", title: t("sections.aiProcessing") },
+    { id: "privacy-rights", number: "15", title: t("sections.privacyRights") },
+    { id: "removing-media", number: "16", title: t("sections.removingMedia") },
+    {
+      id: "california-rights",
+      number: "17",
+      title: t("sections.californiaRights"),
+    },
+    { id: "children", number: "18", title: t("sections.children") },
+    { id: "deletion", number: "19", title: t("sections.deletion") },
+    { id: "breaches", number: "20", title: t("sections.breaches") },
+    {
+      id: "third-party-links",
+      number: "21",
+      title: t("sections.thirdPartyLinks"),
+    },
+    { id: "changes", number: "22", title: t("sections.changes") },
+    { id: "complaints", number: "23", title: t("sections.complaints") },
+    { id: "contact", number: "24", title: t("sections.contact") },
+  ];
+
   return (
     <div className="legal-page">
       <Header />
@@ -56,20 +79,17 @@ export default function PrivacyPage() {
         <div className="legal-page__container legal-page__hero-inner">
           <div className="legal-page__badge">
             <span className="legal-page__badge-dot" aria-hidden="true" />
-            <span>Privacy &amp; Data Trust</span>
+            <span>{t("heroBadge")}</span>
           </div>
-          <h1 className="legal-page__title">Privacy Policy</h1>
+          <h1 className="legal-page__title">{t("heroTitle")}</h1>
           <div className="legal-page__meta">
-            <span>Last updated: September 14, 2026</span>
+            <span>{t("lastUpdated")}</span>
             <span className="legal-page__meta-divider" aria-hidden="true" />
-            <span>Hanoi, Vietnam</span>
+            <span>{t("location")}</span>
             <span className="legal-page__meta-divider" aria-hidden="true" />
-            <span>GDPR &amp; CCPA compliant</span>
+            <span>{t("compliance")}</span>
           </div>
-          <p className="legal-page__lead">
-            This Privacy Policy explains how CandidCrowd collects, uses, stores,
-            shares, and protects personal information when you use CandidCrowd.
-          </p>
+          <p className="legal-page__lead">{t("heroLead")}</p>
         </div>
       </header>
 
@@ -78,9 +98,9 @@ export default function PrivacyPage() {
           {/* Desktop Sticky Sidebar */}
           <aside
             className="legal-page__sidebar"
-            aria-label="Sidebar navigation"
+            aria-label={tToc("sidebarAria")}
           >
-            <TableOfContents items={privacyToc} title="Privacy Contents" />
+            <TableOfContents items={privacyToc} title={t("tocTitle")} />
           </aside>
 
           {/* Main Document Content */}
@@ -89,54 +109,55 @@ export default function PrivacyPage() {
             <div className="legal-callout">
               <div className="legal-callout__header">
                 <Lock className="legal-callout__icon" aria-hidden="true" />
-                <h2 className="legal-callout__title">
-                  Key Privacy Commitments
-                </h2>
+                <h2 className="legal-callout__title">{t("calloutTitle")}</h2>
               </div>
               <div className="legal-callout__body">
-                <p>
-                  At CandidCrowd, personal event memories deserve respectful,
-                  private, and controlled handling:
-                </p>
+                <p>{t("calloutLead")}</p>
               </div>
               <div className="legal-callout__grid">
                 <div className="legal-callout__item">
-                  <span className="legal-callout__item-label">Biometrics</span>
+                  <span className="legal-callout__item-label">
+                    {t("calloutItems.biometricsLabel")}
+                  </span>
                   <span className="legal-callout__item-value">
-                    Zero facial recognition profiling
+                    {t("calloutItems.biometricsValue")}
                   </span>
                 </div>
                 <div className="legal-callout__item">
                   <span className="legal-callout__item-label">
-                    Guest Privacy
+                    {t("calloutItems.guestPrivacyLabel")}
                   </span>
                   <span className="legal-callout__item-value">
-                    No account or email required to upload
+                    {t("calloutItems.guestPrivacyValue")}
                   </span>
                 </div>
                 <div className="legal-callout__item">
                   <span className="legal-callout__item-label">
-                    Storage Security
+                    {t("calloutItems.storageSecurityLabel")}
                   </span>
                   <span className="legal-callout__item-value">
-                    Cloudflare R2 private bucket storage
-                  </span>
-                </div>
-                <div className="legal-callout__item">
-                  <span className="legal-callout__item-label">AI Training</span>
-                  <span className="legal-callout__item-value">
-                    We never train public AI on your photos
-                  </span>
-                </div>
-                <div className="legal-callout__item">
-                  <span className="legal-callout__item-label">Data Sales</span>
-                  <span className="legal-callout__item-value">
-                    We do not sell personal data for money
+                    {t("calloutItems.storageSecurityValue")}
                   </span>
                 </div>
                 <div className="legal-callout__item">
                   <span className="legal-callout__item-label">
-                    Privacy Contact
+                    {t("calloutItems.aiTrainingLabel")}
+                  </span>
+                  <span className="legal-callout__item-value">
+                    {t("calloutItems.aiTrainingValue")}
+                  </span>
+                </div>
+                <div className="legal-callout__item">
+                  <span className="legal-callout__item-label">
+                    {t("calloutItems.dataSalesLabel")}
+                  </span>
+                  <span className="legal-callout__item-value">
+                    {t("calloutItems.dataSalesValue")}
+                  </span>
+                </div>
+                <div className="legal-callout__item">
+                  <span className="legal-callout__item-label">
+                    {t("calloutItems.privacyContactLabel")}
                   </span>
                   <span className="legal-callout__item-value">
                     {siteConfig.privacyEmail}
@@ -161,7 +182,9 @@ export default function PrivacyPage() {
             <section id="who-we-are" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">01</span>
-                <h2 className="legal-section__title">Who We Are</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.whoWeAre")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -198,7 +221,9 @@ export default function PrivacyPage() {
             <section id="information-collected" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">02</span>
-                <h2 className="legal-section__title">Information We Collect</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.informationCollected")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <h3 className="legal-section__subtitle">
@@ -336,7 +361,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">03</span>
                 <h2 className="legal-section__title">
-                  How We Use Personal Information
+                  {t("sections.howWeUse")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -400,7 +425,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">04</span>
                 <h2 className="legal-section__title">
-                  Legal Bases for Processing
+                  {t("sections.legalBases")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -441,7 +466,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">05</span>
                 <h2 className="legal-section__title">
-                  Photos and Videos of Other People
+                  {t("sections.otherPeople")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -478,7 +503,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">06</span>
                 <h2 className="legal-section__title">
-                  Facial Recognition and Biometric Data
+                  {t("sections.facialRecognition")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -506,7 +531,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">07</span>
                 <h2 className="legal-section__title">
-                  How We Share Information
+                  {t("sections.howWeShare")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -543,7 +568,9 @@ export default function PrivacyPage() {
             <section id="hosts-and-guests" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">08</span>
-                <h2 className="legal-section__title">Event Hosts and Guests</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.hostsAndGuests")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>Depending on an event&apos;s settings:</p>
@@ -576,7 +603,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">09</span>
                 <h2 className="legal-section__title">
-                  International Processing
+                  {t("sections.international")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -596,7 +623,9 @@ export default function PrivacyPage() {
             <section id="retention" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">10</span>
-                <h2 className="legal-section__title">Data Retention</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.retention")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -663,7 +692,9 @@ export default function PrivacyPage() {
             <section id="security" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">11</span>
-                <h2 className="legal-section__title">Security</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.security")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -702,7 +733,9 @@ export default function PrivacyPage() {
             <section id="cookies" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">12</span>
-                <h2 className="legal-section__title">Cookies</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.cookies")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>CandidCrowd may use cookies and similar technologies.</p>
@@ -727,7 +760,9 @@ export default function PrivacyPage() {
             <section id="analytics" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">13</span>
-                <h2 className="legal-section__title">Analytics</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.analytics")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -753,7 +788,9 @@ export default function PrivacyPage() {
             <section id="ai-processing" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">14</span>
-                <h2 className="legal-section__title">AI and Uploaded Media</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.aiProcessing")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -789,7 +826,9 @@ export default function PrivacyPage() {
             <section id="privacy-rights" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">15</span>
-                <h2 className="legal-section__title">Your Privacy Rights</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.privacyRights")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>Depending on where you live, you may have rights to:</p>
@@ -837,7 +876,9 @@ export default function PrivacyPage() {
             <section id="removing-media" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">16</span>
-                <h2 className="legal-section__title">Removing Event Media</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.removingMedia")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -881,7 +922,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">17</span>
                 <h2 className="legal-section__title">
-                  California Privacy Rights
+                  {t("sections.californiaRights")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -918,7 +959,9 @@ export default function PrivacyPage() {
             <section id="children" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">18</span>
-                <h2 className="legal-section__title">Children</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.children")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -943,7 +986,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">19</span>
                 <h2 className="legal-section__title">
-                  Account and Event Deletion
+                  {t("sections.deletion")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -973,7 +1016,9 @@ export default function PrivacyPage() {
             <section id="breaches" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">20</span>
-                <h2 className="legal-section__title">Data Breaches</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.breaches")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -993,7 +1038,9 @@ export default function PrivacyPage() {
             <section id="third-party-links" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">21</span>
-                <h2 className="legal-section__title">Third-Party Links</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.thirdPartyLinks")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -1010,7 +1057,7 @@ export default function PrivacyPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">22</span>
                 <h2 className="legal-section__title">
-                  Changes to This Privacy Policy
+                  {t("sections.changes")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -1026,7 +1073,9 @@ export default function PrivacyPage() {
             <section id="complaints" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">23</span>
-                <h2 className="legal-section__title">Complaints</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.complaints")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -1053,7 +1102,9 @@ export default function PrivacyPage() {
             <section id="contact" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">24</span>
-                <h2 className="legal-section__title">Contact</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.contact")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -1100,7 +1151,7 @@ export default function PrivacyPage() {
                 style={{ display: "flex", gap: "16px", alignItems: "center" }}
               >
                 <Link href="/terms" className="legal-section__link">
-                  View Terms of Service &rarr;
+                  {t("viewTerms")}
                 </Link>
               </div>
               <BackToTop />

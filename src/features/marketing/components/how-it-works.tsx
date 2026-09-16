@@ -1,27 +1,30 @@
 import { QrCode, DeviceMobile, Heart } from "@phosphor-icons/react/dist/ssr";
+import { getTranslations } from "next-intl/server";
 
-const steps = [
-  {
-    title: "Create your event",
-    description: "Set up an event in under a minute.",
-    detail: "A name, a date, and something to celebrate.",
-    Icon: Heart,
-  },
-  {
-    title: "Share your QR",
-    description: "Place it on invitations, tables, signs or screens.",
-    detail: "One simple invitation to share their perspective.",
-    Icon: QrCode,
-  },
-  {
-    title: "Everyone contributes",
-    description: "Guests upload from their phones without installing anything.",
-    detail: "During the fun, or when they get home.",
-    Icon: DeviceMobile,
-  },
-];
+export async function HowItWorks() {
+  const t = await getTranslations("marketing.howItWorks");
 
-export function HowItWorks() {
+  const steps = [
+    {
+      title: t("step1Title"),
+      description: t("step1Description"),
+      detail: t("step1Detail"),
+      Icon: Heart,
+    },
+    {
+      title: t("step2Title"),
+      description: t("step2Description"),
+      detail: t("step2Detail"),
+      Icon: QrCode,
+    },
+    {
+      title: t("step3Title"),
+      description: t("step3Description"),
+      detail: t("step3Detail"),
+      Icon: DeviceMobile,
+    },
+  ];
+
   return (
     <section
       className="how-it-works section-pad"
@@ -31,22 +34,22 @@ export function HowItWorks() {
       <div className="container">
         <div className="section-heading">
           <div>
-            <span className="eyebrow">A LITTLE SETUP. A LOT OF MEMORIES.</span>
+            <span className="eyebrow">{t("eyebrow")}</span>
             <h2 id="how-title">
-              Three simple steps.
+              {t("titleLine1")}
               <br />
-              <em>Then, be in the moment.</em>
+              <em>{t("titleLine2")}</em>
             </h2>
           </div>
           <p>
-            The experience we’re building,
+            {t("subheadLine1")}
             <br />
-            from first scan to last dance.
+            {t("subheadLine2")}
           </p>
         </div>
         <div className="how-it-works__grid">
           {steps.map(({ title, description, detail, Icon }, index) => (
-            <article className="how-step" key={title}>
+            <article className="how-step" key={index}>
               <div className="how-step__top">
                 <span>0{index + 1}</span>
                 <Icon size={29} aria-hidden="true" />

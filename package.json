@@ -15,6 +15,9 @@
     "typecheck": "tsc --noEmit",
     "format": "eslint --fix . && prettier --write .",
     "format:check": "prettier --check .",
+    "validate:locales": "node scripts/validate-locales.mjs",
+    "audit:literals": "node scripts/audit-source-literals.mjs",
+    "audit:unused-keys": "node scripts/audit-unused-keys.mjs",
     "test:e2e": "playwright test",
     "migrate:auth": "auth migrate --yes",
     "prepare": "husky"
@@ -32,6 +35,7 @@
     "input-otp": "^1.5.0",
     "motion": "^13.2.0",
     "next": "^16.3.5",
+    "next-intl": "^4.14.5",
     "nodemailer": "^10.0.9",
     "pg": "^8.23.0",
     "qrcode": "^1.5.4",

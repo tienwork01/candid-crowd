@@ -12,12 +12,21 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { Button } from "@/components/ui";
-import { guestDemo, sampleEvent, type MarketingPhoto } from "../data/marketing";
+import { useTranslations } from "next-intl";
+import {
+  guestDemo,
+  sampleEvent,
+  photos as staticPhotos,
+  type MarketingPhoto,
+} from "../data/marketing";
 import { useUploadPreview } from "../hooks/use-upload-preview";
 import { DemoQr } from "./demo-qr";
 import { DemoGallery } from "./demo-gallery";
 
 export function GuestDemo() {
+  const t = useTranslations("marketing.guestDemo");
+  const tSampleEvent = useTranslations("marketing.sampleEvent");
+  const tPhotos = useTranslations("marketing.photos");
   const [opened, setOpened] = useState(false);
   const [selected, setSelected] = useState<MarketingPhoto[]>([]);
   const [error, setError] = useState("");
@@ -33,6 +42,16 @@ export function GuestDemo() {
   const upload = useUploadPreview(inView);
   const busy = upload.phase === "uploading";
   const complete = upload.phase === "success";
+
+  type StaticPhotoKey = keyof typeof staticPhotos;
+
+  function getPhotoAlt(photo: MarketingPhoto) {
+    if (photo.id in staticPhotos) {
+      return tPhotos(photo.id as StaticPhotoKey);
+    }
+
+    return photo.alt;
+  }
 
   useEffect(
     () => () => {
@@ -123,11 +142,7 @@ export function GuestDemo() {
     setSelected((current) =>
       [...current, ...accepted].slice(0, guestDemo.maxPhotos),
     );
-    setError(
-      rejected
-        ? "Some files couldn’t be added. Choose JPG, PNG or WebP under 10 MB. This demo accepts up to 6 photos."
-        : "",
-    );
+    setError(rejected ? t("errorInvalidFiles") : "");
     if (input.current) input.current.value = "";
     readingRef.current = false;
     setReading(false);
@@ -137,16 +152,16 @@ export function GuestDemo() {
     ? [...selected, ...guestDemo.initialPhotos]
     : guestDemo.initialPhotos;
   const status = reading
-    ? "Preparing your local photos…"
+    ? t("statusPreparing")
     : complete
-      ? `${selected.length} photo${selected.length === 1 ? "" : "s"} added to the demo gallery. Your files stayed on this device.`
+      ? t("statusSuccess", { count: selected.length })
       : upload.phase === "error"
-        ? "Demo upload interrupted. Your photos are still selected. Retry when you’re ready."
+        ? t("statusError")
         : busy
-          ? "Simulating upload. Watch your photos join the gallery."
+          ? t("statusBusy")
           : selected.length
-            ? `${selected.length} photo${selected.length === 1 ? "" : "s"} ready to share.`
-            : "Choose your photos or use our sample moments.";
+            ? t("statusReady", { count: selected.length })
+            : t("statusEmpty");
 
   return (
     <section
@@ -157,13 +172,13 @@ export function GuestDemo() {
     >
       <div className="container">
         <div className="center-heading">
-          <span className="eyebrow">NO INSTRUCTIONS NEEDED</span>
+          <span className="eyebrow">{t("eyebrow")}</span>
           <h2 id="demo-title">
-            See how easy it is
+            {t("titleLine1")}
             <br />
-            <em>for your guests.</em>
+            <em>{t("titleLine2")}</em>
           </h2>
-          <p>You’re the guest. Try it yourself.</p>
+          <p>{t("subhead")}</p>
         </div>
         <div className="guest-demo__layout">
           <div className="guest-demo__invitation">
@@ -175,38 +190,38 @@ export function GuestDemo() {
                 addButton.current?.focus();
               }}
             >
-              Try without scanning <ArrowRight aria-hidden="true" />
+              {t("tryWithoutScanning")} <ArrowRight aria-hidden="true" />
             </Button>
-            <span className="guest-demo__caption">
-              No sign-up. Just jump in.
-            </span>
+            <span className="guest-demo__caption">{t("caption")}</span>
           </div>
           <div className="guest-phone">
             <div className="guest-phone__speaker" aria-hidden="true" />
             <div className="guest-phone__intro">
-              <span className="eyebrow">YOU’RE INVITED TO</span>
+              <span className="eyebrow">{t("invitedTo")}</span>
               <h3>{sampleEvent.name}</h3>
-              <p>{sampleEvent.disclosure}</p>
+              <p>{tSampleEvent("disclosure")}</p>
             </div>
-            <ol className="guest-phone__steps" aria-label="Demo progress">
-              {["Open", "Choose", "Share"].map((step, index) => (
-                <li
-                  key={step}
-                  className={
-                    (opened ? (selected.length ? 2 : 1) : 0) >= index
-                      ? "is-current"
-                      : ""
-                  }
-                  aria-current={
-                    (!opened ? 0 : selected.length ? 2 : 1) === index
-                      ? "step"
-                      : undefined
-                  }
-                >
-                  <span>{index + 1}</span>
-                  {step}
-                </li>
-              ))}
+            <ol className="guest-phone__steps" aria-label={t("progressAria")}>
+              {[t("steps.open"), t("steps.choose"), t("steps.share")].map(
+                (step, index) => (
+                  <li
+                    key={index}
+                    className={
+                      (opened ? (selected.length ? 2 : 1) : 0) >= index
+                        ? "is-current"
+                        : ""
+                    }
+                    aria-current={
+                      (!opened ? 0 : selected.length ? 2 : 1) === index
+                        ? "step"
+                        : undefined
+                    }
+                  >
+                    <span>{index + 1}</span>
+                    {step}
+                  </li>
+                ),
+              )}
             </ol>
             <div className="guest-phone__body">
               {!opened ? (
@@ -214,54 +229,59 @@ export function GuestDemo() {
                   <div className="guest-phone__welcome-photo">
                     <Image
                       src="/images/wedding-meadow.webp"
-                      alt="A fictional wedding demo gallery"
+                      alt={t("welcomeAlt")}
                       fill
                       sizes="260px"
                     />
                   </div>
                   <h4>
-                    A little moment.
-                    <br />A memory for everyone.
+                    {t("welcomeTitleLine1")}
+                    <br />
+                    {t("welcomeTitleLine2")}
                   </h4>
                   <Button onClick={() => setOpened(true)}>
-                    Open event <ArrowRight aria-hidden="true" />
+                    {t("openEvent")} <ArrowRight aria-hidden="true" />
                   </Button>
                 </>
               ) : (
                 <>
                   <div className="guest-phone__photo-grid">
                     {selected.length ? (
-                      selected.map((photo) => (
-                        <div key={photo.id} className="guest-phone__photo">
-                          <Image
-                            src={photo.src}
-                            alt={photo.alt}
-                            fill
-                            sizes="120px"
-                            unoptimized={photo.src.startsWith("blob:")}
-                          />
-                          {!busy && !complete && (
-                            <button
-                              className="guest-phone__remove-photo"
-                              disabled={reading}
-                              aria-label={`Remove ${photo.alt}`}
-                              onClick={() =>
-                                setSelected((current) =>
-                                  current.filter(
-                                    (item) => item.id !== photo.id,
-                                  ),
-                                )
-                              }
-                            >
-                              <X size={14} aria-hidden="true" />
-                            </button>
-                          )}
-                        </div>
-                      ))
+                      selected.map((photo) => {
+                        const alt = getPhotoAlt(photo);
+
+                        return (
+                          <div key={photo.id} className="guest-phone__photo">
+                            <Image
+                              src={photo.src}
+                              alt={alt}
+                              fill
+                              sizes="120px"
+                              unoptimized={photo.src.startsWith("blob:")}
+                            />
+                            {!busy && !complete && (
+                              <button
+                                className="guest-phone__remove-photo"
+                                disabled={reading}
+                                aria-label={t("removePhoto", { alt })}
+                                onClick={() =>
+                                  setSelected((current) =>
+                                    current.filter(
+                                      (item) => item.id !== photo.id,
+                                    ),
+                                  )
+                                }
+                              >
+                                <X size={14} aria-hidden="true" />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })
                     ) : (
                       <div className="guest-phone__placeholder">
                         <ImageSquare size={30} aria-hidden="true" />
-                        <span>Your perspective belongs here.</span>
+                        <span>{t("placeholder")}</span>
                       </div>
                     )}
                   </div>
@@ -272,7 +292,7 @@ export function GuestDemo() {
                     hidden
                     multiple
                     accept="image/jpeg,image/png,image/webp"
-                    aria-label="Choose photos for the local demo"
+                    aria-label={t("fileInputAria")}
                     onChange={(event) => void addFiles(event.target.files)}
                   />
                   {!busy && !complete && (
@@ -285,7 +305,7 @@ export function GuestDemo() {
                           reading || selected.length >= guestDemo.maxPhotos
                         }
                       >
-                        <ImageSquare aria-hidden="true" /> Add photos
+                        <ImageSquare aria-hidden="true" /> {t("addPhotos")}
                       </Button>
                       <button
                         className="text-button"
@@ -305,7 +325,7 @@ export function GuestDemo() {
                           );
                         }}
                       >
-                        Use sample photos{" "}
+                        {t("useSamplePhotos")}{" "}
                         <ArrowRight size={14} aria-hidden="true" />
                       </button>
                     </>
@@ -319,21 +339,21 @@ export function GuestDemo() {
                       }}
                     >
                       {upload.phase === "error"
-                        ? "Retry upload"
-                        : `Upload ${selected.length} photo${selected.length === 1 ? "" : "s"}`}{" "}
+                        ? t("retryUpload")
+                        : t("uploadCount", { count: selected.length })}{" "}
                       <ArrowRight aria-hidden="true" />
                     </Button>
                   )}
                   {busy && (
                     <div className="guest-phone__upload-feedback">
                       <div className="guest-phone__progress-label">
-                        <span>Sharing your moments</span>
+                        <span>{t("sharingMoments")}</span>
                         <span>{upload.progress}%</span>
                       </div>
                       <div
                         className="guest-phone__upload-track"
                         role="progressbar"
-                        aria-label="Simulated photo upload"
+                        aria-label={t("progressBarAria")}
                         aria-valuemin={0}
                         aria-valuemax={100}
                         aria-valuenow={upload.progress}
@@ -349,7 +369,7 @@ export function GuestDemo() {
                         className="text-button"
                         onClick={upload.interrupt}
                       >
-                        Simulate an interruption
+                        {t("simulateInterruption")}
                       </button>
                     </div>
                   )}
@@ -361,11 +381,12 @@ export function GuestDemo() {
                     >
                       <Check aria-hidden="true" />
                       <h4>
-                        You made the gallery
-                        <br />a little more you.
+                        {t("successTitleLine1")}
+                        <br />
+                        {t("successTitleLine2")}
                       </h4>
                       <a href="#demo-gallery" className="inline-action">
-                        See your photos{" "}
+                        {t("seeYourPhotos")}{" "}
                         <ArrowRight size={16} aria-hidden="true" />
                       </a>
                     </m.div>
@@ -382,7 +403,8 @@ export function GuestDemo() {
               )}
             </div>
             <button className="text-button guest-phone__reset" onClick={reset}>
-              <ArrowCounterClockwise size={14} aria-hidden="true" /> Reset demo
+              <ArrowCounterClockwise size={14} aria-hidden="true" />{" "}
+              {t("resetDemo")}
             </button>
           </div>
           <div id="demo-gallery" className="guest-demo__gallery-wrap">
@@ -390,16 +412,15 @@ export function GuestDemo() {
             <div className="guest-demo__gallery-note">
               <ArrowRight size={20} aria-hidden="true" />
               <span>
-                From their phone.
+                {t("galleryNoteLine1")}
                 <br />
-                <em>Into your story.</em>
+                <em>{t("galleryNoteLine2")}</em>
               </span>
             </div>
           </div>
         </div>
         <p className="guest-demo__disclosure">
-          <LockKey size={14} aria-hidden="true" /> Simulated experience · No
-          photos are uploaded · Reloading clears the demo
+          <LockKey size={14} aria-hidden="true" /> {t("disclosure")}
         </p>
       </div>
     </section>

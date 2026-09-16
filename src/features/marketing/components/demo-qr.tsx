@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useInView } from "motion/react";
 import { QrCode } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export function DemoQr() {
+  const t = useTranslations("marketing.demoQr");
   const ref = useRef<HTMLDivElement>(null);
   const visible = useInView(ref, { once: true, margin: "200px" });
   const [src, setSrc] = useState("");
@@ -39,17 +41,17 @@ export function DemoQr() {
 
   return (
     <div ref={ref} className="demo-qr">
-      <span className="eyebrow">A LITTLE INVITATION</span>
+      <span className="eyebrow">{t("eyebrow")}</span>
       <span className="demo-qr__title">
-        Your perspective
+        {t("titleLine1")}
         <br />
-        <em>belongs here.</em>
+        <em>{t("titleLine2")}</em>
       </span>
       <div className="demo-qr__image">
         {src ? (
           <Image
             src={src}
-            alt="Scan to open the interactive CandidCrowd guest demo"
+            alt={t("alt")}
             width={160}
             height={160}
             unoptimized
@@ -57,23 +59,13 @@ export function DemoQr() {
         ) : (
           <QrCode
             size={90}
-            aria-label={
-              failed
-                ? "QR unavailable; use Try without scanning"
-                : "QR code loading"
-            }
+            aria-label={failed ? t("qrUnavailable") : t("qrLoading")}
           />
         )}
       </div>
-      <p>
-        {failed
-          ? "Use the button below to try the demo."
-          : "Scan with your phone camera"}
-      </p>
+      <p>{failed ? t("failedInstruction") : t("scanInstruction")}</p>
       <span className="demo-qr__brand">candidcrowd.</span>
-      <p className="demo-qr__note">
-        Use a publicly reachable site URL to scan from another device.
-      </p>
+      <p className="demo-qr__note">{t("note")}</p>
     </div>
   );
 }

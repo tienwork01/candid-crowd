@@ -1,0 +1,734 @@
+{
+  "common": {
+    "skipToContent": "Skip to content",
+    "language": "Language",
+    "brandHome": "CandidCrowd home",
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "close": "Close",
+      "back": "Back"
+    },
+    "errors": {
+      "USER_ALREADY_EXISTS": "An account with this email already exists. Please log in instead.",
+      "INVALID_CREDENTIALS": "Email or password is incorrect. Please check your credentials.",
+      "INVALID_PASSWORD": "The password you entered is incorrect.",
+      "PASSWORD_TOO_SHORT": "Password must be at least 8 characters.",
+      "PASSWORD_TOO_LONG": "Password cannot exceed 128 characters.",
+      "EMAIL_NOT_VERIFIED": "Please verify your email address before continuing.",
+      "USER_NOT_FOUND": "No account was found with this email address.",
+      "INVALID_TOKEN": "This link or code is invalid or has expired.",
+      "TOKEN_EXPIRED": "This link has expired. Please request a new one.",
+      "RESET_PASSWORD_FAILED": "Unable to reset your password. Please request a new link.",
+      "CONSENT_REQUIRED": "Please accept the current Terms of Service and Privacy Policy to continue.",
+      "SESSION_EXPIRED": "Your session has expired. Please sign in again.",
+      "UNAUTHORIZED": "You do not have permission to perform this action.",
+      "SOCIAL_ACCOUNT_ALREADY_LINKED": "This social account is already linked to another user.",
+      "FAILED_TO_CREATE_USER": "We couldn’t create your account. Please try again.",
+      "EVENT_NOT_FOUND": "The requested event could not be found.",
+      "EVENT_NAME_REQUIRED": "Please enter an event name.",
+      "INVALID_EVENT_DATE": "Please select a valid date for your event.",
+      "INVALID_GUEST_COUNT": "Please enter a valid expected guest count.",
+      "EVENT_EXPIRED": "This event has ended and is no longer accepting uploads.",
+      "EVENT_CLOSED": "This event gallery is currently closed.",
+      "INVALID_FILE_TYPE": "Unsupported file type. Please upload a JPG, PNG, HEIC, or WebP photo.",
+      "FILE_TOO_LARGE": "File size exceeds the allowed limit.",
+      "UPLOAD_FAILED": "Upload failed. Please check your connection and try again.",
+      "STORAGE_ERROR": "Storage service temporarily unavailable. Please try again shortly.",
+      "RATE_LIMIT_EXCEEDED": "Too many requests. Please wait a moment before trying again.",
+      "NETWORK_ERROR": "Unable to connect to the server. Please check your internet connection.",
+      "SERVER_ERROR": "A server error occurred. Please try again shortly.",
+      "REQUEST_FAILED": "The request could not be completed. Please try again.",
+      "UNKNOWN": "Something went wrong. Please try again."
+    }
+  },
+  "metadata": {
+    "homeTitle": "CandidCrowd — Every guest. Every perspective.",
+    "homeDescription": "Get the photos your guests already take. One QR code, one shared event gallery. No app. No guest account."
+  },
+  "marketing": {
+    "navigation": {
+      "main": "Main navigation",
+      "mobile": "Mobile navigation",
+      "open": "Open navigation",
+      "close": "Close navigation",
+      "howItWorks": "How it works",
+      "demo": "Demo",
+      "pricing": "Pricing"
+    },
+    "header": {
+      "login": "Log in",
+      "createEvent": "Create free event"
+    },
+    "languageSwitcher": {
+      "label": "Choose language"
+    },
+    "hero": {
+      "eyebrow": "LITTLE MOMENTS. ALL TOGETHER.",
+      "title": "Get the photos your guests already take.",
+      "description": "One QR code gives everyone at your event a simple place to share their photos and videos. No app. No account.",
+      "createEvent": "Create your event free",
+      "seeHowItWorks": "See how it works",
+      "trustNoApp": "No app",
+      "trustPrivate": "Private",
+      "trustOriginalQuality": "Original quality"
+    },
+    "photos": {
+      "countryside": "A couple holding hands while walking through the countryside",
+      "venue": "A garden ceremony gazebo decorated with flowers",
+      "celebration": "A bride and groom smiling at each other in warm sunset light",
+      "couple": "A bride and groom in ivory wedding attire in a sunlit meadow",
+      "table": "A celebration table filled with flowers and glasses",
+      "details": "Wedding rings resting on a pink bouquet",
+      "flowers": "Flowers arranged along a wedding reception table"
+    },
+    "sampleEvent": {
+      "disclosure": "Fictional demo event"
+    },
+    "howItWorks": {
+      "eyebrow": "A LITTLE SETUP. A LOT OF MEMORIES.",
+      "titleLine1": "Three simple steps.",
+      "titleLine2": "Then, be in the moment.",
+      "subheadLine1": "The experience we’re building,",
+      "subheadLine2": "from first scan to last dance.",
+      "step1Title": "Create your event",
+      "step1Description": "Set up an event in under a minute.",
+      "step1Detail": "A name, a date, and something to celebrate.",
+      "step2Title": "Share your QR",
+      "step2Description": "Place it on invitations, tables, signs or screens.",
+      "step2Detail": "One simple invitation to share their perspective.",
+      "step3Title": "Everyone contributes",
+      "step3Description": "Guests upload from their phones without installing anything.",
+      "step3Detail": "During the fun, or when they get home."
+    },
+    "problem": {
+      "eyebrow": "THE MOMENTS BETWEEN THE BIG MOMENTS",
+      "titleLine1": "Your photographer can’t be everywhere.",
+      "titleLine2": "Your guests already are.",
+      "subhead": "At every table. In every hug. On every corner of the dance floor.",
+      "tableCaption": "The table stories.",
+      "tableExtra": "A place for everyone",
+      "coupleCaption": "The happy faces.",
+      "coupleExtra": "Celebrating together",
+      "countrysideCaption": "The in-between.",
+      "countrysideExtra": "A quiet walk together",
+      "venueCaption": "The details you missed.",
+      "venueExtra": "Before everyone arrives",
+      "tagDanceVideos": "Dance-floor videos",
+      "tagGroupSelfies": "Group selfies",
+      "tagUnforgettable": "One more unforgettable moment",
+      "summaryText": "All those perspectives. One CandidCrowd gallery."
+    },
+    "privacy": {
+      "eyebrow": "YOUR PEOPLE. YOUR MOMENTS.",
+      "titleLine1": "Big memories.",
+      "titleLine2": "Beautifully simple.",
+      "subheadLine1": "Designed to feel effortless for your guests,",
+      "subheadLine2": "and reassuringly yours.",
+      "assuranceNoAccount": "No guest account",
+      "assuranceNoApp": "No app installation",
+      "assurancePrivateGallery": "Private event gallery",
+      "assuranceOriginalQuality": "Original-quality files",
+      "assuranceHostControls": "Host controls the event",
+      "assuranceModernBrowsers": "Modern iPhone & Android browsers",
+      "disclosure": "Our product principles. Live event sharing is not available in this preview."
+    },
+    "pricing": {
+      "eyebrow": "A PLAN FOR YOUR KIND OF CELEBRATION",
+      "titleLine1": "Little gathering.",
+      "titleLine2": "Big memories.",
+      "subhead": "Start with the free preview. Find the right fit as we grow.",
+      "recommendedBadge": "Most loved for a full celebration",
+      "availableToExplore": "AVAILABLE TO EXPLORE",
+      "plannedOffering": "PLANNED OFFERING",
+      "essentialNote": "The essentials for bringing every guest perspective together.",
+      "disclosure": "Pricing preview · Paid plans and features are not available yet. No payments are collected.",
+      "plans": {
+        "free": {
+          "name": "Free",
+          "description": "For trying CandidCrowd.",
+          "priceLabel": "Free",
+          "billing": "Explore the preview",
+          "cta": "Try it free"
+        },
+        "essential": {
+          "name": "Essential",
+          "description": "One celebration. Every perspective.",
+          "priceLabel": "Coming soon",
+          "billing": "Pay once per event · Price to be announced",
+          "cta": "Explore the demo"
+        },
+        "plus": {
+          "name": "Plus",
+          "description": "For the moments that need more room.",
+          "priceLabel": "Coming soon",
+          "billing": "Pay once per event · Price to be announced",
+          "cta": "Explore the demo"
+        }
+      }
+    },
+    "eventTypesSection": {
+      "eyebrow": "STARTING WITH “I DO.” MADE FOR SO MUCH MORE.",
+      "titleLine1": "Life gives you the occasion.",
+      "titleLine2": "We bring the memories together.",
+      "photoNoteLine1": "For the big day.",
+      "photoNoteLine2": "And all the days worth keeping.",
+      "optionsEyebrow": "WHAT ARE YOU CELEBRATING?",
+      "exploreAria": "Explore event types",
+      "startDraft": "Start your event draft",
+      "items": {
+        "weddings": {
+          "label": "Weddings",
+          "line": "The big day. Every little moment.",
+          "description": "From happy tears to the last dance, bring every guest’s perspective into your story."
+        },
+        "birthdays": {
+          "label": "Birthdays",
+          "line": "Another year. A hundred new memories.",
+          "description": "The candles, the surprises, and the people who make it your day."
+        },
+        "graduations": {
+          "label": "Graduations",
+          "line": "One chapter closes. A new story begins.",
+          "description": "Keep the proud faces, flying caps, and celebrations with your favorite people."
+        },
+        "reunions": {
+          "label": "Reunions",
+          "line": "Together again. Just like old times.",
+          "description": "A home for every familiar smile, shared story, and long-overdue group photo."
+        },
+        "company-events": {
+          "label": "Company events",
+          "line": "Good people. Shared moments.",
+          "description": "Collect the human side of team offsites, milestones, and company celebrations."
+        }
+      }
+    },
+    "finalCta": {
+      "eyebrow": "EVERY GUEST. EVERY PERSPECTIVE.",
+      "titleLine1": "Your guests are already",
+      "titleLine2": "taking the photos.",
+      "titleLine3": "Bring them together.",
+      "button": "Create your event free",
+      "subhead": "No app. No guest account. All the good stuff."
+    },
+    "footer": {
+      "brandTagline": "Shared memories for every event.",
+      "brandSub": "Made for the moments in between.",
+      "productTitle": "Product",
+      "eventsTitle": "Events",
+      "essentialsTitle": "The essentials",
+      "previewLabel": "Official policies",
+      "bottomNote": "First chapter · Product preview"
+    },
+    "lifecycle": {
+      "eyebrow": "IT’S MORE THAN ONE DAY",
+      "titleLine1": "Before the first hello.",
+      "titleLine2": "After the last goodbye.",
+      "subhead": "A place for your memories, whenever they’re ready to be shared.",
+      "invitationTop": "WITH OUR FAVORITE PEOPLE",
+      "invitationHeadline": "Let’s make memories.",
+      "invitationScan": "Scan. Share. Celebrate.",
+      "invitationTag": "Invitations · Tables · Welcome signs",
+      "beforeEyebrow": "01 — BEFORE",
+      "beforeTitle": "Place the QR anywhere.",
+      "beforeDescription": "On the invitation, your event website, a welcome sign, or every table. Make it easy to find.",
+      "liveWallLabel": "LIVE WALL CONCEPT",
+      "wallNotice": "A new perspective just arrived.",
+      "duringEyebrow": "02 — DURING",
+      "duringTitle": "Watch your story grow.",
+      "duringDescription": "Photos find their way into your shared gallery. A future Live Wall brings them into the room.",
+      "reminderDay": "THE MORNING AFTER",
+      "reminderOneMore": "One more thing…",
+      "reminderPromptLine1": "Got photos from last night?",
+      "reminderPromptLine2": "Share them here.",
+      "reminderLink": "Your event link",
+      "afterEyebrow": "03 — AFTER",
+      "afterTitle": "The memories keep coming.",
+      "afterDescription": "Share the link once more. Collect the moments your guests were too busy enjoying to upload.",
+      "disclosure": "Illustrations of the planned experience. Live Wall and reminders are coming later."
+    },
+    "participation": {
+      "eyebrow": "BUILT AROUND PARTICIPATION",
+      "titleLine1": "Don’t just create an album.",
+      "titleLine2": "Get people to contribute.",
+      "subhead": "A shared gallery is only the beginning. We’re designing CandidCrowd to help you see what gets your guests sharing.",
+      "point1Title": "Know what brings people in.",
+      "point1Description": "See which QR placements make sharing a natural part of your event.",
+      "point2Title": "Make room for every perspective.",
+      "point2Description": "Understand participation, then give guests a gentle nudge when the time is right.",
+      "conceptNote": "Product concept · Analytics and QR source tracking are not live yet.",
+      "dashboardEyebrow": "YOUR EVENT, AT A GLANCE",
+      "expectedGuests": "expected guests",
+      "participationLabel": "participation",
+      "photos": "photos",
+      "videos": "videos",
+      "sourcesHeading": "Where the memories begin",
+      "contributorsCol": "Contributors",
+      "tableCaption": "Illustrative contributors by QR source",
+      "thSource": "Source",
+      "sources": {
+        "entrance": "Entrance QR",
+        "table": "Table QR",
+        "bar": "Bar QR",
+        "link": "Shared link"
+      }
+    },
+    "previewNotice": {
+      "dialogEyebrow": "CANDIDCROWD · FIRST CHAPTER",
+      "createDraft": "Create an event draft",
+      "notices": {
+        "login": {
+          "title": "Your host space is on its way.",
+          "body": "Host accounts aren’t available in this preview yet. You can try the guest experience or create an event draft on this device. No credentials are collected."
+        },
+        "privacy": {
+          "title": "Privacy · preview notice",
+          "body": "Photos selected in this demo stay in this browser session and are not uploaded. An event draft is stored on this device if you save one. The full privacy policy will be published before live accounts and cloud uploads launch. This notice is a placeholder, not the final policy."
+        },
+        "terms": {
+          "title": "Terms · preview notice",
+          "body": "This is an interactive product preview, not a live event-sharing service. Paid plans, host accounts, and cloud uploads are not available. Full terms will be published before the service launches. This notice is a placeholder, not the final terms."
+        }
+      }
+    },
+    "heroScene": {
+      "ariaLabel": "Interactive preview: a guest phone shares a photo into an event gallery",
+      "galleryView": "Gallery view",
+      "rotateLeft": "Rotate view left",
+      "rotateRight": "Rotate view right",
+      "sharedGallery": "THE SHARED GALLERY",
+      "nextMemory": "Your next memory",
+      "caption": "Every guest. A different perspective.",
+      "phoneAlt": "The photo from the guest phone, now in the shared gallery",
+      "guestPhone": "YOUR GUEST’S PHONE",
+      "oneLittleMoment": "One little moment.",
+      "tryAgain": "Try again",
+      "sharing": "Sharing… {progress}%",
+      "shareMemory": "Share a memory",
+      "footnote": "Interactive preview",
+      "statusNewMemory": "A new memory, together.",
+      "statusUploading": "From their phone to your gallery…",
+      "statusIdle": "Their camera roll. Your memories.",
+      "statusNewMemorySub": "Photo added to the sample gallery.",
+      "statusIdleSub": "Try “Share a memory” below.",
+      "legendGuestPhone": "Guest phone",
+      "legendShare": "Share",
+      "legendYourGallery": "Your gallery"
+    },
+    "demoQr": {
+      "eyebrow": "A LITTLE INVITATION",
+      "titleLine1": "Your perspective",
+      "titleLine2": "belongs here.",
+      "alt": "Scan to open the interactive CandidCrowd guest demo",
+      "qrUnavailable": "QR unavailable; use Try without scanning",
+      "qrLoading": "QR code loading",
+      "failedInstruction": "Use the button below to try the demo.",
+      "scanInstruction": "Scan with your phone camera",
+      "note": "Use a publicly reachable site URL to scan from another device."
+    },
+    "demoGallery": {
+      "eyebrow": "THE SHARED GALLERY",
+      "memories": "Our memories",
+      "photosCount": "{count, plural, =1 {1 photo · Demo} other {# photos · Demo}}",
+      "viewPhoto": "View photo: {alt}",
+      "caption": "A whole day, seen through their eyes.",
+      "previewTitle": "Photo preview"
+    },
+    "guestDemo": {
+      "eyebrow": "NO INSTRUCTIONS NEEDED",
+      "titleLine1": "See how easy it is",
+      "titleLine2": "for your guests.",
+      "subhead": "You’re the guest. Try it yourself.",
+      "tryWithoutScanning": "Try without scanning",
+      "caption": "No sign-up. Just jump in.",
+      "invitedTo": "YOU’RE INVITED TO",
+      "progressAria": "Demo progress",
+      "steps": {
+        "open": "Open",
+        "choose": "Choose",
+        "share": "Share"
+      },
+      "welcomeAlt": "A fictional wedding demo gallery",
+      "welcomeTitleLine1": "A little moment.",
+      "welcomeTitleLine2": "A memory for everyone.",
+      "openEvent": "Open event",
+      "removePhoto": "Remove {alt}",
+      "placeholder": "Your perspective belongs here.",
+      "fileInputAria": "Choose photos for the local demo",
+      "addPhotos": "Add photos",
+      "useSamplePhotos": "Use sample photos",
+      "retryUpload": "Retry upload",
+      "uploadCount": "Upload {count, plural, =1 {1 photo} other {# photos}}",
+      "sharingMoments": "Sharing your moments",
+      "progressBarAria": "Simulated photo upload",
+      "simulateInterruption": "Simulate an interruption",
+      "successTitleLine1": "You made the gallery",
+      "successTitleLine2": "a little more you.",
+      "seeYourPhotos": "See your photos",
+      "resetDemo": "Reset demo",
+      "galleryNoteLine1": "From their phone.",
+      "galleryNoteLine2": "Into your story.",
+      "disclosure": "Simulated experience · No photos are uploaded · Reloading clears the demo",
+      "errorInvalidFiles": "Some files couldn’t be added. Choose JPG, PNG or WebP under 10 MB. This demo accepts up to 6 photos.",
+      "statusPreparing": "Preparing your local photos…",
+      "statusSuccess": "{count, plural, =1 {1 photo} other {# photos}} added to the demo gallery. Your files stayed on this device.",
+      "statusError": "Demo upload interrupted. Your photos are still selected. Retry when you’re ready.",
+      "statusBusy": "Simulating upload. Watch your photos join the gallery.",
+      "statusReady": "{count, plural, =1 {1 photo} other {# photos}} ready to share.",
+      "statusEmpty": "Choose your photos or use our sample moments."
+    }
+  },
+  "auth": {
+    "ui": {
+      "home": "Home",
+      "getStarted": "Get started",
+      "memoriesTogether": "Your memories, together",
+      "registerDescription": "Collect every photo from your event in original quality.",
+      "loginDescription": "A little closer to all your favorite moments.",
+      "emailPlaceholder": "you@example.com",
+      "fullNamePlaceholder": "Your full name",
+      "forgotPassword": "Forgot password?",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "wait": "Please wait…",
+      "signUpWithProvider": "Sign up with a provider",
+      "logInWithProvider": "Log in with a provider",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithApple": "Continue with Apple",
+      "socialConsentPrefix": "By continuing, you agree to our",
+      "terms": "Terms",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "orWithEmail": "or with email",
+      "createPasswordPlaceholder": "Create a password",
+      "enterPasswordPlaceholder": "Enter your password",
+      "passwordMinHint": "At least 8 characters.",
+      "agreeToTermsPrefix": "I agree to the",
+      "termsOfService": "Terms of service",
+      "submitCreateAccount": "Create account",
+      "submitLogIn": "Log in",
+      "alreadyHaveAccount": "Already have an account?",
+      "newToCandidCrowd": "New to CandidCrowd?",
+      "actionLogIn": "Log in",
+      "actionCreateAccount": "Create an account",
+      "logOut": "Log out"
+    },
+    "signIn": {
+      "title": "Welcome back",
+      "email": "Email",
+      "password": "Password"
+    },
+    "register": {
+      "title": "Create your account",
+      "name": "Full name"
+    },
+    "recovery": {
+      "forgotPasswordEyebrow": "ACCOUNT RECOVERY",
+      "forgotPasswordTitle": "Find your way back.",
+      "forgotPasswordDescription": "Enter the email attached to your account and we’ll prepare a secure reset link.",
+      "resetPasswordEyebrow": "A FRESH START",
+      "resetPasswordTitle": "Choose a new password.",
+      "resetPasswordDescription": "Create a password you haven’t used before to keep your memories protected.",
+      "verifyEmailEyebrow": "ONE LAST STEP",
+      "verifyEmailTitle": "Check your inbox.",
+      "verifyEmailDescription": "We sent you a secure verification link. Open it to finish setting up your account.",
+      "emailAddress": "Email address",
+      "newPassword": "New password",
+      "confirmNewPassword": "Confirm new password",
+      "passwordsDoNotMatch": "Passwords do not match. Check both fields and try again.",
+      "invalidOrExpiredResetLink": "This reset link is invalid or expired.",
+      "returnToRegistration": "Return to registration and enter your email again.",
+      "verificationLinkOnWay": "A fresh verification link is on its way.",
+      "verifyEmailExpiryNotice": "Verification links expire for your security. Check spam or request a fresh email below.",
+      "didntReceiveEmail": "Didn’t receive the email?",
+      "resendGuidance": "Use the button above to resend securely.",
+      "sendResetLink": "Send reset link",
+      "saveNewPassword": "Save new password",
+      "sendAnotherLink": "Send another link",
+      "successCheckInboxEyebrow": "CHECK YOUR INBOX",
+      "successAllSetEyebrow": "ALL SET",
+      "successResetLinkReady": "Your reset link is ready.",
+      "successPasswordRenewed": "Your password is renewed.",
+      "successResetLinkBody": "If an account exists for that email, a secure reset link will arrive shortly.",
+      "successPasswordRenewedBody": "Your password has been changed. You can now log in with your new password.",
+      "tryAnotherEmail": "Try another email",
+      "continueToLogIn": "Continue to log in"
+    },
+    "layout": {
+      "heroAlt": "Couple holding hands while walking through the countryside in golden hour",
+      "momentsInBetween": "THE MOMENTS IN BETWEEN",
+      "heroQuoteLine1": "Every guest.",
+      "heroQuoteLine2": "A different perspective.",
+      "heroSub": "The memories you almost missed.",
+      "polaroidAlt": "A bride and groom smiling at each other in warm sunset light",
+      "polaroidCaption": "Golden hour · Table 04",
+      "badgeText": "184 candid moments captured"
+    },
+    "pages": {
+      "loginMetaTitle": "Log in — CandidCrowd",
+      "registerMetaTitle": "Create an account — CandidCrowd",
+      "forgotPasswordMetaTitle": "Forgot password — CandidCrowd",
+      "resetPasswordMetaTitle": "Reset password — CandidCrowd",
+      "verifyEmailMetaTitle": "Verify email — CandidCrowd"
+    }
+  },
+  "event": {
+    "create": {
+      "title": "Create your event",
+      "name": "Event name",
+      "type": "Event type",
+      "date": "Event date"
+    },
+    "types": {
+      "Wedding": "Wedding",
+      "Birthday": "Birthday",
+      "Anniversary": "Anniversary",
+      "Reunion": "Reunion",
+      "Trip": "Trip",
+      "Team celebration": "Team celebration",
+      "Other": "Other"
+    },
+    "setup": {
+      "nameRequired": "Give your event a name to continue.",
+      "dateRequired": "Choose an event date to continue.",
+      "signInRequired": "Please sign in to create and save your event.",
+      "previewEyebrow": "EVENT PREVIEW",
+      "readyEyebrow": "YOUR EVENT IS READY",
+      "readyTitleSuffix": "is ready.",
+      "previewDescription": "This is a local preview. Sign in when you are ready to save and share a real event.",
+      "readyDescription": "Share this QR code and guests can start adding their perspective.",
+      "qrAltPrefix": "QR code for",
+      "makeItYoursCta": "Want to make it yours?",
+      "introEyebrow": "CREATE AN EVENT",
+      "introTitleLine1": "Make a home for",
+      "introTitleLine2": "the moments.",
+      "introDescription": "Start simple. You can refine every detail later.",
+      "progressAria": "Event setup progress",
+      "step1": "Event basics",
+      "step2": "Your event is ready",
+      "startHere": "START HERE",
+      "step1Sub": "The essentials your guests will see.",
+      "nameLabel": "Event name",
+      "namePlaceholder": "e.g. Emma & James",
+      "typeLabel": "Event type",
+      "dateLabel": "When is it?",
+      "creating": "Creating event...",
+      "create": "Create event",
+      "step2Eyebrow": "STEP 2 OF 2",
+      "step2Heading": "Make it yours",
+      "step2Sub": "Optional touches for your guest experience.",
+      "qrStyleLabel": "QR style",
+      "qrClassic": "Classic",
+      "qrModernFrame": "Modern frame",
+      "qrEditorial": "Editorial",
+      "colorLegend": "Event color",
+      "themeOlive": "Olive",
+      "themeRose": "Rose",
+      "themeMidnight": "Midnight",
+      "coverLabel": "Optional cover photo",
+      "choosePhoto": "Choose a photo",
+      "coverFormatHint": "JPG, PNG or WebP",
+      "back": "Back",
+      "continue": "Continue",
+      "skipForNow": "Skip for now",
+      "overviewAria": "Event overview",
+      "overviewTitle": "EVENT OVERVIEW",
+      "coverPlaceholder": "YOUR COVER PHOTO",
+      "nameFallback": "Your event name",
+      "dateFallback": "Choose a date",
+      "qrSuffix": "QR",
+      "privateEvent": "Private event"
+    }
+  },
+  "guest": {
+    "upload": {
+      "addPhotos": "Add photos",
+      "uploading": "Uploading...",
+      "complete": "Upload complete"
+    }
+  },
+  "formats": {
+    "dateTime": {
+      "short": {
+        "day": "numeric",
+        "month": "short",
+        "year": "numeric"
+      }
+    },
+    "number": {
+      "percent": {
+        "style": "percent",
+        "maximumFractionDigits": 0
+      }
+    },
+    "currency": {
+      "usd": {
+        "style": "currency",
+        "currency": "USD"
+      }
+    }
+  },
+  "host": {
+    "shell": {
+      "brandAria": "CandidCrowd host workspace",
+      "navAria": "Host workspace",
+      "events": "Events",
+      "createEventAria": "Create a new event",
+      "newEvent": "New event",
+      "footerAria": "Workspace footer",
+      "help": "Help",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "accountMenu": {
+      "openMenuAria": "Open account menu",
+      "yourAccount": "Your account",
+      "signInToManage": "Sign in to manage your account",
+      "freePlan": "Free plan",
+      "currentPlan": "Current plan",
+      "planFree": "Free",
+      "menuAria": "Account menu",
+      "profile": "Profile",
+      "planAndBilling": "Plan & billing",
+      "logOut": "Log out"
+    },
+    "pages": {
+      "createMetaTitle": "Create an event — CandidCrowd",
+      "eventsMetaTitle": "Your events — CandidCrowd",
+      "eventsEyebrow": "HOST WORKSPACE",
+      "eventsTitle": "Your events",
+      "eventsDescription": "Every shared memory starts with one simple event.",
+      "createEvent": "Create event",
+      "shelfWaiting": "Your event shelf is waiting.",
+      "shelfDescription": "Create an event, share its QR code, and this is where its gallery and host controls will live.",
+      "createFirstEvent": "Create your first event",
+      "profileMetaTitle": "Profile — CandidCrowd",
+      "accountEyebrow": "ACCOUNT",
+      "profileTitle": "Profile",
+      "profileCardTitle": "Your host profile",
+      "profileCardDescription": "Your name, avatar, and contact preferences will live here.",
+      "billingMetaTitle": "Plan & billing — CandidCrowd",
+      "billingTitle": "Plan & billing",
+      "billingCardTitle": "Free plan",
+      "billingCardDescription": "Plans, invoices, and usage will appear here when billing launches."
+    }
+  },
+  "legal": {
+    "toc": {
+      "title": "Table of Contents",
+      "sectionsCount": "{count, plural, =1 {1 section} other {# sections}}",
+      "backToTop": "Back to top",
+      "backToTopAria": "Scroll back to top of page",
+      "sidebarAria": "Sidebar navigation"
+    },
+    "privacy": {
+      "metaTitle": "Privacy Policy | CandidCrowd",
+      "metaDescription": "Learn how CandidCrowd protects your privacy, handles event photos and videos, and guarantees no biometric facial scanning by default.",
+      "heroBadge": "Privacy & Data Trust",
+      "heroTitle": "Privacy Policy",
+      "lastUpdated": "Last updated: September 14, 2026",
+      "location": "Hanoi, Vietnam",
+      "compliance": "GDPR & CCPA compliant",
+      "heroLead": "This Privacy Policy explains how CandidCrowd collects, uses, stores, shares, and protects personal information when you use CandidCrowd.",
+      "tocTitle": "Privacy Contents",
+      "calloutTitle": "Key Privacy Commitments",
+      "calloutLead": "At CandidCrowd, personal event memories deserve respectful, private, and controlled handling:",
+      "calloutItems": {
+        "biometricsLabel": "Biometrics",
+        "biometricsValue": "Zero facial recognition profiling",
+        "guestPrivacyLabel": "Guest Privacy",
+        "guestPrivacyValue": "No account or email required to upload",
+        "storageSecurityLabel": "Storage Security",
+        "storageSecurityValue": "Cloudflare R2 private bucket storage",
+        "aiTrainingLabel": "AI Training",
+        "aiTrainingValue": "We never train public AI on your photos",
+        "dataSalesLabel": "Data Sales",
+        "dataSalesValue": "We do not sell personal data for money",
+        "privacyContactLabel": "Privacy Contact"
+      },
+      "sections": {
+        "whoWeAre": "Who We Are",
+        "informationCollected": "Information We Collect",
+        "howWeUse": "How We Use Personal Information",
+        "legalBases": "Legal Bases for Processing",
+        "otherPeople": "Photos and Videos of Other People",
+        "facialRecognition": "Facial Recognition and Biometric Data",
+        "howWeShare": "How We Share Information",
+        "hostsAndGuests": "Event Hosts and Guests",
+        "international": "International Processing",
+        "retention": "Data Retention",
+        "security": "Security",
+        "cookies": "Cookies",
+        "analytics": "Analytics",
+        "aiProcessing": "AI and Uploaded Media",
+        "privacyRights": "Your Privacy Rights",
+        "removingMedia": "Removing Event Media",
+        "californiaRights": "California Privacy Rights",
+        "children": "Children",
+        "deletion": "Account and Event Deletion",
+        "breaches": "Data Breaches",
+        "thirdPartyLinks": "Third-Party Links",
+        "changes": "Changes to This Privacy Policy",
+        "complaints": "Complaints",
+        "contact": "Contact"
+      },
+      "viewTerms": "View Terms of Service →"
+    },
+    "terms": {
+      "metaTitle": "Terms of Service | CandidCrowd",
+      "metaDescription": "Review the terms and conditions governing your use of CandidCrowd, including host responsibilities, guest uploads, storage periods, and refund policies.",
+      "heroBadge": "Official Terms",
+      "heroTitle": "Terms of Service",
+      "lastUpdated": "Last updated: September 14, 2026",
+      "location": "Hanoi, Vietnam",
+      "effective": "Effective immediately",
+      "heroLead": "These Terms govern your access to and use of CandidCrowd, including our event galleries, photo and video upload tools, live features, and related services.",
+      "tocTitle": "Terms Contents",
+      "calloutTitle": "Key Highlights for Hosts & Guests",
+      "calloutLead": "We believe legal terms should be straightforward. Here are the most critical terms that apply to your use of CandidCrowd:",
+      "calloutItems": {
+        "ownershipLabel": "Ownership",
+        "ownershipValue": "You keep 100% of your copyright",
+        "guestFrictionLabel": "Guest Friction",
+        "guestFrictionValue": "No account or app needed for guests",
+        "freeStorageLabel": "Free Storage",
+        "freeStorageValue": "30 days after event date",
+        "paidStorageLabel": "Paid Storage",
+        "paidStorageValue": "12 months after event date",
+        "refundPolicyLabel": "Refund Policy",
+        "refundPolicyValue": "14-day window before uploads/start",
+        "governingLawLabel": "Governing Law",
+        "governingLawValue": "Hanoi, Vietnam jurisdiction"
+      },
+      "sections": {
+        "about": "About CandidCrowd",
+        "eligibility": "Eligibility",
+        "accounts": "Accounts",
+        "eventsAndGuests": "Events and Guest Access",
+        "userContent": "User Content",
+        "responsibility": "Responsibility for Content",
+        "hostResponsibilities": "Host Responsibilities",
+        "moderation": "Content Moderation",
+        "storage": "Storage Periods",
+        "availability": "Availability and Backups",
+        "payments": "Payments",
+        "refundPolicy": "Refund Policy",
+        "freeServices": "Free Services",
+        "serviceChanges": "Service Changes",
+        "intellectualProperty": "Intellectual Property",
+        "prohibitedUse": "Prohibited Use",
+        "thirdParty": "Third-Party Services",
+        "suspension": "Suspension and Termination",
+        "deletion": "Account Deletion",
+        "disclaimer": "Disclaimer",
+        "liability": "Limitation of Liability",
+        "indemnity": "Indemnity",
+        "governingLaw": "Governing Law",
+        "changes": "Changes to These Terms",
+        "contact": "Contact"
+      },
+      "viewPrivacy": "View Privacy Policy →"
+    }
+  }
+}

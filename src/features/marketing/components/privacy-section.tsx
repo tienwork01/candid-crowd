@@ -1,15 +1,18 @@
 import { Check, LockKey } from "@phosphor-icons/react/dist/ssr";
+import { getTranslations } from "next-intl/server";
 
-const assurances = [
-  "No guest account",
-  "No app installation",
-  "Private event gallery",
-  "Original-quality files",
-  "Host controls the event",
-  "Modern iPhone & Android browsers",
-];
+export async function PrivacySection() {
+  const t = await getTranslations("marketing.privacy");
 
-export function PrivacySection() {
+  const assurances = [
+    t("assuranceNoAccount"),
+    t("assuranceNoApp"),
+    t("assurancePrivateGallery"),
+    t("assuranceOriginalQuality"),
+    t("assuranceHostControls"),
+    t("assuranceModernBrowsers"),
+  ];
+
   return (
     <section
       id="privacy"
@@ -19,16 +22,16 @@ export function PrivacySection() {
       <div className="privacy-section__intro">
         <LockKey size={30} aria-hidden="true" />
         <div>
-          <span className="eyebrow">YOUR PEOPLE. YOUR MOMENTS.</span>
+          <span className="eyebrow">{t("eyebrow")}</span>
           <h2 id="privacy-title">
-            Big memories.
+            {t("titleLine1")}
             <br />
-            <em>Beautifully simple.</em>
+            <em>{t("titleLine2")}</em>
           </h2>
           <p>
-            Designed to feel effortless for your guests,
+            {t("subheadLine1")}
             <br />
-            and reassuringly yours.
+            {t("subheadLine2")}
           </p>
         </div>
       </div>
@@ -40,10 +43,7 @@ export function PrivacySection() {
             </li>
           ))}
         </ul>
-        <p className="section-disclosure">
-          Our product principles. Live event sharing is not available in this
-          preview.
-        </p>
+        <p className="section-disclosure">{t("disclosure")}</p>
       </div>
     </section>
   );

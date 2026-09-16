@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +20,7 @@ export function PreviewNotice({
   children: React.ReactNode;
   className?: string;
 }) {
-  const notice = previewNotices[kind];
+  const t = useTranslations("marketing.previewNotice");
 
   return (
     <Dialog>
@@ -27,14 +28,16 @@ export function PreviewNotice({
         {children}
       </DialogTrigger>
       <DialogContent>
-        <span className="eyebrow mb-4">CANDIDCROWD · FIRST CHAPTER</span>
-        <DialogTitle className="notice__title">{notice.title}</DialogTitle>
+        <span className="eyebrow mb-4">{t("dialogEyebrow")}</span>
+        <DialogTitle className="notice__title">
+          {t(`notices.${kind}.title`)}
+        </DialogTitle>
         <DialogDescription className="mt-5 text-sm leading-relaxed text-muted-foreground">
-          {notice.body}
+          {t(`notices.${kind}.body`)}
         </DialogDescription>
         {kind === "login" && (
           <Link href="/events/new" className="button mt-6">
-            Create an event draft
+            {t("createDraft")}
           </Link>
         )}
       </DialogContent>

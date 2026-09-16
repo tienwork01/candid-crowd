@@ -1,0 +1,734 @@
+{
+  "common": {
+    "skipToContent": "Chuyển đến nội dung",
+    "language": "Ngôn ngữ",
+    "brandHome": "Trang chủ CandidCrowd",
+    "actions": {
+      "save": "Lưu",
+      "cancel": "Hủy",
+      "close": "Đóng",
+      "back": "Quay lại"
+    },
+    "errors": {
+      "USER_ALREADY_EXISTS": "Tài khoản với email này đã tồn tại. Vui lòng đăng nhập.",
+      "INVALID_CREDENTIALS": "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.",
+      "INVALID_PASSWORD": "Mật khẩu bạn đã nhập không chính xác.",
+      "PASSWORD_TOO_SHORT": "Mật khẩu phải có ít nhất 8 ký tự.",
+      "PASSWORD_TOO_LONG": "Mật khẩu không được vượt quá 128 ký tự.",
+      "EMAIL_NOT_VERIFIED": "Vui lòng xác minh địa chỉ email của bạn trước khi tiếp tục.",
+      "USER_NOT_FOUND": "Không tìm thấy tài khoản nào với địa chỉ email này.",
+      "INVALID_TOKEN": "Liên kết hoặc mã này không hợp lệ hoặc đã hết hạn.",
+      "TOKEN_EXPIRED": "Liên kết này đã hết hạn. Vui lòng yêu cầu liên kết mới.",
+      "RESET_PASSWORD_FAILED": "Không thể đặt lại mật khẩu. Vui lòng yêu cầu một liên kết mới.",
+      "CONSENT_REQUIRED": "Vui lòng chấp nhận Điều khoản dịch vụ và Chính sách quyền riêng tư để tiếp tục.",
+      "SESSION_EXPIRED": "Phiên làm việc của bạn đã hết hạn. Vui lòng đăng nhập lại.",
+      "UNAUTHORIZED": "Bạn không có quyền thực hiện hành động này.",
+      "SOCIAL_ACCOUNT_ALREADY_LINKED": "Tài khoản mạng xã hội này đã được liên kết với người dùng khác.",
+      "FAILED_TO_CREATE_USER": "Không thể tạo tài khoản của bạn. Vui lòng thử lại.",
+      "EVENT_NOT_FOUND": "Không tìm thấy sự kiện được yêu cầu.",
+      "EVENT_NAME_REQUIRED": "Vui lòng nhập tên sự kiện.",
+      "INVALID_EVENT_DATE": "Vui lòng chọn ngày hợp lệ cho sự kiện của bạn.",
+      "INVALID_GUEST_COUNT": "Vui lòng nhập số lượng khách dự kiến hợp lệ.",
+      "EVENT_EXPIRED": "Sự kiện này đã kết thúc và không còn nhận ảnh tải lên nữa.",
+      "EVENT_CLOSED": "Thư viện sự kiện này hiện đang đóng.",
+      "INVALID_FILE_TYPE": "Loại tệp không được hỗ trợ. Vui lòng tải lên ảnh JPG, PNG, HEIC hoặc WebP.",
+      "FILE_TOO_LARGE": "Kích thước tệp vượt quá giới hạn cho phép.",
+      "UPLOAD_FAILED": "Tải lên thất bại. Vui lòng kiểm tra kết nối mạng và thử lại.",
+      "STORAGE_ERROR": "Dịch vụ lưu trữ tạm thời không khả dụng. Vui lòng thử lại sau ít phút.",
+      "RATE_LIMIT_EXCEEDED": "Quá nhiều yêu cầu. Vui lòng đợi một chút trước khi thử lại.",
+      "NETWORK_ERROR": "Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng của bạn.",
+      "SERVER_ERROR": "Đã xảy ra lỗi máy chủ. Vui lòng thử lại sau ít phút.",
+      "REQUEST_FAILED": "Yêu cầu không thể hoàn thành. Vui lòng thử lại.",
+      "UNKNOWN": "Đã xảy ra lỗi. Vui lòng thử lại."
+    }
+  },
+  "metadata": {
+    "homeTitle": "CandidCrowd — Mỗi vị khách. Mỗi góc nhìn.",
+    "homeDescription": "Nhận những bức ảnh khách của bạn đã chụp. Một mã QR, một thư viện sự kiện chung. Không cần ứng dụng. Không cần tài khoản khách."
+  },
+  "marketing": {
+    "navigation": {
+      "main": "Điều hướng chính",
+      "mobile": "Điều hướng di động",
+      "open": "Mở điều hướng",
+      "close": "Đóng điều hướng",
+      "howItWorks": "Cách hoạt động",
+      "demo": "Bản xem thử",
+      "pricing": "Giá"
+    },
+    "header": {
+      "login": "Đăng nhập",
+      "createEvent": "Tạo sự kiện miễn phí"
+    },
+    "languageSwitcher": {
+      "label": "Chọn ngôn ngữ"
+    },
+    "hero": {
+      "eyebrow": "TỪNG KHOẢNH KHẮC NHỎ. TRỌN VẸN CÙNG NHAU.",
+      "title": "Nhận những bức ảnh khách của bạn đã chụp.",
+      "description": "Một mã QR cho mọi người trong sự kiện của bạn nơi đơn giản để chia sẻ ảnh và video. Không cần ứng dụng. Không cần tài khoản.",
+      "createEvent": "Tạo sự kiện miễn phí",
+      "seeHowItWorks": "Xem cách hoạt động",
+      "trustNoApp": "Không cần tải app",
+      "trustPrivate": "Riêng tư",
+      "trustOriginalQuality": "Chất lượng gốc"
+    },
+    "photos": {
+      "countryside": "Một cặp đôi nắm tay nhau đi dạo qua vùng nông thôn",
+      "venue": "Vọng lâu làm lễ ngoài vườn được trang trí bằng hoa tươi",
+      "celebration": "Cô dâu chú rể mỉm cười nhìn nhau dưới ánh hoàng hôn ấm áp",
+      "couple": "Cô dâu chú rể trong trang phục cưới màu ngà giữa đồng cỏ ngập nắng",
+      "table": "Bàn tiệc tràn ngập hoa tươi và những ly thủy tinh",
+      "details": "Nhẫn cưới đặt trên bó hoa cầm tay màu hồng",
+      "flowers": "Hoa tươi được bài trí dọc theo bàn tiệc cưới"
+    },
+    "sampleEvent": {
+      "disclosure": "Sự kiện demo giả định"
+    },
+    "howItWorks": {
+      "eyebrow": "CHỈ CHÚT THIẾT LẬP. TRỌN VẸN KỶ NIỆM.",
+      "titleLine1": "Ba bước đơn giản.",
+      "titleLine2": "Rồi thảnh thơi tận hưởng khoảnh khắc.",
+      "subheadLine1": "Trải nghiệm chúng tôi đang kiến tạo,",
+      "subheadLine2": "từ lượt quét đầu tiên đến điệu nhảy cuối cùng.",
+      "step1Title": "Tạo sự kiện của bạn",
+      "step1Description": "Thiết lập sự kiện chỉ trong vòng chưa đầy một phút.",
+      "step1Detail": "Một cái tên, một ngày và lý do để ăn mừng.",
+      "step2Title": "Chia sẻ mã QR",
+      "step2Description": "Đặt mã trên thiệp mời, bàn tiệc, biển chào mừng hoặc màn hình.",
+      "step2Detail": "Lời mời đơn giản để mọi người chia sẻ góc nhìn của mình.",
+      "step3Title": "Mọi người cùng đóng góp",
+      "step3Description": "Khách tải lên từ điện thoại mà không cần cài đặt bất kỳ ứng dụng nào.",
+      "step3Detail": "Trong lúc đang vui chơi, hoặc khi đã về đến nhà."
+    },
+    "problem": {
+      "eyebrow": "NHỮNG KHOẢNH KHẮC ĐAN XEN GIỮA CÁC ĐẠI LỄ",
+      "titleLine1": "Nhiếp ảnh gia không thể có mặt ở mọi nơi.",
+      "titleLine2": "Nhưng khách của bạn thì đã ở đó rồi.",
+      "subhead": "Tại mỗi bàn tiệc. Trong từng cái ôm. Trên mỗi góc sàn nhảy.",
+      "tableCaption": "Những câu chuyện quanh bàn tiệc.",
+      "tableExtra": "Nơi dành cho tất cả mọi người",
+      "coupleCaption": "Những nụ cười rạng rỡ.",
+      "coupleExtra": "Cùng nhau chung vui",
+      "countrysideCaption": "Khoảnh khắc bình dị.",
+      "countrysideExtra": "Dạo bước bình yên bên nhau",
+      "venueCaption": "Những chi tiết bạn đã bỏ lỡ.",
+      "venueExtra": "Trước khi mọi người đến",
+      "tagDanceVideos": "Video trên sàn nhảy",
+      "tagGroupSelfies": "Ảnh selfie nhóm",
+      "tagUnforgettable": "Thêm một khoảnh khắc khó quên",
+      "summaryText": "Tất cả những góc nhìn. Chung một thư viện CandidCrowd."
+    },
+    "privacy": {
+      "eyebrow": "NHỮNG NGƯỜI THÂN YÊU. NHỮNG KHOẢNH KHẮC.",
+      "titleLine1": "Kỷ niệm lớn lao.",
+      "titleLine2": "Đơn giản một cách tinh tế.",
+      "subheadLine1": "Được thiết kế để thật dễ dàng cho khách mời,",
+      "subheadLine2": "và an tâm thuộc về bạn.",
+      "assuranceNoAccount": "Không cần tài khoản khách",
+      "assuranceNoApp": "Không cần cài đặt ứng dụng",
+      "assurancePrivateGallery": "Thư viện sự kiện riêng tư",
+      "assuranceOriginalQuality": "Tệp chất lượng gốc",
+      "assuranceHostControls": "Chủ trì toàn quyền kiểm soát sự kiện",
+      "assuranceModernBrowsers": "Trình duyệt iPhone & Android hiện đại",
+      "disclosure": "Nguyên tắc sản phẩm của chúng tôi. Chia sẻ sự kiện trực tiếp chưa có trong bản xem trước này."
+    },
+    "pricing": {
+      "eyebrow": "GÓI PHÙ HỢP CHO TỪNG DỊP KỶ NIỆM",
+      "titleLine1": "Dịp sum họp nhỏ.",
+      "titleLine2": "Kỷ niệm lớn lao.",
+      "subhead": "Bắt đầu với bản xem trước miễn phí. Tìm gói phù hợp khi chúng tôi phát triển.",
+      "recommendedBadge": "Được yêu thích nhất cho một sự kiện trọn vẹn",
+      "availableToExplore": "SẴN SÀNG TRẢI NGHIỆM",
+      "plannedOffering": "GÓI DỰ KIẾN",
+      "essentialNote": "Những điều cốt lõi để gắn kết mọi góc nhìn của khách mời.",
+      "disclosure": "Xem trước bảng giá · Các gói trả phí và tính năng nâng cao chưa khả dụng. Chúng tôi không thu bất kỳ khoản phí nào.",
+      "plans": {
+        "free": {
+          "name": "Miễn phí",
+          "description": "Dành cho trải nghiệm thử CandidCrowd.",
+          "priceLabel": "Miễn phí",
+          "billing": "Khám phá bản xem trước",
+          "cta": "Dùng thử miễn phí"
+        },
+        "essential": {
+          "name": "Cơ bản",
+          "description": "Một ngày vui. Trọn vẹn mọi góc nhìn.",
+          "priceLabel": "Sắp ra mắt",
+          "billing": "Trả một lần theo sự kiện · Giá sẽ sớm công bố",
+          "cta": "Khám phá bản xem thử"
+        },
+        "plus": {
+          "name": "Nâng cao",
+          "description": "Dành cho những kỷ niệm cần nhiều không gian hơn.",
+          "priceLabel": "Sắp ra mắt",
+          "billing": "Trả một lần theo sự kiện · Giá sẽ sớm công bố",
+          "cta": "Khám phá bản xem thử"
+        }
+      }
+    },
+    "eventTypesSection": {
+      "eyebrow": "BẮT ĐẦU TỪ LỜI HẸN ƯỚC. DÀNH CHO MUÔN VÀN KỶ NIỆM.",
+      "titleLine1": "Cuộc sống mang đến cho bạn dịp kỷ niệm.",
+      "titleLine2": "Chúng tôi giúp bạn kết nối trọn vẹn kỷ niệm.",
+      "photoNoteLine1": "Cho ngày trọng đại.",
+      "photoNoteLine2": "Và mọi ngày đáng nhớ trong đời.",
+      "optionsEyebrow": "BẠN ĐANG ĂN MỪNG DỊP GÌ?",
+      "exploreAria": "Khám phá các loại sự kiện",
+      "startDraft": "Bắt đầu tạo bản nháp sự kiện",
+      "items": {
+        "weddings": {
+          "label": "Đám cưới",
+          "line": "Ngày trọng đại. Từng khoảnh khắc nhỏ.",
+          "description": "Từ những giọt nước mắt hạnh phúc đến điệu nhảy cuối cùng, đưa góc nhìn của mỗi vị khách vào câu chuyện của bạn."
+        },
+        "birthdays": {
+          "label": "Sinh nhật",
+          "line": "Thêm một tuổi mới. Hàng trăm kỷ niệm mới.",
+          "description": "Ánh nến, những bất ngờ và những người đã tạo nên ngày đặc biệt của bạn."
+        },
+        "graduations": {
+          "label": "Lễ tốt nghiệp",
+          "line": "Một chương khép lại. Một câu chuyện mới bắt đầu.",
+          "description": "Lưu giữ những gương mặt tự hào, mũ cử nhân tung bay và niềm vui cùng những người bạn yêu quý."
+        },
+        "reunions": {
+          "label": "Họp mặt",
+          "line": "Lại bên nhau. Như những ngày xưa cũ.",
+          "description": "Nơi lưu giữ từng nụ cười thân quen, câu chuyện sẻ chia và bức ảnh chụp chung bấy lâu mong đợi."
+        },
+        "company-events": {
+          "label": "Sự kiện công ty",
+          "line": "Đồng nghiệp tuyệt vời. Khoảnh khắc sẻ chia.",
+          "description": "Ghi lại những khía cạnh chân thực, gắn kết trong các buổi dã ngoại, cột mốc và sự kiện công ty."
+        }
+      }
+    },
+    "finalCta": {
+      "eyebrow": "MỖI VỊ KHÁCH. MỖI GÓC NHÌN.",
+      "titleLine1": "Khách của bạn vốn dĩ",
+      "titleLine2": "đang chụp rất nhiều ảnh.",
+      "titleLine3": "Hãy gom chúng lại cùng nhau.",
+      "button": "Tạo sự kiện miễn phí",
+      "subhead": "Không cần ứng dụng. Không cần tài khoản khách. Trọn vẹn khoảnh khắc tuyệt vời."
+    },
+    "footer": {
+      "brandTagline": "Kỷ niệm sẻ chia cho mọi sự kiện.",
+      "brandSub": "Dành riêng cho những khoảnh khắc đời thường.",
+      "productTitle": "Sản phẩm",
+      "eventsTitle": "Sự kiện",
+      "essentialsTitle": "Thông tin cần biết",
+      "previewLabel": "Chính sách chính thức",
+      "bottomNote": "Chương đầu tiên · Bản xem trước sản phẩm"
+    },
+    "lifecycle": {
+      "eyebrow": "HƠN CẢ MỘT NGÀY VUI",
+      "titleLine1": "Trước lời chào đầu tiên.",
+      "titleLine2": "Sau lời tạm biệt cuối cùng.",
+      "subhead": "Nơi dành cho những kỷ niệm của bạn, bất cứ lúc nào sẵn sàng để chia sẻ.",
+      "invitationTop": "CÙNG NHỮNG NGƯỜI THÂN YÊU",
+      "invitationHeadline": "Cùng tạo nên kỷ niệm.",
+      "invitationScan": "Quét. Chia sẻ. Ăn mừng.",
+      "invitationTag": "Thiệp mời · Bàn tiệc · Biển chào mừng",
+      "beforeEyebrow": "01 — TRƯỚC SỰ KIỆN",
+      "beforeTitle": "Đặt mã QR ở bất cứ đâu.",
+      "beforeDescription": "Trên thiệp mời, trang web sự kiện, biển đón tiếp hoặc từng bàn tiệc. Hãy để khách dễ dàng nhìn thấy.",
+      "liveWallLabel": "Ý TƯỞNG BỨC TƯỜNG TRỰC TIẾP",
+      "wallNotice": "Một góc nhìn mới vừa được gửi tới.",
+      "duringEyebrow": "02 — TRONG SỰ KIỆN",
+      "duringTitle": "Chứng kiến câu chuyện dần đầy ắp.",
+      "duringDescription": "Ảnh sẽ tự động xuất hiện trong thư viện chung. Tính năng Live Wall sắp tới sẽ chiếu ngay lên màn hình lớn.",
+      "reminderDay": "BUỔI SÁNG HÔM SAU",
+      "reminderOneMore": "Thêm một điều nữa…",
+      "reminderPromptLine1": "Bạn có ảnh từ tối qua?",
+      "reminderPromptLine2": "Chia sẻ tại đây nhé.",
+      "reminderLink": "Liên kết sự kiện của bạn",
+      "afterEyebrow": "03 — SAU SỰ KIỆN",
+      "afterTitle": "Những kỷ niệm vẫn tiếp tục ùa về.",
+      "afterDescription": "Gửi lại liên kết một lần nữa. Thu thập những khoảnh khắc mà khách đã quá mải mê tận hưởng nên chưa kịp tải lên.",
+      "disclosure": "Hình ảnh minh họa cho trải nghiệm dự kiến. Tính năng Live Wall và nhắc nhở sau sự kiện sẽ ra mắt sau."
+    },
+    "participation": {
+      "eyebrow": "THIẾT KẾ ĐỂ TĂNG SỰ THAM GIA",
+      "titleLine1": "Đừng chỉ tạo một album ảnh đơn thuần.",
+      "titleLine2": "Hãy khuyến khích mọi người cùng sẻ chia.",
+      "subhead": "Thư viện chung chỉ là bước khởi đầu. CandidCrowd được tạo ra để giúp bạn thấu hiểu điều gì thúc đẩy khách mời chia sẻ.",
+      "point1Title": "Biết được điều gì thu hút mọi người.",
+      "point1Description": "Xem vị trí đặt mã QR nào khiến việc chia sẻ trở nên tự nhiên nhất trong sự kiện.",
+      "point2Title": "Tạo không gian cho mọi góc nhìn.",
+      "point2Description": "Nắm bắt mức độ tham gia, rồi gửi lời nhắn nhẹ nhàng tới khách vào đúng thời điểm.",
+      "conceptNote": "Ý tưởng sản phẩm · Số liệu phân tích và theo dõi nguồn mã QR chưa hoạt động.",
+      "dashboardEyebrow": "SỰ KIỆN CỦA BẠN, TỔNG QUAN",
+      "expectedGuests": "khách dự kiến",
+      "participationLabel": "tham gia",
+      "photos": "ảnh",
+      "videos": "video",
+      "sourcesHeading": "Nơi kỷ niệm bắt đầu",
+      "contributorsCol": "Người đóng góp",
+      "tableCaption": "Minh họa người đóng góp theo nguồn mã QR",
+      "thSource": "Nguồn",
+      "sources": {
+        "entrance": "QR Lối vào",
+        "table": "QR Bàn tiệc",
+        "bar": "QR Quầy bar",
+        "link": "Liên kết chia sẻ"
+      }
+    },
+    "previewNotice": {
+      "dialogEyebrow": "CANDIDCROWD · CHƯƠNG ĐẦU TIÊN",
+      "createDraft": "Tạo bản nháp sự kiện",
+      "notices": {
+        "login": {
+          "title": "Không gian tổ chức đang trên đường hoàn thiện.",
+          "body": "Tài khoản người tổ chức chưa khả dụng trong bản xem trước này. Bạn có thể thử nghiệm trải nghiệm khách mời hoặc tạo bản nháp sự kiện trên thiết bị này. Không có thông tin cá nhân nào bị thu thập."
+        },
+        "privacy": {
+          "title": "Quyền riêng tư · thông báo bản xem trước",
+          "body": "Ảnh được chọn trong bản demo này chỉ lưu lại trong phiên duyệt web và không được tải lên máy chủ. Bản nháp sự kiện được lưu trên thiết bị này nếu bạn lưu lại. Chính sách bảo mật đầy đủ sẽ được công bố trước khi tính năng tải lên đám mây ra mắt."
+        },
+        "terms": {
+          "title": "Điều khoản · thông báo bản xem trước",
+          "body": "Đây là bản xem trước sản phẩm tương tác, không phải dịch vụ chia sẻ sự kiện thực tế. Các gói trả phí, tài khoản người tổ chức và tải lên đám mây chưa khả dụng. Điều khoản đầy đủ sẽ được công bố trước khi dịch vụ ra mắt."
+        }
+      }
+    },
+    "heroScene": {
+      "ariaLabel": "Bản xem trước tương tác: điện thoại khách chia sẻ ảnh vào thư viện sự kiện",
+      "galleryView": "Góc nhìn thư viện",
+      "rotateLeft": "Xoay góc nhìn sang trái",
+      "rotateRight": "Xoay góc nhìn sang phải",
+      "sharedGallery": "THƯ VIỆN CHUNG",
+      "nextMemory": "Kỷ niệm tiếp theo của bạn",
+      "caption": "Mỗi vị khách. Một góc nhìn riêng biệt.",
+      "phoneAlt": "Ảnh từ điện thoại của khách, hiện đã có trong thư viện chung",
+      "guestPhone": "ĐIỆN THOẠI CỦA KHÁCH",
+      "oneLittleMoment": "Một khoảnh khắc nhỏ.",
+      "tryAgain": "Thử lại",
+      "sharing": "Đang chia sẻ… {progress}%",
+      "shareMemory": "Chia sẻ kỷ niệm",
+      "footnote": "Bản xem trước tương tác",
+      "statusNewMemory": "Cùng nhau thêm một kỷ niệm mới.",
+      "statusUploading": "Từ điện thoại của khách đến thư viện sự kiện…",
+      "statusIdle": "Bộ sưu tập của khách. Kỷ niệm của bạn.",
+      "statusNewMemorySub": "Ảnh đã được thêm vào thư viện mẫu.",
+      "statusIdleSub": "Thử nhấn “Chia sẻ kỷ niệm” bên dưới.",
+      "legendGuestPhone": "Điện thoại khách",
+      "legendShare": "Chia sẻ",
+      "legendYourGallery": "Thư viện của bạn"
+    },
+    "demoQr": {
+      "eyebrow": "LỜI MỜI NHỎ",
+      "titleLine1": "Góc nhìn của bạn",
+      "titleLine2": "thuộc về nơi này.",
+      "alt": "Quét để mở bản dùng thử tương tác cho khách của CandidCrowd",
+      "qrUnavailable": "Mã QR chưa khả dụng; hãy dùng Thử không cần quét",
+      "qrLoading": "Đang tải mã QR",
+      "failedInstruction": "Sử dụng nút bên dưới để trải nghiệm bản dùng thử.",
+      "scanInstruction": "Quét bằng camera điện thoại của bạn",
+      "note": "Sử dụng URL trang web công khai để quét từ thiết bị khác."
+    },
+    "demoGallery": {
+      "eyebrow": "THƯ VIỆN CHUNG",
+      "memories": "Kỷ niệm của chúng ta",
+      "photosCount": "{count} ảnh · Bản thử nghiệm",
+      "viewPhoto": "Xem ảnh: {alt}",
+      "caption": "Trọn vẹn một ngày, qua góc nhìn của từng vị khách.",
+      "previewTitle": "Xem trước ảnh"
+    },
+    "guestDemo": {
+      "eyebrow": "KHÔNG CẦN HƯỚNG DẪN",
+      "titleLine1": "Xem sự dễ dàng",
+      "titleLine2": "dành cho khách của bạn.",
+      "subhead": "Bạn chính là khách mời. Hãy tự mình trải nghiệm.",
+      "tryWithoutScanning": "Thử không cần quét",
+      "caption": "Không cần đăng ký. Bắt đầu ngay lập tức.",
+      "invitedTo": "BẠN ĐƯỢC MỜI ĐẾN",
+      "progressAria": "Tiến trình dùng thử",
+      "steps": {
+        "open": "Mở",
+        "choose": "Chọn",
+        "share": "Chia sẻ"
+      },
+      "welcomeAlt": "Thư viện mẫu cho tiệc cưới giả định",
+      "welcomeTitleLine1": "Một khoảnh khắc nhỏ.",
+      "welcomeTitleLine2": "Kỷ niệm dành cho mọi người.",
+      "openEvent": "Mở sự kiện",
+      "removePhoto": "Xóa {alt}",
+      "placeholder": "Góc nhìn của bạn thuộc về nơi này.",
+      "fileInputAria": "Chọn ảnh cho bản dùng thử trên máy",
+      "addPhotos": "Thêm ảnh",
+      "useSamplePhotos": "Dùng ảnh mẫu",
+      "retryUpload": "Tải lên lại",
+      "uploadCount": "Tải lên {count} ảnh",
+      "sharingMoments": "Đang chia sẻ khoảnh khắc của bạn",
+      "progressBarAria": "Mô phỏng quá trình tải ảnh",
+      "simulateInterruption": "Mô phỏng sự cố gián đoạn",
+      "successTitleLine1": "Bạn đã làm thư viện",
+      "successTitleLine2": "đậm dấu ấn riêng hơn.",
+      "seeYourPhotos": "Xem ảnh của bạn",
+      "resetDemo": "Đặt lại bản thử nghiệm",
+      "galleryNoteLine1": "Từ điện thoại của khách.",
+      "galleryNoteLine2": "Bước vào câu chuyện của bạn.",
+      "disclosure": "Trải nghiệm mô phỏng · Không tải ảnh lên máy chủ · Tải lại trang sẽ xóa dữ liệu dùng thử",
+      "errorInvalidFiles": "Một số tệp không thể thêm được. Vui lòng chọn JPG, PNG hoặc WebP dưới 10 MB. Bản thử nghiệm nhận tối đa 6 ảnh.",
+      "statusPreparing": "Đang chuẩn bị ảnh trên máy của bạn…",
+      "statusSuccess": "Đã thêm {count} ảnh vào thư viện mẫu. Tệp của bạn chỉ lưu trên thiết bị này.",
+      "statusError": "Quá trình tải lên mô phỏng bị gián đoạn. Ảnh của bạn vẫn được chọn. Hãy thử lại khi sẵn sàng.",
+      "statusBusy": "Đang mô phỏng tải lên. Xem ảnh xuất hiện trong thư viện.",
+      "statusReady": "Đã sẵn sàng chia sẻ {count} ảnh.",
+      "statusEmpty": "Chọn ảnh của bạn hoặc sử dụng ảnh mẫu của chúng tôi."
+    }
+  },
+  "auth": {
+    "ui": {
+      "home": "Trang chủ",
+      "getStarted": "Bắt đầu",
+      "memoriesTogether": "Những kỷ niệm, cùng nhau",
+      "registerDescription": "Thu thập mọi bức ảnh từ sự kiện của bạn ở chất lượng gốc.",
+      "loginDescription": "Gần hơn một chút với mọi khoảnh khắc bạn yêu thích.",
+      "emailPlaceholder": "ban@example.com",
+      "fullNamePlaceholder": "Họ và tên của bạn",
+      "forgotPassword": "Quên mật khẩu?",
+      "showPassword": "Hiện mật khẩu",
+      "hidePassword": "Ẩn mật khẩu",
+      "wait": "Vui lòng đợi…",
+      "signUpWithProvider": "Đăng ký bằng nhà cung cấp",
+      "logInWithProvider": "Đăng nhập bằng nhà cung cấp",
+      "continueWithGoogle": "Tiếp tục với Google",
+      "continueWithApple": "Tiếp tục với Apple",
+      "socialConsentPrefix": "Bằng cách tiếp tục, bạn đồng ý với",
+      "terms": "Điều khoản",
+      "and": "và",
+      "privacyPolicy": "Chính sách quyền riêng tư",
+      "orWithEmail": "hoặc bằng email",
+      "createPasswordPlaceholder": "Tạo mật khẩu",
+      "enterPasswordPlaceholder": "Nhập mật khẩu của bạn",
+      "passwordMinHint": "Tối thiểu 8 ký tự.",
+      "agreeToTermsPrefix": "Tôi đồng ý với",
+      "termsOfService": "Điều khoản dịch vụ",
+      "submitCreateAccount": "Tạo tài khoản",
+      "submitLogIn": "Đăng nhập",
+      "alreadyHaveAccount": "Đã có tài khoản?",
+      "newToCandidCrowd": "Mới dùng CandidCrowd?",
+      "actionLogIn": "Đăng nhập",
+      "actionCreateAccount": "Tạo một tài khoản",
+      "logOut": "Đăng xuất"
+    },
+    "signIn": {
+      "title": "Chào mừng trở lại",
+      "email": "Email",
+      "password": "Mật khẩu"
+    },
+    "register": {
+      "title": "Tạo tài khoản của bạn",
+      "name": "Họ và tên"
+    },
+    "recovery": {
+      "forgotPasswordEyebrow": "KHÔI PHỤC TÀI KHOẢN",
+      "forgotPasswordTitle": "Tìm lại đường về.",
+      "forgotPasswordDescription": "Nhập email gắn liền với tài khoản của bạn và chúng tôi sẽ chuẩn bị liên kết đặt lại an toàn.",
+      "resetPasswordEyebrow": "KHỞI ĐẦU MỚI",
+      "resetPasswordTitle": "Chọn mật khẩu mới.",
+      "resetPasswordDescription": "Tạo mật khẩu bạn chưa từng dùng trước đây để bảo vệ các kỷ niệm của mình.",
+      "verifyEmailEyebrow": "MỘT BƯỚC CUỐI CÙNG",
+      "verifyEmailTitle": "Kiểm tra hộp thư đến.",
+      "verifyEmailDescription": "Chúng tôi đã gửi cho bạn một liên kết xác minh an toàn. Mở liên kết để hoàn tất thiết lập tài khoản.",
+      "emailAddress": "Địa chỉ email",
+      "newPassword": "Mật khẩu mới",
+      "confirmNewPassword": "Xác nhận mật khẩu mới",
+      "passwordsDoNotMatch": "Mật khẩu không khớp. Kiểm tra cả hai trường và thử lại.",
+      "invalidOrExpiredResetLink": "Liên kết đặt lại này không hợp lệ hoặc đã hết hạn.",
+      "returnToRegistration": "Quay lại trang đăng ký và nhập lại email của bạn.",
+      "verificationLinkOnWay": "Một liên kết xác minh mới đang trên đường đến bạn.",
+      "verifyEmailExpiryNotice": "Liên kết xác minh sẽ hết hạn vì lý do bảo mật. Kiểm tra thư rác hoặc yêu cầu email mới bên dưới.",
+      "didntReceiveEmail": "Chưa nhận được email?",
+      "resendGuidance": "Sử dụng nút phía trên để gửi lại một cách an toàn.",
+      "sendResetLink": "Gửi liên kết đặt lại",
+      "saveNewPassword": "Lưu mật khẩu mới",
+      "sendAnotherLink": "Gửi liên kết khác",
+      "successCheckInboxEyebrow": "KIỂM TRA HỘP THƯ",
+      "successAllSetEyebrow": "ĐÃ XONG",
+      "successResetLinkReady": "Liên kết đặt lại của bạn đã sẵn sàng.",
+      "successPasswordRenewed": "Mật khẩu của bạn đã được đổi mới.",
+      "successResetLinkBody": "Nếu tài khoản tồn tại với email đó, liên kết đặt lại an toàn sẽ sớm được gửi đến.",
+      "successPasswordRenewedBody": "Mật khẩu của bạn đã được thay đổi. Bây giờ bạn có thể đăng nhập bằng mật khẩu mới.",
+      "tryAnotherEmail": "Thử một email khác",
+      "continueToLogIn": "Tiếp tục đăng nhập"
+    },
+    "layout": {
+      "heroAlt": "Cặp đôi nắm tay nhau đi dạo qua vùng nông thôn vào giờ vàng hoàng hôn",
+      "momentsInBetween": "NHỮNG KHOẢNH KHẮC ĐAN XEN",
+      "heroQuoteLine1": "Mỗi vị khách.",
+      "heroQuoteLine2": "Một góc nhìn riêng.",
+      "heroSub": "Những kỷ niệm bạn suýt bỏ lỡ.",
+      "polaroidAlt": "Cô dâu chú rể mỉm cười nhìn nhau dưới ánh hoàng hôn ấm áp",
+      "polaroidCaption": "Giờ vàng · Bàn 04",
+      "badgeText": "184 khoảnh khắc tự nhiên được ghi lại"
+    },
+    "pages": {
+      "loginMetaTitle": "Đăng nhập — CandidCrowd",
+      "registerMetaTitle": "Tạo tài khoản — CandidCrowd",
+      "forgotPasswordMetaTitle": "Quên mật khẩu — CandidCrowd",
+      "resetPasswordMetaTitle": "Đặt lại mật khẩu — CandidCrowd",
+      "verifyEmailMetaTitle": "Xác minh email — CandidCrowd"
+    }
+  },
+  "event": {
+    "create": {
+      "title": "Tạo sự kiện",
+      "name": "Tên sự kiện",
+      "type": "Loại sự kiện",
+      "date": "Ngày sự kiện"
+    },
+    "types": {
+      "Wedding": "Đám cưới",
+      "Birthday": "Sinh nhật",
+      "Anniversary": "Kỷ niệm ngày cưới",
+      "Reunion": "Họp mặt",
+      "Trip": "Chuyến đi",
+      "Team celebration": "Liên hoan đội ngũ",
+      "Other": "Khác"
+    },
+    "setup": {
+      "nameRequired": "Đặt tên cho sự kiện của bạn để tiếp tục.",
+      "dateRequired": "Chọn ngày diễn ra sự kiện để tiếp tục.",
+      "signInRequired": "Vui lòng đăng nhập để tạo và lưu sự kiện của bạn.",
+      "previewEyebrow": "XEM TRƯỚC SỰ KIỆN",
+      "readyEyebrow": "SỰ KIỆN CỦA BẠN ĐÃ SẴN SÀNG",
+      "readyTitleSuffix": "đã sẵn sàng.",
+      "previewDescription": "Đây là bản xem trước cục bộ. Đăng nhập khi bạn sẵn sàng lưu và chia sẻ một sự kiện thực tế.",
+      "readyDescription": "Chia sẻ mã QR này và khách mời có thể bắt đầu đóng góp góc nhìn của họ.",
+      "qrAltPrefix": "Mã QR cho",
+      "makeItYoursCta": "Bạn muốn tùy chỉnh theo ý mình?",
+      "introEyebrow": "TẠO SỰ KIỆN",
+      "introTitleLine1": "Tạo nơi lưu giữ",
+      "introTitleLine2": "những khoảnh khắc.",
+      "introDescription": "Bắt đầu thật đơn giản. Bạn có thể tinh chỉnh mọi chi tiết sau.",
+      "progressAria": "Tiến trình thiết lập sự kiện",
+      "step1": "Thông tin cơ bản",
+      "step2": "Sự kiện đã sẵn sàng",
+      "startHere": "BẮT ĐẦU TẠI ĐÂY",
+      "step1Sub": "Những thông tin thiết yếu mà khách của bạn sẽ thấy.",
+      "nameLabel": "Tên sự kiện",
+      "namePlaceholder": "vd: Emma & James",
+      "typeLabel": "Loại sự kiện",
+      "dateLabel": "Khi nào diễn ra?",
+      "creating": "Đang tạo sự kiện...",
+      "create": "Tạo sự kiện",
+      "step2Eyebrow": "BƯỚC 2 / 2",
+      "step2Heading": "Tùy biến theo phong cách của bạn",
+      "step2Sub": "Những điểm nhấn tùy chọn cho trải nghiệm khách mời.",
+      "qrStyleLabel": "Kiểu mã QR",
+      "qrClassic": "Cổ điển",
+      "qrModernFrame": "Khung hiện đại",
+      "qrEditorial": "Biên tập",
+      "colorLegend": "Màu sắc sự kiện",
+      "themeOlive": "Oliu",
+      "themeRose": "Hồng",
+      "themeMidnight": "Nửa đêm",
+      "coverLabel": "Ảnh bìa tùy chọn",
+      "choosePhoto": "Chọn một bức ảnh",
+      "coverFormatHint": "JPG, PNG hoặc WebP",
+      "back": "Quay lại",
+      "continue": "Tiếp tục",
+      "skipForNow": "Bỏ qua lúc này",
+      "overviewAria": "Tổng quan sự kiện",
+      "overviewTitle": "TỔNG QUAN SỰ KIỆN",
+      "coverPlaceholder": "ẢNH BÌA CỦA BẠN",
+      "nameFallback": "Tên sự kiện của bạn",
+      "dateFallback": "Chọn một ngày",
+      "qrSuffix": "QR",
+      "privateEvent": "Sự kiện riêng tư"
+    }
+  },
+  "guest": {
+    "upload": {
+      "addPhotos": "Thêm ảnh",
+      "uploading": "Đang tải lên...",
+      "complete": "Tải lên hoàn tất"
+    }
+  },
+  "formats": {
+    "dateTime": {
+      "short": {
+        "day": "numeric",
+        "month": "short",
+        "year": "numeric"
+      }
+    },
+    "number": {
+      "percent": {
+        "style": "percent",
+        "maximumFractionDigits": 0
+      }
+    },
+    "currency": {
+      "usd": {
+        "style": "currency",
+        "currency": "USD"
+      }
+    }
+  },
+  "host": {
+    "shell": {
+      "brandAria": "Không gian tổ chức CandidCrowd",
+      "navAria": "Khu vực làm việc của người tổ chức",
+      "events": "Sự kiện",
+      "createEventAria": "Tạo sự kiện mới",
+      "newEvent": "Sự kiện mới",
+      "footerAria": "Chân trang khu vực làm việc",
+      "help": "Trợ giúp",
+      "privacy": "Quyền riêng tư",
+      "terms": "Điều khoản"
+    },
+    "accountMenu": {
+      "openMenuAria": "Mở menu tài khoản",
+      "yourAccount": "Tài khoản của bạn",
+      "signInToManage": "Đăng nhập để quản lý tài khoản",
+      "freePlan": "Gói miễn phí",
+      "currentPlan": "Gói hiện tại",
+      "planFree": "Miễn phí",
+      "menuAria": "Menu tài khoản",
+      "profile": "Hồ sơ",
+      "planAndBilling": "Gói & thanh toán",
+      "logOut": "Đăng xuất"
+    },
+    "pages": {
+      "createMetaTitle": "Tạo sự kiện — CandidCrowd",
+      "eventsMetaTitle": "Sự kiện của bạn — CandidCrowd",
+      "eventsEyebrow": "KHÔNG GIAN TỔ CHỨC",
+      "eventsTitle": "Sự kiện của bạn",
+      "eventsDescription": "Mỗi kỷ niệm sẻ chia đều bắt đầu từ một sự kiện giản đơn.",
+      "createEvent": "Tạo sự kiện",
+      "shelfWaiting": "Kệ sự kiện của bạn đang chờ đón.",
+      "shelfDescription": "Tạo sự kiện, chia sẻ mã QR và đây sẽ là nơi hiển thị thư viện ảnh cũng như công cụ điều khiển của bạn.",
+      "createFirstEvent": "Tạo sự kiện đầu tiên của bạn",
+      "profileMetaTitle": "Hồ sơ — CandidCrowd",
+      "accountEyebrow": "TÀI KHOẢN",
+      "profileTitle": "Hồ sơ",
+      "profileCardTitle": "Hồ sơ người tổ chức",
+      "profileCardDescription": "Tên, ảnh đại diện và tùy chọn liên hệ của bạn sẽ xuất hiện tại đây.",
+      "billingMetaTitle": "Gói & thanh toán — CandidCrowd",
+      "billingTitle": "Gói & thanh toán",
+      "billingCardTitle": "Gói miễn phí",
+      "billingCardDescription": "Các gói cước, hóa đơn và mức sử dụng sẽ xuất hiện tại đây khi tính năng thanh toán ra mắt."
+    }
+  },
+  "legal": {
+    "toc": {
+      "title": "Mục lục",
+      "sectionsCount": "{count} mục",
+      "backToTop": "Về đầu trang",
+      "backToTopAria": "Cuộn lên đầu trang",
+      "sidebarAria": "Điều hướng thanh bên"
+    },
+    "privacy": {
+      "metaTitle": "Chính sách Bảo mật | CandidCrowd",
+      "metaDescription": "Tìm hiểu cách CandidCrowd bảo vệ quyền riêng tư, xử lý ảnh và video sự kiện và cam kết không quét sinh trắc học khuôn mặt theo mặc định.",
+      "heroBadge": "Quyền riêng tư & Tin cậy dữ liệu",
+      "heroTitle": "Chính sách Bảo mật",
+      "lastUpdated": "Cập nhật lần cuối: 14 tháng 9, 2026",
+      "location": "Hà Nội, Việt Nam",
+      "compliance": "Tuân thủ GDPR & CCPA",
+      "heroLead": "Chính sách Bảo mật này giải thích cách CandidCrowd thu thập, sử dụng, lưu trữ, chia sẻ và bảo vệ thông tin cá nhân khi bạn sử dụng CandidCrowd.",
+      "tocTitle": "Nội dung Chính sách",
+      "calloutTitle": "Cam kết bảo mật cốt lõi",
+      "calloutLead": "Tại CandidCrowd, kỷ niệm sự kiện cá nhân xứng đáng được bảo vệ, tôn trọng và bảo mật:",
+      "calloutItems": {
+        "biometricsLabel": "Sinh trắc học",
+        "biometricsValue": "Không nhận diện hay định danh khuôn mặt",
+        "guestPrivacyLabel": "Quyền riêng tư của khách",
+        "guestPrivacyValue": "Không cần tài khoản hay email để tải ảnh lên",
+        "storageSecurityLabel": "An toàn lưu trữ",
+        "storageSecurityValue": "Lưu trữ đám mây riêng tư trên Cloudflare R2",
+        "aiTrainingLabel": "Huấn luyện AI",
+        "aiTrainingValue": "Không dùng ảnh của bạn để huấn luyện AI công cộng",
+        "dataSalesLabel": "Bán dữ liệu",
+        "dataSalesValue": "Chúng tôi không bán thông tin cá nhân",
+        "privacyContactLabel": "Liên hệ bảo mật"
+      },
+      "sections": {
+        "whoWeAre": "Chúng tôi là ai",
+        "informationCollected": "Thông tin chúng tôi thu thập",
+        "howWeUse": "Cách chúng tôi sử dụng thông tin cá nhân",
+        "legalBases": "Cơ sở pháp lý cho việc xử lý",
+        "otherPeople": "Ảnh và video về người khác",
+        "facialRecognition": "Nhận diện khuôn mặt và dữ liệu sinh trắc học",
+        "howWeShare": "Cách chúng tôi chia sẻ thông tin",
+        "hostsAndGuests": "Người tổ chức và khách tham dự",
+        "international": "Xử lý dữ liệu quốc tế",
+        "retention": "Lưu giữ dữ liệu",
+        "security": "Bảo mật",
+        "cookies": "Cookie",
+        "analytics": "Phân tích",
+        "aiProcessing": "Trí tuệ nhân tạo và dữ liệu tải lên",
+        "privacyRights": "Quyền riêng tư của bạn",
+        "removingMedia": "Yêu cầu gỡ bỏ phương tiện",
+        "californiaRights": "Quyền riêng tư theo luật California",
+        "children": "Trẻ em",
+        "deletion": "Xóa tài khoản và sự kiện",
+        "breaches": "Sự cố dữ liệu",
+        "thirdPartyLinks": "Liên kết bên thứ ba",
+        "changes": "Thay đổi chính sách bảo mật này",
+        "complaints": "Khiếu nại",
+        "contact": "Liên hệ"
+      },
+      "viewTerms": "Xem Điều khoản dịch vụ →"
+    },
+    "terms": {
+      "metaTitle": "Điều khoản Dịch vụ | CandidCrowd",
+      "metaDescription": "Xem lại các điều khoản và điều kiện điều chỉnh việc bạn sử dụng CandidCrowd, bao gồm trách nhiệm của chủ tiệc, quyền tải ảnh của khách, thời hạn lưu trữ và chính sách hoàn tiền.",
+      "heroBadge": "Điều khoản chính thức",
+      "heroTitle": "Điều khoản Dịch vụ",
+      "lastUpdated": "Cập nhật lần cuối: 14 tháng 9, 2026",
+      "location": "Hà Nội, Việt Nam",
+      "effective": "Có hiệu lực ngay lập tức",
+      "heroLead": "Các điều khoản này điều chỉnh quyền truy cập và sử dụng CandidCrowd của bạn, bao gồm các thư viện sự kiện, công cụ tải ảnh và video, tính năng trực tiếp và các dịch vụ liên quan.",
+      "tocTitle": "Nội dung Điều khoản",
+      "calloutTitle": "Điểm nổi bật dành cho Chủ tiệc & Khách mời",
+      "calloutLead": "Chúng tôi tin rằng điều khoản pháp lý nên rõ ràng và dễ hiểu. Dưới đây là các điều khoản quan trọng nhất áp dụng cho bạn:",
+      "calloutItems": {
+        "ownershipLabel": "Quyền sở hữu",
+        "ownershipValue": "Bạn giữ 100% bản quyền ảnh của mình",
+        "guestFrictionLabel": "Tiện lợi cho khách",
+        "guestFrictionValue": "Khách không cần tài khoản hay ứng dụng",
+        "freeStorageLabel": "Lưu trữ miễn phí",
+        "freeStorageValue": "30 ngày sau ngày diễn ra sự kiện",
+        "paidStorageLabel": "Lưu trữ trả phí",
+        "paidStorageValue": "12 tháng sau ngày diễn ra sự kiện",
+        "refundPolicyLabel": "Chính sách hoàn tiền",
+        "refundPolicyValue": "Thời hạn 14 ngày trước khi bắt đầu tải ảnh",
+        "governingLawLabel": "Luật điều chỉnh",
+        "governingLawValue": "Tòa án thẩm quyền tại Hà Nội, Việt Nam"
+      },
+      "sections": {
+        "about": "Về CandidCrowd",
+        "eligibility": "Điều kiện tham gia",
+        "accounts": "Tài khoản",
+        "eventsAndGuests": "Sự kiện và quyền truy cập của khách",
+        "userContent": "Nội dung người dùng",
+        "responsibility": "Trách nhiệm đối với nội dung",
+        "hostResponsibilities": "Trách nhiệm của chủ tiệc",
+        "moderation": "Kiểm duyệt nội dung",
+        "storage": "Thời hạn lưu trữ",
+        "availability": "Tính sẵn sàng và sao lưu",
+        "payments": "Thanh toán",
+        "refundPolicy": "Chính sách hoàn tiền",
+        "freeServices": "Dịch vụ miễn phí",
+        "serviceChanges": "Thay đổi dịch vụ",
+        "intellectualProperty": "Sở hữu trí tuệ",
+        "prohibitedUse": "Hành vi bị nghiêm cấm",
+        "thirdParty": "Dịch vụ bên thứ ba",
+        "suspension": "Đình chỉ và chấm dứt",
+        "deletion": "Xóa tài khoản",
+        "disclaimer": "Tuyên bố từ chối trách nhiệm",
+        "liability": "Giới hạn trách nhiệm pháp lý",
+        "indemnity": "Bồi thường",
+        "governingLaw": "Luật điều chỉnh",
+        "changes": "Thay đổi điều khoản này",
+        "contact": "Liên hệ"
+      },
+      "viewPrivacy": "Xem Chính sách bảo mật →"
+    }
+  }
+}

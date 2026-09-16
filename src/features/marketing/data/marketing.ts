@@ -66,6 +66,10 @@ export const participation = {
     { label: "Table QR", contributors: 46 },
     { label: "Bar QR", contributors: 18 },
     { label: "Shared link", contributors: 8 },
+    { key: "entrance", label: "Entrance QR", contributors: 21 },
+    { key: "table", label: "Table QR", contributors: 46 },
+    { key: "bar", label: "Bar QR", contributors: 18 },
+    { key: "link", label: "Shared link", contributors: 8 },
   ],
 };
 

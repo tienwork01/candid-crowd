@@ -11,6 +11,7 @@ import {
   EnvelopeSimple,
   ArrowsClockwise,
 } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 import { Brand } from "@/components/shared";
 import { Button } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
@@ -18,30 +19,6 @@ import { getSafeAuthRedirect, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
 
 type RecoveryMode = "forgot-password" | "reset-password" | "verify-email";
-
-const content = {
-  "forgot-password": {
-    eyebrow: "ACCOUNT RECOVERY",
-    title: "Find your way back.",
-    description:
-      "Enter the email attached to your account and we’ll prepare a secure reset link.",
-  },
-  "reset-password": {
-    eyebrow: "A FRESH START",
-    title: "Choose a new password.",
-    description:
-      "Create a password you haven’t used before to keep your memories protected.",
-  },
-  "verify-email": {
-    eyebrow: "ONE LAST STEP",
-    title: "Check your inbox.",
-    description:
-      "We sent you a secure verification link. Open it to finish setting up your account.",
-  },
-} satisfies Record<
-  RecoveryMode,
-  { eyebrow: string; title: string; description: string }
->;
 
 export function AccountRecovery({
   mode,
@@ -54,6 +31,8 @@ export function AccountRecovery({
   token?: string;
   nextPath?: string;
 }) {
+  const t = useTranslations("auth");
+  const tErrors = useTranslations("common.errors");
   const [complete, setComplete] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -61,8 +40,25 @@ export function AccountRecovery({
   const [notice, setNotice] = useState("");
   const [isPending, setIsPending] = useState(false);
   const confirmPasswordRef = useRef<HTMLInputElement>(null);
-  const page = content[mode];
   const safeNextPath = getSafeAuthRedirect(nextPath);
+
+  const headingContent = {
+    "forgot-password": {
+      eyebrow: t("recovery.forgotPasswordEyebrow"),
+      title: t("recovery.forgotPasswordTitle"),
+      description: t("recovery.forgotPasswordDescription"),
+    },
+    "reset-password": {
+      eyebrow: t("recovery.resetPasswordEyebrow"),
+      title: t("recovery.resetPasswordTitle"),
+      description: t("recovery.resetPasswordDescription"),
+    },
+    "verify-email": {
+      eyebrow: t("recovery.verifyEmailEyebrow"),
+      title: t("recovery.verifyEmailTitle"),
+      description: t("recovery.verifyEmailDescription"),
+    },
+  }[mode];
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -81,9 +77,7 @@ export function AccountRecovery({
 
     if (mode === "reset-password") {
       if (data.get("password") !== data.get("confirm-password")) {
-        setPasswordError(
-          "Passwords do not match. Check both fields and try again.",
-        );
+        setPasswordError(t("recovery.passwordsDoNotMatch"));
         confirmPasswordRef.current?.focus();
         setIsPending(false);
 
@@ -91,7 +85,7 @@ export function AccountRecovery({
       }
 
       if (!token) {
-        setPasswordError("This reset link is invalid or expired.");
+        setPasswordError(t("recovery.invalidOrExpiredResetLink"));
         setIsPending(false);
 
         return;
@@ -104,10 +98,7 @@ export function AccountRecovery({
 
       if (result.error) {
         setPasswordError(
-          getErrorMessage(
-            result.error.code,
-            "This reset link is invalid or expired.",
-          ),
+          getErrorMessage(result.error.code, undefined, tErrors),
         );
         setIsPending(false);
 
@@ -117,7 +108,7 @@ export function AccountRecovery({
 
     if (mode === "verify-email") {
       if (!email) {
-        setNotice("Return to registration and enter your email again.");
+        setNotice(t("recovery.returnToRegistration"));
         setIsPending(false);
 
         return;
@@ -129,18 +120,13 @@ export function AccountRecovery({
       });
 
       if (result.error) {
-        setNotice(
-          getErrorMessage(
-            result.error.code,
-            "We couldn’t send the verification email. Please try again.",
-          ),
-        );
+        setNotice(getErrorMessage(result.error.code, undefined, tErrors));
         setIsPending(false);
 
         return;
       }
 
-      setNotice("A fresh verification link is on its way.");
+      setNotice(t("recovery.verificationLinkOnWay"));
       setIsPending(false);
 
       return;
@@ -159,7 +145,7 @@ export function AccountRecovery({
           className="recovery-form__back"
         >
           <ArrowLeft size={15} aria-hidden="true" />
-          Log in
+          {t("ui.submitLogIn")}
         </Link>
       </div>
 
@@ -172,15 +158,19 @@ export function AccountRecovery({
       ) : (
         <>
           <div className="recovery-form__heading">
-            <span className="recovery-form__eyebrow">{page.eyebrow}</span>
-            <h1 id="recovery-heading">{page.title}</h1>
-            <p>{page.description}</p>
+            <span className="recovery-form__eyebrow">
+              {headingContent.eyebrow}
+            </span>
+            <h1 id="recovery-heading">{headingContent.title}</h1>
+            <p>{headingContent.description}</p>
           </div>
 
           <form className="recovery-form__fields" onSubmit={submit}>
             {mode === "forgot-password" && (
               <div className="recovery-form__field">
-                <label htmlFor="recovery-email">Email address</label>
+                <label htmlFor="recovery-email">
+                  {t("recovery.emailAddress")}
+                </label>
                 <input
                   id="recovery-email"
                   name="email"
@@ -188,7 +178,7 @@ export function AccountRecovery({
                   autoComplete="email"
                   autoCapitalize="none"
                   spellCheck={false}
-                  placeholder="you@example.com"
+                  placeholder={t("ui.emailPlaceholder")}
                   required
                 />
               </div>
@@ -198,18 +188,18 @@ export function AccountRecovery({
               <>
                 <PasswordField
                   id="new-password"
-                  label="New password"
+                  label={t("recovery.newPassword")}
                   name="password"
                   visible={showPassword}
                   onVisibilityChange={() => setShowPassword((value) => !value)}
                   describedBy="new-password-hint"
                 />
                 <p className="recovery-form__hint" id="new-password-hint">
-                  Use at least 8 characters.
+                  {t("ui.passwordMinHint")}
                 </p>
                 <PasswordField
                   id="confirm-password"
-                  label="Confirm new password"
+                  label={t("recovery.confirmNewPassword")}
                   name="confirm-password"
                   visible={showConfirmation}
                   onVisibilityChange={() =>
@@ -233,8 +223,7 @@ export function AccountRecovery({
 
             {mode === "verify-email" && (
               <p className="recovery-form__hint">
-                Verification links expire for your security. Check spam or
-                request a fresh email below.
+                {t("recovery.verifyEmailExpiryNotice")}
               </p>
             )}
 
@@ -244,22 +233,22 @@ export function AccountRecovery({
               disabled={isPending}
             >
               {isPending
-                ? "Please wait…"
+                ? t("ui.wait")
                 : mode === "forgot-password"
-                  ? "Send reset link"
+                  ? t("recovery.sendResetLink")
                   : mode === "reset-password"
-                    ? "Save new password"
-                    : "Send another link"}
+                    ? t("recovery.saveNewPassword")
+                    : t("recovery.sendAnotherLink")}
               <ArrowRight aria-hidden="true" />
             </Button>
           </form>
 
           {mode === "verify-email" && (
             <div className="recovery-form__resend">
-              <span>Didn’t receive the email?</span>
+              <span>{t("recovery.didntReceiveEmail")}</span>
               <span>
-                <ArrowsClockwise size={14} aria-hidden="true" /> Use the button
-                above to resend securely.
+                <ArrowsClockwise size={14} aria-hidden="true" />{" "}
+                {t("recovery.resendGuidance")}
               </span>
             </div>
           )}
@@ -292,6 +281,8 @@ function PasswordField({
   invalid?: boolean;
   inputRef?: React.RefObject<HTMLInputElement | null>;
 }) {
+  const t = useTranslations("auth.ui");
+
   return (
     <div className="recovery-form__field">
       <label htmlFor={id}>{label}</label>
@@ -313,11 +304,7 @@ function PasswordField({
           variant="ghost"
           size="icon"
           className="recovery-form__visibility"
-          aria-label={
-            visible
-              ? `Hide ${label.toLowerCase()}`
-              : `Show ${label.toLowerCase()}`
-          }
+          aria-label={visible ? t("hidePassword") : t("showPassword")}
           aria-pressed={visible}
           onClick={onVisibilityChange}
         >
@@ -341,6 +328,7 @@ function RecoverySuccess({
   nextPath: string;
   onReset: () => void;
 }) {
+  const t = useTranslations("auth.recovery");
   const forgot = mode === "forgot-password";
   const Icon = forgot ? EnvelopeSimple : Key;
 
@@ -350,15 +338,13 @@ function RecoverySuccess({
         <Icon aria-hidden="true" />
       </span>
       <span className="recovery-form__eyebrow">
-        {forgot ? "CHECK YOUR INBOX" : "ALL SET"}
+        {forgot ? t("successCheckInboxEyebrow") : t("successAllSetEyebrow")}
       </span>
       <h1 id="recovery-heading">
-        {forgot ? "Your reset link is ready." : "Your password is renewed."}
+        {forgot ? t("successResetLinkReady") : t("successPasswordRenewed")}
       </h1>
       <p>
-        {forgot
-          ? "If an account exists for that email, a secure reset link will arrive shortly."
-          : "Your password has been changed. You can now log in with your new password."}
+        {forgot ? t("successResetLinkBody") : t("successPasswordRenewedBody")}
       </p>
       {forgot ? (
         <button
@@ -366,14 +352,14 @@ function RecoverySuccess({
           type="button"
           onClick={onReset}
         >
-          Try another email
+          {t("tryAnotherEmail")}
         </button>
       ) : (
         <Link
           href={withAuthRedirect("/login", nextPath)}
           className="button recovery-form__success-action"
         >
-          Continue to log in <ArrowRight aria-hidden="true" />
+          {t("continueToLogIn")} <ArrowRight aria-hidden="true" />
         </Link>
       )}
     </div>

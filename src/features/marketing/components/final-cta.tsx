@@ -1,22 +1,25 @@
 import Link from "next/link";
 import { Aperture, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { getTranslations } from "next-intl/server";
 
-export function FinalCta() {
+export async function FinalCta() {
+  const t = await getTranslations("marketing.finalCta");
+
   return (
     <section className="final-cta" aria-labelledby="final-title">
       <Aperture size={39} aria-hidden="true" />
-      <span className="eyebrow">EVERY GUEST. EVERY PERSPECTIVE.</span>
+      <span className="eyebrow">{t("eyebrow")}</span>
       <h2 id="final-title">
-        Your guests are already
+        {t("titleLine1")}
         <br />
-        taking the photos.
+        {t("titleLine2")}
         <br />
-        <em>Bring them together.</em>
+        <em>{t("titleLine3")}</em>
       </h2>
       <Link href="/events/new" className="button">
-        Create your event free <ArrowUpRight size={18} aria-hidden="true" />
+        {t("button")} <ArrowUpRight size={18} aria-hidden="true" />
       </Link>
-      <p>No app. No guest account. All the good stuff.</p>
+      <p>{t("subhead")}</p>
     </section>
   );
 }

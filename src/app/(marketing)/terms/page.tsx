@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ShieldCheck } from "@phosphor-icons/react/dist/ssr";
+import { getTranslations } from "next-intl/server";
 import { Header, Footer } from "@/features/marketing/components";
 import {
   TableOfContents,
@@ -10,41 +11,63 @@ import {
 import { siteConfig } from "@/lib/config";
 import "@/features/legal/components/legal.css";
 
-export const metadata: Metadata = {
-  title: "Terms of Service | CandidCrowd",
-  description:
-    "Review the terms and conditions governing your use of CandidCrowd, including host responsibilities, guest uploads, storage periods, and refund policies.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("legal.terms");
 
-const termsToc: TocItem[] = [
-  { id: "about", number: "1", title: "About CandidCrowd" },
-  { id: "eligibility", number: "2", title: "Eligibility" },
-  { id: "accounts", number: "3", title: "Accounts" },
-  { id: "events-and-guests", number: "4", title: "Events and Guest Access" },
-  { id: "user-content", number: "5", title: "User Content" },
-  { id: "responsibility", number: "6", title: "Responsibility for Content" },
-  { id: "host-responsibilities", number: "7", title: "Host Responsibilities" },
-  { id: "moderation", number: "8", title: "Content Moderation" },
-  { id: "storage", number: "9", title: "Storage Periods" },
-  { id: "availability", number: "10", title: "Availability and Backups" },
-  { id: "payments", number: "11", title: "Payments" },
-  { id: "refund-policy", number: "12", title: "Refund Policy" },
-  { id: "free-services", number: "13", title: "Free Services" },
-  { id: "service-changes", number: "14", title: "Service Changes" },
-  { id: "intellectual-property", number: "15", title: "Intellectual Property" },
-  { id: "prohibited-use", number: "16", title: "Prohibited Use" },
-  { id: "third-party", number: "17", title: "Third-Party Services" },
-  { id: "suspension", number: "18", title: "Suspension and Termination" },
-  { id: "deletion", number: "19", title: "Account Deletion" },
-  { id: "disclaimer", number: "20", title: "Disclaimer" },
-  { id: "liability", number: "21", title: "Limitation of Liability" },
-  { id: "indemnity", number: "22", title: "Indemnity" },
-  { id: "governing-law", number: "23", title: "Governing Law" },
-  { id: "changes", number: "24", title: "Changes to These Terms" },
-  { id: "contact", number: "25", title: "Contact" },
-];
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const t = await getTranslations("legal.terms");
+  const tToc = await getTranslations("legal.toc");
+
+  const termsToc: TocItem[] = [
+    { id: "about", number: "1", title: t("sections.about") },
+    { id: "eligibility", number: "2", title: t("sections.eligibility") },
+    { id: "accounts", number: "3", title: t("sections.accounts") },
+    {
+      id: "events-and-guests",
+      number: "4",
+      title: t("sections.eventsAndGuests"),
+    },
+    { id: "user-content", number: "5", title: t("sections.userContent") },
+    { id: "responsibility", number: "6", title: t("sections.responsibility") },
+    {
+      id: "host-responsibilities",
+      number: "7",
+      title: t("sections.hostResponsibilities"),
+    },
+    { id: "moderation", number: "8", title: t("sections.moderation") },
+    { id: "storage", number: "9", title: t("sections.storage") },
+    { id: "availability", number: "10", title: t("sections.availability") },
+    { id: "payments", number: "11", title: t("sections.payments") },
+    { id: "refund-policy", number: "12", title: t("sections.refundPolicy") },
+    { id: "free-services", number: "13", title: t("sections.freeServices") },
+    {
+      id: "service-changes",
+      number: "14",
+      title: t("sections.serviceChanges"),
+    },
+    {
+      id: "intellectual-property",
+      number: "15",
+      title: t("sections.intellectualProperty"),
+    },
+    { id: "prohibited-use", number: "16", title: t("sections.prohibitedUse") },
+    { id: "third-party", number: "17", title: t("sections.thirdParty") },
+    { id: "suspension", number: "18", title: t("sections.suspension") },
+    { id: "deletion", number: "19", title: t("sections.deletion") },
+    { id: "disclaimer", number: "20", title: t("sections.disclaimer") },
+    { id: "liability", number: "21", title: t("sections.liability") },
+    { id: "indemnity", number: "22", title: t("sections.indemnity") },
+    { id: "governing-law", number: "23", title: t("sections.governingLaw") },
+    { id: "changes", number: "24", title: t("sections.changes") },
+    { id: "contact", number: "25", title: t("sections.contact") },
+  ];
+
   return (
     <div className="legal-page">
       <Header />
@@ -53,21 +76,17 @@ export default function TermsPage() {
         <div className="legal-page__container legal-page__hero-inner">
           <div className="legal-page__badge">
             <span className="legal-page__badge-dot" aria-hidden="true" />
-            <span>Official Terms</span>
+            <span>{t("heroBadge")}</span>
           </div>
-          <h1 className="legal-page__title">Terms of Service</h1>
+          <h1 className="legal-page__title">{t("heroTitle")}</h1>
           <div className="legal-page__meta">
-            <span>Last updated: September 14, 2026</span>
+            <span>{t("lastUpdated")}</span>
             <span className="legal-page__meta-divider" aria-hidden="true" />
-            <span>Hanoi, Vietnam</span>
+            <span>{t("location")}</span>
             <span className="legal-page__meta-divider" aria-hidden="true" />
-            <span>Effective immediately</span>
+            <span>{t("effective")}</span>
           </div>
-          <p className="legal-page__lead">
-            These Terms govern your access to and use of CandidCrowd, including
-            our event galleries, photo and video upload tools, live features,
-            and related services.
-          </p>
+          <p className="legal-page__lead">{t("heroLead")}</p>
         </div>
       </header>
 
@@ -76,9 +95,9 @@ export default function TermsPage() {
           {/* Desktop Sticky Sidebar */}
           <aside
             className="legal-page__sidebar"
-            aria-label="Sidebar navigation"
+            aria-label={tToc("sidebarAria")}
           >
-            <TableOfContents items={termsToc} title="Terms Contents" />
+            <TableOfContents items={termsToc} title={t("tocTitle")} />
           </aside>
 
           {/* Main Document Content */}
@@ -90,61 +109,58 @@ export default function TermsPage() {
                   className="legal-callout__icon"
                   aria-hidden="true"
                 />
-                <h2 className="legal-callout__title">
-                  Key Highlights for Hosts & Guests
-                </h2>
+                <h2 className="legal-callout__title">{t("calloutTitle")}</h2>
               </div>
               <div className="legal-callout__body">
-                <p>
-                  We believe legal terms should be straightforward. Here are the
-                  most critical terms that apply to your use of CandidCrowd:
-                </p>
+                <p>{t("calloutLead")}</p>
               </div>
               <div className="legal-callout__grid">
                 <div className="legal-callout__item">
-                  <span className="legal-callout__item-label">Ownership</span>
+                  <span className="legal-callout__item-label">
+                    {t("calloutItems.ownershipLabel")}
+                  </span>
                   <span className="legal-callout__item-value">
-                    You keep 100% of your copyright
+                    {t("calloutItems.ownershipValue")}
                   </span>
                 </div>
                 <div className="legal-callout__item">
                   <span className="legal-callout__item-label">
-                    Guest Friction
+                    {t("calloutItems.guestFrictionLabel")}
                   </span>
                   <span className="legal-callout__item-value">
-                    No account or app needed for guests
+                    {t("calloutItems.guestFrictionValue")}
                   </span>
                 </div>
                 <div className="legal-callout__item">
                   <span className="legal-callout__item-label">
-                    Free Storage
+                    {t("calloutItems.freeStorageLabel")}
                   </span>
                   <span className="legal-callout__item-value">
-                    30 days after event date
+                    {t("calloutItems.freeStorageValue")}
                   </span>
                 </div>
                 <div className="legal-callout__item">
                   <span className="legal-callout__item-label">
-                    Paid Storage
+                    {t("calloutItems.paidStorageLabel")}
                   </span>
                   <span className="legal-callout__item-value">
-                    12 months after event date
+                    {t("calloutItems.paidStorageValue")}
                   </span>
                 </div>
                 <div className="legal-callout__item">
                   <span className="legal-callout__item-label">
-                    Refund Policy
+                    {t("calloutItems.refundPolicyLabel")}
                   </span>
                   <span className="legal-callout__item-value">
-                    14-day window before uploads/start
+                    {t("calloutItems.refundPolicyValue")}
                   </span>
                 </div>
                 <div className="legal-callout__item">
                   <span className="legal-callout__item-label">
-                    Governing Law
+                    {t("calloutItems.governingLawLabel")}
                   </span>
                   <span className="legal-callout__item-value">
-                    Hanoi, Vietnam jurisdiction
+                    {t("calloutItems.governingLawValue")}
                   </span>
                 </div>
               </div>
@@ -171,7 +187,7 @@ export default function TermsPage() {
             <section id="about" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">01</span>
-                <h2 className="legal-section__title">About CandidCrowd</h2>
+                <h2 className="legal-section__title">{t("sections.about")}</h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -203,7 +219,9 @@ export default function TermsPage() {
             <section id="eligibility" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">02</span>
-                <h2 className="legal-section__title">Eligibility</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.eligibility")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -224,7 +242,9 @@ export default function TermsPage() {
             <section id="accounts" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">03</span>
-                <h2 className="legal-section__title">Accounts</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.accounts")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -268,7 +288,7 @@ export default function TermsPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">04</span>
                 <h2 className="legal-section__title">
-                  Events and Guest Access
+                  {t("sections.eventsAndGuests")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -313,7 +333,9 @@ export default function TermsPage() {
             <section id="user-content" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">05</span>
-                <h2 className="legal-section__title">User Content</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.userContent")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -363,7 +385,7 @@ export default function TermsPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">06</span>
                 <h2 className="legal-section__title">
-                  Responsibility for Uploaded Content
+                  {t("sections.responsibility")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -407,7 +429,9 @@ export default function TermsPage() {
             <section id="host-responsibilities" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">07</span>
-                <h2 className="legal-section__title">Host Responsibilities</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.hostResponsibilities")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -445,7 +469,9 @@ export default function TermsPage() {
             <section id="moderation" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">08</span>
-                <h2 className="legal-section__title">Content Moderation</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.moderation")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>Hosts may moderate or remove content from their events.</p>
@@ -479,7 +505,9 @@ export default function TermsPage() {
             <section id="storage" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">09</span>
-                <h2 className="legal-section__title">Storage Periods</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.storage")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -519,7 +547,7 @@ export default function TermsPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">10</span>
                 <h2 className="legal-section__title">
-                  Availability and Backups
+                  {t("sections.availability")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -542,7 +570,9 @@ export default function TermsPage() {
             <section id="payments" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">11</span>
-                <h2 className="legal-section__title">Payments</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.payments")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>Certain features require payment.</p>
@@ -570,7 +600,9 @@ export default function TermsPage() {
             <section id="refund-policy" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">12</span>
-                <h2 className="legal-section__title">Refund Policy</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.refundPolicy")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -620,7 +652,9 @@ export default function TermsPage() {
             <section id="free-services" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">13</span>
-                <h2 className="legal-section__title">Free Services</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.freeServices")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -644,7 +678,9 @@ export default function TermsPage() {
             <section id="service-changes" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">14</span>
-                <h2 className="legal-section__title">Service Changes</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.serviceChanges")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>CandidCrowd is an evolving product.</p>
@@ -664,7 +700,9 @@ export default function TermsPage() {
             <section id="intellectual-property" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">15</span>
-                <h2 className="legal-section__title">Intellectual Property</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.intellectualProperty")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -706,7 +744,9 @@ export default function TermsPage() {
             <section id="prohibited-use" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">16</span>
-                <h2 className="legal-section__title">Prohibited Use</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.prohibitedUse")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>You must not:</p>
@@ -749,7 +789,9 @@ export default function TermsPage() {
             <section id="third-party" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">17</span>
-                <h2 className="legal-section__title">Third-Party Services</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.thirdParty")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -775,7 +817,7 @@ export default function TermsPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">18</span>
                 <h2 className="legal-section__title">
-                  Account Suspension and Termination
+                  {t("sections.suspension")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -809,7 +851,9 @@ export default function TermsPage() {
             <section id="deletion" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">19</span>
-                <h2 className="legal-section__title">Account Deletion</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.deletion")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>Hosts may request account deletion.</p>
@@ -834,7 +878,9 @@ export default function TermsPage() {
             <section id="disclaimer" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">20</span>
-                <h2 className="legal-section__title">Disclaimer</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.disclaimer")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -871,7 +917,7 @@ export default function TermsPage() {
               <div className="legal-section__header">
                 <span className="legal-section__number">21</span>
                 <h2 className="legal-section__title">
-                  Limitation of Liability
+                  {t("sections.liability")}
                 </h2>
               </div>
               <div className="legal-section__body">
@@ -903,7 +949,9 @@ export default function TermsPage() {
             <section id="indemnity" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">22</span>
-                <h2 className="legal-section__title">Indemnity</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.indemnity")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -931,7 +979,9 @@ export default function TermsPage() {
             <section id="governing-law" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">23</span>
-                <h2 className="legal-section__title">Governing Law</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.governingLaw")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>
@@ -955,7 +1005,9 @@ export default function TermsPage() {
             <section id="changes" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">24</span>
-                <h2 className="legal-section__title">Changes to These Terms</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.changes")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>We may update these Terms as CandidCrowd develops.</p>
@@ -975,7 +1027,9 @@ export default function TermsPage() {
             <section id="contact" className="legal-section">
               <div className="legal-section__header">
                 <span className="legal-section__number">25</span>
-                <h2 className="legal-section__title">Contact</h2>
+                <h2 className="legal-section__title">
+                  {t("sections.contact")}
+                </h2>
               </div>
               <div className="legal-section__body">
                 <p>Questions about these Terms can be sent to:</p>
@@ -1002,7 +1056,7 @@ export default function TermsPage() {
                 style={{ display: "flex", gap: "16px", alignItems: "center" }}
               >
                 <Link href="/privacy" className="legal-section__link">
-                  View Privacy Policy &rarr;
+                  {t("viewPrivacy")}
                 </Link>
               </div>
               <BackToTop />

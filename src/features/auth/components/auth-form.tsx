@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 import { Brand } from "@/components/shared";
 import { Button } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
@@ -18,6 +19,8 @@ export function AuthForm({
   mode: "login" | "register";
   nextPath?: string;
 }) {
+  const t = useTranslations("auth");
+  const tErrors = useTranslations("common.errors");
   const register = mode === "register";
   const [showPassword, setShowPassword] = useState(false);
   const [feedback, setFeedback] = useState("");
@@ -50,12 +53,7 @@ export function AuthForm({
       setIsPending(false);
 
       if (result.error) {
-        setFeedback(
-          getErrorMessage(
-            result.error.code,
-            "We couldn’t create your account. Please try again.",
-          ),
-        );
+        setFeedback(getErrorMessage(result.error.code, undefined, tErrors));
 
         return;
       }
@@ -80,12 +78,7 @@ export function AuthForm({
     setIsPending(false);
 
     if (result.error) {
-      setFeedback(
-        getErrorMessage(
-          result.error.code,
-          "Email or password is incorrect. Please check your credentials.",
-        ),
-      );
+      setFeedback(getErrorMessage(result.error.code, undefined, tErrors));
 
       return;
     }
@@ -107,12 +100,7 @@ export function AuthForm({
     });
 
     if (result.error) {
-      setFeedback(
-        getErrorMessage(
-          result.error.code,
-          `Couldn’t continue with ${provider}. Please try again.`,
-        ),
-      );
+      setFeedback(getErrorMessage(result.error.code, undefined, tErrors));
       setIsPending(false);
     }
   }
@@ -124,21 +112,19 @@ export function AuthForm({
         <Brand />
         <Link href="/" className="auth-form__back">
           <ArrowLeft size={15} aria-hidden="true" />
-          Home
+          {t("ui.home")}
         </Link>
       </div>
 
       <div className="auth-form__heading">
         <span className="auth-form__eyebrow">
-          {register ? "GET STARTED" : "YOUR MEMORIES, TOGETHER"}
+          {register ? t("ui.getStarted") : t("ui.memoriesTogether")}
         </span>
         <h1 id="auth-heading">
-          {register ? "Create your account." : "Welcome back."}
+          {register ? t("register.title") : t("signIn.title")}
         </h1>
         <p>
-          {register
-            ? "Collect every photo from your event in original quality."
-            : "A little closer to all your favorite moments."}
+          {register ? t("ui.registerDescription") : t("ui.loginDescription")}
         </p>
       </div>
 
@@ -148,14 +134,14 @@ export function AuthForm({
             className="auth-form__social"
             role="group"
             aria-label={
-              register ? "Sign up with a provider" : "Log in with a provider"
+              register ? t("ui.signUpWithProvider") : t("ui.logInWithProvider")
             }
           >
             {googleEnabled && (
               <button
                 type="button"
                 className="auth-form__social-btn auth-form__social-btn--google"
-                aria-label="Continue with Google"
+                aria-label={t("ui.continueWithGoogle")}
                 disabled={isPending}
                 onClick={() => void social("google")}
               >
@@ -167,7 +153,7 @@ export function AuthForm({
               <button
                 type="button"
                 className="auth-form__social-btn auth-form__social-btn--apple"
-                aria-label="Continue with Apple"
+                aria-label={t("ui.continueWithApple")}
                 disabled={isPending}
                 onClick={() => void social("apple")}
               >
@@ -183,11 +169,12 @@ export function AuthForm({
             )}
           </div>
           <p className="auth-form__social-consent">
-            By continuing, you agree to our <Link href="/terms">Terms</Link> and{" "}
-            <Link href="/privacy">Privacy Policy</Link>.
+            {t("ui.socialConsentPrefix")}{" "}
+            <Link href="/terms">{t("ui.terms")}</Link> {t("ui.and")}{" "}
+            <Link href="/privacy">{t("ui.privacyPolicy")}</Link>.
           </p>
           <div className="auth-form__divider">
-            <span>or with email</span>
+            <span>{t("ui.orWithEmail")}</span>
           </div>
         </>
       )}
@@ -195,20 +182,20 @@ export function AuthForm({
       <form className="auth-form__fields" onSubmit={submit}>
         {register && (
           <div className="auth-form__field">
-            <label htmlFor="full-name">Full name</label>
+            <label htmlFor="full-name">{t("register.name")}</label>
             <input
               id="full-name"
               name="name"
               type="text"
               autoComplete="name"
-              placeholder="Your full name"
+              placeholder={t("ui.fullNamePlaceholder")}
               required
               maxLength={100}
             />
           </div>
         )}
         <div className="auth-form__field">
-          <label htmlFor="email">Email address</label>
+          <label htmlFor="email">{t("signIn.email")}</label>
           <input
             id="email"
             name="email"
@@ -216,19 +203,19 @@ export function AuthForm({
             autoComplete="email"
             autoCapitalize="none"
             spellCheck={false}
-            placeholder="you@example.com"
+            placeholder={t("ui.emailPlaceholder")}
             required
           />
         </div>
         <div className="auth-form__field">
           <div className="auth-form__label-row">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t("signIn.password")}</label>
             {!register && (
               <Link
                 className="auth-form__text-button"
                 href={withAuthRedirect("/forgot-password", safeNextPath)}
               >
-                Forgot password?
+                {t("ui.forgotPassword")}
               </Link>
             )}
           </div>
@@ -239,7 +226,9 @@ export function AuthForm({
               type={showPassword ? "text" : "password"}
               autoComplete={register ? "new-password" : "current-password"}
               placeholder={
-                register ? "Create a password" : "Enter your password"
+                register
+                  ? t("ui.createPasswordPlaceholder")
+                  : t("ui.enterPasswordPlaceholder")
               }
               required
               minLength={register ? 8 : undefined}
@@ -250,9 +239,11 @@ export function AuthForm({
               variant="ghost"
               size="icon"
               className="auth-form__visibility"
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={
+                showPassword ? t("ui.hidePassword") : t("ui.showPassword")
+              }
               aria-pressed={showPassword}
-              title={showPassword ? "Hide password" : "Show password"}
+              title={showPassword ? t("ui.hidePassword") : t("ui.showPassword")}
               onClick={() => setShowPassword((value) => !value)}
             >
               {showPassword ? (
@@ -264,7 +255,7 @@ export function AuthForm({
           </div>
           {register && (
             <p className="auth-form__hint" id="password-hint">
-              At least 8 characters.
+              {t("ui.passwordMinHint")}
             </p>
           )}
         </div>
@@ -272,23 +263,23 @@ export function AuthForm({
           <div className="auth-form__consent">
             <input id="terms" name="terms" type="checkbox" required />
             <label htmlFor="terms">
-              I agree to the{" "}
+              {t("ui.agreeToTermsPrefix")}{" "}
               <Link
                 href="/terms"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="auth-form__text-button"
               >
-                Terms of service
+                {t("ui.termsOfService")}
               </Link>{" "}
-              and{" "}
+              {t("ui.and")}{" "}
               <Link
                 href="/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="auth-form__text-button"
               >
-                Privacy policy
+                {t("ui.privacyPolicy")}
               </Link>
               .
             </label>
@@ -302,20 +293,24 @@ export function AuthForm({
           type="submit"
           disabled={isPending}
         >
-          {isPending ? "Please wait…" : register ? "Create account" : "Log in"}
+          {isPending
+            ? t("ui.wait")
+            : register
+              ? t("ui.submitCreateAccount")
+              : t("ui.submitLogIn")}
           <ArrowRight aria-hidden="true" className="auth-form__submit-arrow" />
         </Button>
       </form>
 
       <p className="auth-form__switch">
-        {register ? "Already have an account?" : "New to CandidCrowd?"}{" "}
+        {register ? t("ui.alreadyHaveAccount") : t("ui.newToCandidCrowd")}{" "}
         <Link
           href={withAuthRedirect(
             register ? "/login" : "/register",
             safeNextPath,
           )}
         >
-          {register ? "Log in" : "Create an account"}
+          {register ? t("ui.actionLogIn") : t("ui.actionCreateAccount")}
         </Link>
       </p>
     </section>

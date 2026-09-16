@@ -1,8 +1,29 @@
 import Link from "next/link";
 import { ArrowUpRight, Check } from "@phosphor-icons/react/dist/ssr";
+import { getTranslations } from "next-intl/server";
 import { pricingPlans } from "../data/marketing";
 
-export function Pricing() {
+export async function Pricing() {
+  const t = await getTranslations("marketing.pricing");
+
+  const plans = pricingPlans.map((plan) => {
+    const planKey = plan.id as "free" | "essential" | "plus";
+
+    return {
+      ...plan,
+      name: t(`plans.${planKey}.name`),
+      description: t(`plans.${planKey}.description`),
+      priceLabel: t(`plans.${planKey}.priceLabel`),
+      billing: t(`plans.${planKey}.billing`),
+      cta: t(`plans.${planKey}.cta`),
+      features: [
+        t(`plans.${planKey}.features.f1`),
+        t(`plans.${planKey}.features.f2`),
+        t(`plans.${planKey}.features.f3`),
+      ],
+    };
+  });
+
   return (
     <section
       className="pricing container section-pad"
@@ -10,36 +31,36 @@ export function Pricing() {
       aria-labelledby="pricing-title"
     >
       <div className="center-heading">
-        <span className="eyebrow">A PLAN FOR YOUR KIND OF CELEBRATION</span>
+        <span className="eyebrow">{t("eyebrow")}</span>
         <h2 id="pricing-title">
-          Little gathering.
+          {t("titleLine1")}
           <br />
-          <em>Big memories.</em>
+          <em>{t("titleLine2")}</em>
         </h2>
-        <p>Start with the free preview. Find the right fit as we grow.</p>
+        <p>{t("subhead")}</p>
       </div>
       <div className="pricing__grid">
-        {pricingPlans.map((plan) => (
+        {plans.map((plan) => (
           <div className="plan-card__motion" key={plan.id}>
             <article
               className={`plan-card ${plan.featured ? "plan-card--featured" : ""}`}
             >
               {plan.featured ? (
                 <span className="plan-card__recommendation">
-                  Most loved for a full celebration
+                  {t("recommendedBadge")}
                 </span>
               ) : null}
               <span className="eyebrow">
-                {plan.available ? "AVAILABLE TO EXPLORE" : "PLANNED OFFERING"}
+                {plan.available
+                  ? t("availableToExplore")
+                  : t("plannedOffering")}
               </span>
               <h3>{plan.name}</h3>
               <p>{plan.description}</p>
               <div className="plan-card__price">{plan.priceLabel}</div>
               <span className="plan-card__billing">{plan.billing}</span>
               {plan.featured ? (
-                <p className="plan-card__note">
-                  The essentials for bringing every guest perspective together.
-                </p>
+                <p className="plan-card__note">{t("essentialNote")}</p>
               ) : null}
               <ul>
                 {plan.features.map((feature) => (
@@ -60,10 +81,7 @@ export function Pricing() {
           </div>
         ))}
       </div>
-      <p className="section-disclosure">
-        Pricing preview · Paid plans and features are not available yet. No
-        payments are collected.
-      </p>
+      <p className="section-disclosure">{t("disclosure")}</p>
     </section>
   );
 }

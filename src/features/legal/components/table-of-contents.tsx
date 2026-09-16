@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CaretDown, ListBullets, ArrowUp } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 
 export interface TocItem {
   id: string;
@@ -14,10 +15,9 @@ interface TableOfContentsProps {
   title?: string;
 }
 
-export function TableOfContents({
-  items,
-  title = "Table of Contents",
-}: TableOfContentsProps) {
+export function TableOfContents({ items, title }: TableOfContentsProps) {
+  const t = useTranslations("legal.toc");
+  const displayTitle = title ?? t("title");
   const [activeId, setActiveId] = useState<string>("");
   const [isOpenMobile, setIsOpenMobile] = useState(false);
 
@@ -56,11 +56,13 @@ export function TableOfContents({
     const element = document.getElementById(id);
 
     if (element) {
-      const yOffset = -96; // Header clearance
-      const y =
-        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      const topOffset =
+        element.getBoundingClientRect().top + window.scrollY - 100;
 
-      window.scrollTo({ top: y, behavior: "smooth" });
+      window.scrollTo({
+        top: topOffset,
+        behavior: "smooth",
+      });
       setActiveId(id);
       setIsOpenMobile(false);
       window.history.pushState(null, "", `#${id}`);
@@ -83,7 +85,7 @@ export function TableOfContents({
               <span>
                 {activeItem
                   ? `${activeItem.number ? `${activeItem.number}. ` : ""}${activeItem.title}`
-                  : title}
+                  : displayTitle}
               </span>
             </span>
             <CaretDown className="legal-toc-mobile__icon" aria-hidden="true" />
@@ -107,10 +109,12 @@ export function TableOfContents({
       </div>
 
       {/* Desktop Sticky Table of Contents */}
-      <nav className="legal-toc" aria-label={title}>
+      <nav className="legal-toc" aria-label={displayTitle}>
         <div className="legal-toc__header">
-          <span className="legal-toc__title">{title}</span>
-          <span className="legal-toc__count">{items.length} sections</span>
+          <span className="legal-toc__title">{displayTitle}</span>
+          <span className="legal-toc__count">
+            {t("sectionsCount", { count: items.length })}
+          </span>
         </div>
         <ol className="legal-toc__list">
           {items.map((item) => {
@@ -141,6 +145,8 @@ export function TableOfContents({
 }
 
 export function BackToTop() {
+  const t = useTranslations("legal.toc");
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -150,10 +156,10 @@ export function BackToTop() {
       type="button"
       onClick={scrollToTop}
       className="legal-page__back-top"
-      aria-label="Scroll back to top of page"
+      aria-label={t("backToTopAria")}
     >
       <ArrowUp size={16} aria-hidden="true" />
-      <span>Back to top</span>
+      <span>{t("backToTop")}</span>
     </button>
   );
 }

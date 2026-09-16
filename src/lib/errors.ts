@@ -11,98 +11,81 @@ export const DEFAULT_ERROR_MESSAGE =
 
 export const ERROR_MESSAGES: Record<string, string> = {
   // Authentication & Account
-  user_already_exists:
+  USER_ALREADY_EXISTS:
     "An account with this email already exists. Please log in instead.",
-  email_exists:
-    "An account with this email already exists. Please log in instead.",
-  invalid_email_or_password:
+  INVALID_CREDENTIALS:
     "Email or password is incorrect. Please check your credentials.",
-  invalid_credentials:
-    "Email or password is incorrect. Please check your credentials.",
-  invalid_password: "The password you entered is incorrect.",
-  password_too_short: "Password must be at least 8 characters.",
-  password_too_long: "Password cannot exceed 128 characters.",
-  email_not_verified: "Please verify your email address before continuing.",
-  email_unverified: "Please verify your email address before continuing.",
-  user_not_found: "No account was found with this email address.",
-  invalid_token: "This link or code is invalid or has expired.",
-  token_expired: "This link has expired. Please request a new one.",
-  reset_password_failed:
+  INVALID_PASSWORD: "The password you entered is incorrect.",
+  PASSWORD_TOO_SHORT: "Password must be at least 8 characters.",
+  PASSWORD_TOO_LONG: "Password cannot exceed 128 characters.",
+  EMAIL_NOT_VERIFIED: "Please verify your email address before continuing.",
+  USER_NOT_FOUND: "No account was found with this email address.",
+  INVALID_TOKEN: "This link or code is invalid or has expired.",
+  TOKEN_EXPIRED: "This link has expired. Please request a new one.",
+  RESET_PASSWORD_FAILED:
     "Unable to reset your password. Please request a new link.",
-  consent_required:
+  CONSENT_REQUIRED:
     "Please accept the current Terms of Service and Privacy Policy to continue.",
-  session_expired: "Your session has expired. Please sign in again.",
-  unauthenticated: "Your session has expired. Please sign in again.",
-  unauthorized: "You do not have permission to perform this action.",
-  forbidden: "You do not have permission to perform this action.",
-  social_account_already_linked:
+  SESSION_EXPIRED: "Your session has expired. Please sign in again.",
+  UNAUTHORIZED: "You do not have permission to perform this action.",
+  SOCIAL_ACCOUNT_ALREADY_LINKED:
     "This social account is already linked to another user.",
-  failed_to_create_user: "We couldn’t create your account. Please try again.",
+  FAILED_TO_CREATE_USER: "We couldn’t create your account. Please try again.",
 
   // Event & Domain
-  event_not_found: "The requested event could not be found.",
-  event_name_required: "Please enter an event name.",
-  invalid_event_date: "Please select a valid date for your event.",
-  invalid_guest_count: "Please enter a valid expected guest count.",
-  event_expired: "This event has ended and is no longer accepting uploads.",
-  event_closed: "This event gallery is currently closed.",
+  EVENT_NOT_FOUND: "The requested event could not be found.",
+  EVENT_NAME_REQUIRED: "Please enter an event name.",
+  INVALID_EVENT_DATE: "Please select a valid date for your event.",
+  INVALID_GUEST_COUNT: "Please enter a valid expected guest count.",
+  EVENT_EXPIRED: "This event has ended and is no longer accepting uploads.",
+  EVENT_CLOSED: "This event gallery is currently closed.",
 
   // Media & Upload
-  invalid_file_type:
+  INVALID_FILE_TYPE:
     "Unsupported file type. Please upload a JPG, PNG, HEIC, or WebP photo.",
-  file_too_large: "File size exceeds the allowed limit.",
-  upload_failed: "Upload failed. Please check your connection and try again.",
-  storage_error:
+  FILE_TOO_LARGE: "File size exceeds the allowed limit.",
+  UPLOAD_FAILED: "Upload failed. Please check your connection and try again.",
+  STORAGE_ERROR:
     "Storage service temporarily unavailable. Please try again shortly.",
 
   // System, Network & Rate Limiting
-  rate_limit_exceeded:
+  RATE_LIMIT_EXCEEDED:
     "Too many requests. Please wait a moment before trying again.",
-  too_many_requests:
-    "Too many requests. Please wait a moment before trying again.",
-  network_error:
+  NETWORK_ERROR:
     "Unable to connect to the server. Please check your internet connection.",
-  server_error: "A server error occurred. Please try again shortly.",
-  internal_server_error: "A server error occurred. Please try again shortly.",
-  request_failed: "The request could not be completed. Please try again.",
+  SERVER_ERROR: "A server error occurred. Please try again shortly.",
+  REQUEST_FAILED: "The request could not be completed. Please try again.",
+  UNKNOWN: DEFAULT_ERROR_MESSAGE,
+};
+
+const ERROR_CODE_ALIASES: Record<string, string> = {
+  EMAIL_EXISTS: "USER_ALREADY_EXISTS",
+  INVALID_EMAIL_OR_PASSWORD: "INVALID_CREDENTIALS",
+  EMAIL_UNVERIFIED: "EMAIL_NOT_VERIFIED",
+  UNAUTHENTICATED: "SESSION_EXPIRED",
+  FORBIDDEN: "UNAUTHORIZED",
+  TOO_MANY_REQUESTS: "RATE_LIMIT_EXCEEDED",
+  INTERNAL_SERVER_ERROR: "SERVER_ERROR",
 };
 
 /**
- * Normalizes an error code by trimming, lowercasing, and replacing hyphens with underscores.
- * E.g. "USER_ALREADY_EXISTS" -> "user_already_exists"
- *      "user-already-exists" -> "user_already_exists"
+ * Normalizes an error code by trimming, uppercasing, and replacing hyphens with underscores.
+ * E.g. "user_already_exists" -> "USER_ALREADY_EXISTS"
+ *      "user-already-exists" -> "USER_ALREADY_EXISTS"
  */
 export function normalizeErrorCode(code: string): string {
   return code
     .trim()
-    .toLowerCase()
+    .toUpperCase()
     .replace(/-/g, "_")
-    .replace(/[^a-z0-9_]/g, "");
+    .replace(/[^A-Z0-9_]/g, "");
 }
 
 /**
- * Resolves a user-facing error message from an error code or error object.
- *
- * Lookup flow:
- * 1. Extract error code from input (string, APIError, Better-Auth error object, etc.).
- * 2. Normalize the error code.
- * 3. Match against the frontend `ERROR_MESSAGES` dictionary.
- * 4. If matched, return the curated message.
- * 5. If not matched or no code found, return the fallback message (or DEFAULT_ERROR_MESSAGE).
- *
- * @param errorOrCode An error code string, Error instance, or error response object
- * @param customFallback Optional fallback message if the error code is unrecognized
- * @returns The user-facing error message
+ * Resolves an error object or string into a canonical uppercase error code.
  */
-export function getErrorMessage(
-  errorOrCode?: unknown,
-  customFallback?: string,
-): string {
-  const fallback = customFallback ?? DEFAULT_ERROR_MESSAGE;
-
-  if (!errorOrCode) {
-    return fallback;
-  }
+export function resolveErrorCode(errorOrCode?: unknown): string {
+  if (!errorOrCode) return "UNKNOWN";
 
   let rawCode: string | undefined;
 
@@ -122,11 +105,39 @@ export function getErrorMessage(
     }
   }
 
-  if (!rawCode) {
-    return fallback;
-  }
+  if (!rawCode) return "UNKNOWN";
 
   const normalized = normalizeErrorCode(rawCode);
 
-  return ERROR_MESSAGES[normalized] ?? fallback;
+  return ERROR_CODE_ALIASES[normalized] ?? normalized;
+}
+
+/**
+ * Resolves a user-facing error message from an error code or error object.
+ * When a `translator` (e.g. from `useTranslations("common.errors")`) is provided,
+ * returns the localized message; otherwise falls back to the English dictionary.
+ *
+ * @param errorOrCode An error code string, Error instance, or error response object
+ * @param customFallback Optional fallback message if the error code is unrecognized
+ * @param translator Optional next-intl translation function for common.errors
+ * @returns The user-facing error message
+ */
+export function getErrorMessage(
+  errorOrCode?: unknown,
+  customFallback?: string,
+  translator?: (key: string) => string,
+): string {
+  const code = resolveErrorCode(errorOrCode);
+
+  if (translator) {
+    try {
+      const translated = translator(code);
+
+      if (translated && translated !== code) return translated;
+    } catch {
+      // Fall through to dictionary or fallback
+    }
+  }
+
+  return ERROR_MESSAGES[code] ?? customFallback ?? ERROR_MESSAGES.UNKNOWN;
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CaretDown, CreditCard, SignOut, User } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 
 function initials(value: string) {
@@ -20,10 +21,11 @@ export function HostAccountMenu({
 }: {
   active?: "profile" | "billing";
 }) {
+  const t = useTranslations("host.accountMenu");
   const { data: session } = authClient.useSession();
   const router = useRouter();
-  const name = session?.user.name || "Your account";
-  const email = session?.user.email || "Sign in to manage your account";
+  const name = session?.user.name || t("yourAccount");
+  const email = session?.user.email || t("signInToManage");
   const avatarStyle = session?.user.image
     ? { backgroundImage: `url("${session.user.image}")` }
     : undefined;
@@ -31,7 +33,7 @@ export function HostAccountMenu({
 
   return (
     <details className="host-account-menu">
-      <summary aria-label="Open account menu">
+      <summary aria-label={t("openMenuAria")}>
         <span
           className={avatarClassName}
           style={avatarStyle}
@@ -41,7 +43,7 @@ export function HostAccountMenu({
         </span>
         <span className="host-account-menu__summary-copy">
           <strong>{name}</strong>
-          <small>Free plan</small>
+          <small>{t("freePlan")}</small>
         </span>
         <CaretDown
           className="host-account-menu__chevron"
@@ -64,21 +66,21 @@ export function HostAccountMenu({
           </span>
         </div>
         <div className="host-account-menu__plan">
-          <span>Current plan</span>
-          <strong>Free</strong>
+          <span>{t("currentPlan")}</span>
+          <strong>{t("planFree")}</strong>
         </div>
-        <nav aria-label="Account menu">
+        <nav aria-label={t("menuAria")}>
           <Link
             aria-current={active === "profile" ? "page" : undefined}
             href="/profile"
           >
-            <User size={16} aria-hidden="true" /> Profile
+            <User size={16} aria-hidden="true" /> {t("profile")}
           </Link>
           <Link
             aria-current={active === "billing" ? "page" : undefined}
             href="/billing"
           >
-            <CreditCard size={16} aria-hidden="true" /> Plan &amp; billing
+            <CreditCard size={16} aria-hidden="true" /> {t("planAndBilling")}
           </Link>
         </nav>
         <button
@@ -91,7 +93,7 @@ export function HostAccountMenu({
           }}
         >
           <SignOut size={16} aria-hidden="true" />
-          Log out
+          {t("logOut")}
         </button>
       </div>
     </details>

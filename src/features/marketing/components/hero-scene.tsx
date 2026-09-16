@@ -11,12 +11,15 @@ import {
   ArrowCounterClockwise,
   ArrowClockwise,
 } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui";
 import { photos, sampleEvent } from "../data/marketing";
 import { useUploadPreview } from "../hooks/use-upload-preview";
 import { HeroThree } from "./hero-three";
 
 export function HeroScene() {
+  const t = useTranslations("marketing.heroScene");
+  const tPhotos = useTranslations("marketing.photos");
   const ref = useRef<HTMLDivElement>(null);
   const [threeReady, setThreeReady] = useState(false);
   const [threeFallbackReason, setThreeFallbackReason] = useState<string | null>(
@@ -36,7 +39,7 @@ export function HeroScene() {
       data-fallback-reason={
         threeReady ? undefined : (threeFallbackReason ?? undefined)
       }
-      aria-label="Interactive preview: a guest phone shares a photo into an event gallery"
+      aria-label={t("ariaLabel")}
     >
       <div className="hero-scene__orbit" aria-hidden="true" />
       <HeroThree
@@ -50,13 +53,13 @@ export function HeroScene() {
         <div
           className="hero-scene__view-controls"
           role="group"
-          aria-label="Gallery view"
+          aria-label={t("galleryView")}
         >
           <Button
             variant="outline"
             size="icon"
-            aria-label="Rotate view left"
-            title="Rotate view left"
+            aria-label={t("rotateLeft")}
+            title={t("rotateLeft")}
             disabled={angle <= -0.4}
             onClick={() => setAngle((value) => Math.max(-0.4, value - 0.4))}
           >
@@ -65,8 +68,8 @@ export function HeroScene() {
           <Button
             variant="outline"
             size="icon"
-            aria-label="Rotate view right"
-            title="Rotate view right"
+            aria-label={t("rotateRight")}
+            title={t("rotateRight")}
             disabled={angle >= 0.4}
             onClick={() => setAngle((value) => Math.min(0.4, value + 0.4))}
           >
@@ -77,7 +80,7 @@ export function HeroScene() {
       <div className="hero-scene__gallery">
         <div className="hero-scene__gallery-top">
           <div>
-            <span className="eyebrow">THE SHARED GALLERY</span>
+            <span className="eyebrow">{t("sharedGallery")}</span>
             <h2>{sampleEvent.name}</h2>
           </div>
           <LockKey size={14} aria-hidden="true" />
@@ -86,7 +89,7 @@ export function HeroScene() {
           <div className="hero-scene__cover">
             <Image
               src={photos.couple.src}
-              alt={photos.couple.alt}
+              alt={tPhotos("couple")}
               fill
               sizes="(max-width: 600px) 230px, 310px"
               priority
@@ -95,7 +98,7 @@ export function HeroScene() {
           <div className="hero-scene__tile">
             <Image
               src={photos.table.src}
-              alt={photos.table.alt}
+              alt={tPhotos("table")}
               fill
               sizes="160px"
             />
@@ -109,7 +112,7 @@ export function HeroScene() {
               >
                 <Image
                   src={photos.celebration.src}
-                  alt="The photo from the guest phone, now in the shared gallery"
+                  alt={t("phoneAlt")}
                   fill
                   sizes="160px"
                 />
@@ -117,25 +120,23 @@ export function HeroScene() {
             ) : (
               <>
                 <ImageSquare size={22} aria-hidden="true" />
-                <span>Your next memory</span>
+                <span>{t("nextMemory")}</span>
               </>
             )}
           </div>
         </div>
-        <span className="hero-scene__caption">
-          Every guest. A different perspective.
-        </span>
+        <span className="hero-scene__caption">{t("caption")}</span>
       </div>
       <div className="hero-scene__phone">
         <div className="hero-scene__speaker" aria-hidden="true" />
         <div className="hero-scene__topline">
           9:41 <span aria-hidden="true">•••</span>
         </div>
-        <span className="eyebrow">YOUR GUEST’S PHONE</span>
+        <span className="eyebrow">{t("guestPhone")}</span>
         <div className="hero-scene__phone-photo">
           <Image
             src={photos.celebration.src}
-            alt={photos.celebration.alt}
+            alt={tPhotos("celebration")}
             fill
             sizes="(max-width: 600px) 150px, 185px"
             priority
@@ -143,7 +144,7 @@ export function HeroScene() {
         </div>
         <div className="hero-scene__phone-action">
           <ImageSquare size={16} aria-hidden="true" />
-          <span>One little moment.</span>
+          <span>{t("oneLittleMoment")}</span>
         </div>
         <Button
           className="hero-scene__share"
@@ -153,17 +154,17 @@ export function HeroScene() {
         >
           {done ? (
             <>
-              <ArrowCounterClockwise aria-hidden="true" /> Try again
+              <ArrowCounterClockwise aria-hidden="true" /> {t("tryAgain")}
             </>
           ) : upload.phase === "uploading" ? (
-            `Sharing… ${upload.progress}%`
+            t("sharing", { progress: upload.progress })
           ) : (
             <>
-              Share a memory <ArrowRight aria-hidden="true" />
+              {t("shareMemory")} <ArrowRight aria-hidden="true" />
             </>
           )}
         </Button>
-        <span className="hero-scene__phone-footnote">Interactive preview</span>
+        <span className="hero-scene__phone-footnote">{t("footnote")}</span>
       </div>
       <div className="hero-scene__connection" aria-hidden="true">
         <ArrowRight size={25} />
@@ -184,24 +185,20 @@ export function HeroScene() {
         <div>
           <strong>
             {done
-              ? "A new memory, together."
+              ? t("statusNewMemory")
               : upload.phase === "uploading"
-                ? "From their phone to your gallery…"
-                : "Their camera roll. Your memories."}
+                ? t("statusUploading")
+                : t("statusIdle")}
           </strong>
-          <span>
-            {done
-              ? "Photo added to the sample gallery."
-              : "Try “Share a memory” below."}
-          </span>
+          <span>{done ? t("statusNewMemorySub") : t("statusIdleSub")}</span>
         </div>
       </m.div>
       <div className="hero-scene__legend">
-        <span>Guest phone</span>
+        <span>{t("legendGuestPhone")}</span>
         <ArrowRight aria-hidden="true" />
-        <span>Share</span>
+        <span>{t("legendShare")}</span>
         <ArrowRight aria-hidden="true" />
-        <span>Your gallery</span>
+        <span>{t("legendYourGallery")}</span>
       </div>
     </div>
   );

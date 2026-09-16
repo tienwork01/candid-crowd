@@ -1,9 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 
 export function LogoutButton() {
+  const t = useTranslations("auth.ui");
   const router = useRouter();
 
   return (
@@ -16,7 +18,7 @@ export function LogoutButton() {
         router.refresh();
       }}
     >
-      Log out
+      {t("logOut")}
     </button>
   );
 }

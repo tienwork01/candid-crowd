@@ -502,6 +502,14 @@ All `components` directories across features and shared folders (e.g. `src/featu
 - **Import from the folder, never deep paths**: Always import from the component folder path (e.g. `import { Header, Footer } from "@/features/marketing/components";` or `import { Button } from "@/components/ui";`). Never use deep relative or deep alias imports targeting individual component files (e.g. do **not** do `import { Header } from "@/features/marketing/components/header";`).
 - **Styles and non-JS assets**: Asset/style imports that cannot be re-exported through TypeScript (such as `.css` files like `auth.css` or `legal.css`) remain direct imports.
 
+### Dead Translation Key Elimination Convention (i18n Cleanliness Rule)
+
+All translation keys across the project must be strictly maintained, actively referenced, and synchronized:
+- **Immediate Dead Key Removal**: When modifying, refactoring, or deleting code (e.g. changing JSX markup, removing or renaming a component, updating label keys), if any translation key becomes unused anywhere in the codebase, you **MUST immediately delete that key from all locale JSON files (`messages/*.json`)** across all supported locales (`en`, `vi`, `es`, `fr`, `de`, `it`, `pt-BR`).
+- **Zero Orphaned Keys Policy**: Never leave dead keys behind as legacy debt. Orphaned keys bloat translation bundles and confuse contributors.
+- **Strict Key Parity**: All locale files must maintain 100% key parity at all times (verified by `pnpm validate:locales`).
+- **Automated Verification Command**: Always run `pnpm audit:unused-keys` to verify that 0 dead keys exist in the codebase.
+
 ## Backend
 
 Preferred:

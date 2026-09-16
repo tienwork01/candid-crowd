@@ -1,12 +1,15 @@
 import Image from "next/image";
 import { Sparkle } from "@phosphor-icons/react/dist/ssr";
+import { getTranslations } from "next-intl/server";
 import "@/features/auth/components/auth.css";
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const t = await getTranslations("auth.layout");
+
   return (
     <div className="auth-page">
       <main id="main" className="auth-page__main">
@@ -16,7 +19,7 @@ export default function AuthLayout({
           <figure className="auth-page__hero-frame">
             <Image
               src="/images/countryside.jpg"
-              alt="Couple holding hands while walking through the countryside in golden hour"
+              alt={t("heroAlt")}
               fill
               sizes="(max-width: 900px) 100vw, 50vw"
               quality={90}
@@ -25,16 +28,14 @@ export default function AuthLayout({
             />
             <figcaption className="auth-page__hero-quote">
               <span className="auth-page__hero-tag">
-                THE MOMENTS IN BETWEEN
+                {t("momentsInBetween")}
               </span>
               <p className="auth-page__hero-text">
-                Every guest.
+                {t("heroQuoteLine1")}
                 <br />
-                <em>A different perspective.</em>
+                <em>{t("heroQuoteLine2")}</em>
               </p>
-              <span className="auth-page__hero-sub">
-                The memories you almost missed.
-              </span>
+              <span className="auth-page__hero-sub">{t("heroSub")}</span>
             </figcaption>
           </figure>
 
@@ -43,21 +44,21 @@ export default function AuthLayout({
             <div className="auth-page__polaroid-media">
               <Image
                 src="/images/wedding-sunset.webp"
-                alt="A bride and groom smiling at each other in warm sunset light"
+                alt={t("polaroidAlt")}
                 fill
                 sizes="240px"
                 quality={85}
               />
             </div>
             <div className="auth-page__polaroid-caption">
-              <span>Golden hour · Table 04</span>
+              <span>{t("polaroidCaption")}</span>
             </div>
           </div>
 
           {/* Floating live participation badge */}
           <div className="auth-page__badge">
             <Sparkle size={13} className="auth-page__badge-icon" />
-            <span>184 candid moments captured</span>
+            <span>{t("badgeText")}</span>
           </div>
         </div>
       </main>

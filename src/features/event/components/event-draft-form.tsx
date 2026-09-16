@@ -9,35 +9,55 @@ import {
   ImageSquare,
   QrCode,
 } from "@phosphor-icons/react";
+import { useLocale, useTranslations } from "next-intl";
 import { eventTypes, type EventDraft } from "@/features/event/types/event";
 import { useCreateEvent } from "@/features/event/hooks";
+import { formatDate } from "@/i18n/format";
+import type { AppLocale } from "@/i18n/locales";
 import { APIError } from "@/lib/api-client";
 import { getErrorMessage } from "@/lib/errors";
 
 type Basics = { name: string; date: string; type: EventDraft["type"] };
 
 const themes = ["Olive", "Rose", "Midnight"] as const;
+const qrStyles = ["Classic", "Modern frame", "Editorial"] as const;
 const previewMode = process.env.NODE_ENV === "development";
 
 export function EventDraftForm() {
-  const [step, setStep] = useState<1 | 2>(1),
-    [basics, setBasics] = useState<Basics>({
-      name: "",
-      date: "",
-      type: "Wedding",
-    }),
-    [theme, setTheme] = useState<(typeof themes)[number]>("Olive"),
-    [qr, setQr] = useState("Classic"),
-    [cover, setCover] = useState(""),
-    [error, setError] = useState(""),
-    [saved, setSaved] = useState(false),
-    [preview, setPreview] = useState(false),
-    [qrImage, setQrImage] = useState(""),
-    [guestUrl, setGuestUrl] = useState("");
+  const t = useTranslations("event");
+  const tErrors = useTranslations("common.errors");
+  const locale = useLocale() as AppLocale;
+
+  const [step, setStep] = useState<1 | 2>(1);
+  const [basics, setBasics] = useState<Basics>({
+    name: "",
+    date: "",
+    type: "Wedding",
+  });
+  const [theme, setTheme] = useState<(typeof themes)[number]>("Olive");
+  const [qr, setQr] = useState<(typeof qrStyles)[number]>("Classic");
+  const [cover, setCover] = useState("");
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+  const [preview, setPreview] = useState(false);
+  const [qrImage, setQrImage] = useState("");
+  const [guestUrl, setGuestUrl] = useState("");
   const nameInput = useRef<HTMLInputElement>(null);
   const { mutateAsync: createEvent, isPending: isCreating } = useCreateEvent();
   const update = (key: keyof Basics, value: string) =>
     setBasics({ ...basics, [key]: value });
+
+  const themeLabels: Record<(typeof themes)[number], string> = {
+    Olive: t("setup.themeOlive"),
+    Rose: t("setup.themeRose"),
+    Midnight: t("setup.themeMidnight"),
+  };
+
+  const qrLabels: Record<(typeof qrStyles)[number], string> = {
+    Classic: t("setup.qrClassic"),
+    "Modern frame": t("setup.qrModernFrame"),
+    Editorial: t("setup.qrEditorial"),
+  };
 
   useEffect(() => {
     if (!saved) return;
@@ -65,9 +85,7 @@ export function EventDraftForm() {
   const next = () => {
     if (!basics.name.trim() || !basics.date) {
       setError(
-        !basics.name.trim()
-          ? "Give your event a name to continue."
-          : "Choose an event date to continue.",
+        !basics.name.trim() ? t("setup.nameRequired") : t("setup.dateRequired"),
       );
       nameInput.current?.focus();
 
@@ -110,17 +128,12 @@ export function EventDraftForm() {
           return;
         }
 
-        setError("Please sign in to create and save your event.");
+        setError(t("setup.signInRequired"));
 
         return;
       }
 
-      setError(
-        getErrorMessage(
-          caught,
-          "We couldn’t create your event. Please try again.",
-        ),
-      );
+      setError(getErrorMessage(caught, undefined, tErrors));
     }
   };
 
@@ -134,19 +147,21 @@ export function EventDraftForm() {
           <Check aria-hidden="true" />
         </span>
         <p className="eyebrow">
-          {preview ? "EVENT PREVIEW" : "YOUR EVENT IS READY"}
+          {preview ? t("setup.previewEyebrow") : t("setup.readyEyebrow")}
         </p>
-        <h1 id="event-ready-title">{basics.name} is ready.</h1>
+        <h1 id="event-ready-title">
+          {basics.name} {t("setup.readyTitleSuffix")}
+        </h1>
         <p>
           {preview
-            ? "This is a local preview. Sign in when you are ready to save and share a real event."
-            : "Share this QR code and guests can start adding their perspective."}
+            ? t("setup.previewDescription")
+            : t("setup.readyDescription")}
         </p>
         <div className="event-setup__qr">
           {qrImage ? (
             <Image
               src={qrImage}
-              alt={`QR code for ${basics.name}`}
+              alt={`${t("setup.qrAltPrefix")} ${basics.name}`}
               width={280}
               height={280}
               unoptimized
@@ -168,7 +183,8 @@ export function EventDraftForm() {
             setStep(2);
           }}
         >
-          Want to make it yours? <ArrowRight size={16} aria-hidden="true" />
+          {t("setup.makeItYoursCta")}{" "}
+          <ArrowRight size={16} aria-hidden="true" />
         </button>
       </section>
     );
@@ -176,20 +192,22 @@ export function EventDraftForm() {
   return (
     <section className="event-setup" aria-labelledby="event-setup-title">
       <div className="event-setup__intro">
-        <p className="eyebrow">CREATE AN EVENT</p>
+        <p className="eyebrow">{t("setup.introEyebrow")}</p>
         <h1 id="event-setup-title">
-          Make a home for
+          {t("setup.introTitleLine1")}
           <br />
-          <em>the moments.</em>
+          <em>{t("setup.introTitleLine2")}</em>
         </h1>
-        <p>Start simple. You can refine every detail later.</p>
+        <p>{t("setup.introDescription")}</p>
       </div>
-      <ol className="event-setup__steps" aria-label="Event setup progress">
+      <ol className="event-setup__steps" aria-label={t("setup.progressAria")}>
         <li aria-current={step === 1 ? "step" : undefined}>
-          <span>1</span>Event basics
+          <span>1</span>
+          {t("setup.step1")}
         </li>
         <li>
-          <span>2</span>Your event is ready
+          <span>2</span>
+          {t("setup.step2")}
         </li>
       </ol>
       <div className="event-setup__grid">
@@ -197,35 +215,37 @@ export function EventDraftForm() {
           {step === 1 ? (
             <div className="event-form">
               <div className="event-form__heading">
-                <span>START HERE</span>
-                <h2>Event basics</h2>
-                <p>The essentials your guests will see.</p>
+                <span>{t("setup.startHere")}</span>
+                <h2>{t("setup.step1")}</h2>
+                <p>{t("setup.step1Sub")}</p>
               </div>
               <div className="event-form__field">
-                <label htmlFor="event-name">Event name</label>
+                <label htmlFor="event-name">{t("setup.nameLabel")}</label>
                 <input
                   ref={nameInput}
                   id="event-name"
                   value={basics.name}
                   onChange={(e) => update("name", e.target.value)}
-                  placeholder="e.g. Emma & James"
+                  placeholder={t("setup.namePlaceholder")}
                 />
               </div>
               <div className="event-form__row">
                 <div className="event-form__field">
-                  <label htmlFor="event-type">Event type</label>
+                  <label htmlFor="event-type">{t("setup.typeLabel")}</label>
                   <select
                     id="event-type"
                     value={basics.type}
                     onChange={(e) => update("type", e.target.value)}
                   >
                     {eventTypes.map((type) => (
-                      <option key={type}>{type}</option>
+                      <option key={type} value={type}>
+                        {t(`types.${type}`)}
+                      </option>
                     ))}
                   </select>
                 </div>
                 <div className="event-form__field">
-                  <label htmlFor="event-date">When is it?</label>
+                  <label htmlFor="event-date">{t("setup.dateLabel")}</label>
                   <input
                     id="event-date"
                     type="date"
@@ -245,31 +265,35 @@ export function EventDraftForm() {
                 onClick={next}
                 disabled={isCreating}
               >
-                {isCreating ? "Creating event..." : "Create event"}{" "}
+                {isCreating ? t("setup.creating") : t("setup.create")}{" "}
                 <ArrowRight size={17} aria-hidden="true" />
               </button>
             </div>
           ) : (
             <div className="event-form">
               <div className="event-form__heading">
-                <span>STEP 2 OF 2</span>
-                <h2>Make it yours</h2>
-                <p>Optional touches for your guest experience.</p>
+                <span>{t("setup.step2Eyebrow")}</span>
+                <h2>{t("setup.step2Heading")}</h2>
+                <p>{t("setup.step2Sub")}</p>
               </div>
               <div className="event-form__field">
-                <label htmlFor="qr-style">QR style</label>
+                <label htmlFor="qr-style">{t("setup.qrStyleLabel")}</label>
                 <select
                   id="qr-style"
                   value={qr}
-                  onChange={(e) => setQr(e.target.value)}
+                  onChange={(e) =>
+                    setQr(e.target.value as (typeof qrStyles)[number])
+                  }
                 >
-                  <option>Classic</option>
-                  <option>Modern frame</option>
-                  <option>Editorial</option>
+                  {qrStyles.map((style) => (
+                    <option key={style} value={style}>
+                      {qrLabels[style]}
+                    </option>
+                  ))}
                 </select>
               </div>
               <fieldset className="event-form__field">
-                <legend>Event color</legend>
+                <legend>{t("setup.colorLegend")}</legend>
                 <div className="event-form__themes">
                   {themes.map((item) => (
                     <button
@@ -280,17 +304,17 @@ export function EventDraftForm() {
                       onClick={() => setTheme(item)}
                     >
                       <span aria-hidden="true" />
-                      {item}
+                      {themeLabels[item]}
                     </button>
                   ))}
                 </div>
               </fieldset>
               <div className="event-form__field">
-                <label htmlFor="event-cover">Optional cover photo</label>
+                <label htmlFor="event-cover">{t("setup.coverLabel")}</label>
                 <label className="event-form__cover" htmlFor="event-cover">
                   <ImageSquare aria-hidden="true" />
-                  <span>{cover || "Choose a photo"}</span>
-                  <small>JPG, PNG or WebP</small>
+                  <span>{cover || t("setup.choosePhoto")}</span>
+                  <small>{t("setup.coverFormatHint")}</small>
                 </label>
                 <input
                   id="event-cover"
@@ -311,10 +335,11 @@ export function EventDraftForm() {
                   type="button"
                   onClick={() => setStep(1)}
                 >
-                  <ArrowLeft size={16} aria-hidden="true" /> Back
+                  <ArrowLeft size={16} aria-hidden="true" /> {t("setup.back")}
                 </button>
                 <button className="button" type="button" onClick={create}>
-                  Continue <ArrowRight size={17} aria-hidden="true" />
+                  {t("setup.continue")}{" "}
+                  <ArrowRight size={17} aria-hidden="true" />
                 </button>
               </div>
               <button
@@ -322,39 +347,42 @@ export function EventDraftForm() {
                 type="button"
                 onClick={create}
               >
-                Skip for now
+                {t("setup.skipForNow")}
               </button>
             </div>
           )}
         </div>
         <aside
           className={`event-overview event-overview--${theme.toLowerCase()}`}
-          aria-label="Event overview"
+          aria-label={t("setup.overviewAria")}
         >
           <div className="event-overview__top">
-            <span>EVENT OVERVIEW</span>
+            <span>{t("setup.overviewTitle")}</span>
             <QrCode size={19} aria-hidden="true" />
           </div>
           <div className="event-overview__cover">
             {cover ? (
               <ImageSquare aria-hidden="true" />
             ) : (
-              <span>YOUR COVER PHOTO</span>
+              <span>{t("setup.coverPlaceholder")}</span>
             )}
           </div>
-          <p>{basics.type}</p>
-          <h2>{basics.name || "Your event name"}</h2>
+          <p>{t(`types.${basics.type}`)}</p>
+          <h2>{basics.name || t("setup.nameFallback")}</h2>
           <time>
             {basics.date
-              ? new Date(`${basics.date}T12:00:00`).toLocaleDateString(
-                  "en-US",
-                  { month: "long", day: "numeric", year: "numeric" },
-                )
-              : "Choose a date"}
+              ? formatDate(`${basics.date}T12:00:00`, locale, {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : t("setup.dateFallback")}
           </time>
           <div className="event-overview__footer">
-            <span>{qr} QR</span>
-            <span>Private event</span>
+            <span>
+              {qrLabels[qr]} {t("setup.qrSuffix")}
+            </span>
+            <span>{t("setup.privateEvent")}</span>
           </div>
         </aside>
       </div>

@@ -2,6 +2,7 @@
 
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { X } from "@phosphor-icons/react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export const Dialog = DialogPrimitive.Root;
@@ -14,6 +15,8 @@ export function DialogContent({
   children,
   ...props
 }: DialogPrimitive.Popup.Props) {
+  const t = useTranslations("common.actions");
+
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-ink/65 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
@@ -27,7 +30,7 @@ export function DialogContent({
         {children}
         <DialogPrimitive.Close
           className="absolute right-3 top-3 grid size-11 cursor-pointer place-items-center rounded-full border border-border bg-card"
-          aria-label="Close dialog"
+          aria-label={t("close")}
         >
           <X size={20} aria-hidden="true" />
         </DialogPrimitive.Close>

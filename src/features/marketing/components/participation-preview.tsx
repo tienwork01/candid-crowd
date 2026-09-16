@@ -1,8 +1,17 @@
 import { ArrowUpRight, Users } from "@phosphor-icons/react/dist/ssr";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { Reveal } from "@/components/shared";
 import { participation, sampleEvent } from "../data/marketing";
 
-export function ParticipationPreview() {
+export async function ParticipationPreview() {
+  const [t, tSources, format] = await Promise.all([
+    getTranslations("marketing.participation"),
+    getTranslations("marketing.participation.sources"),
+    getFormatter(),
+  ]);
+
+  type SourceKey = "entrance" | "table" | "bar" | "link";
+
   const rate = Math.round(
     (participation.contributors / participation.guests) * 100,
   );
@@ -14,99 +23,95 @@ export function ParticipationPreview() {
       aria-labelledby="participation-title"
     >
       <div className="participation__copy">
-        <span className="eyebrow">BUILT AROUND PARTICIPATION</span>
+        <span className="eyebrow">{t("eyebrow")}</span>
         <h2 id="participation-title">
-          Don’t just create an album.
+          {t("titleLine1")}
           <br />
-          <em>Get people to contribute.</em>
+          <em>{t("titleLine2")}</em>
         </h2>
-        <p>
-          A shared gallery is only the beginning. We’re designing CandidCrowd to
-          help you see what gets your guests sharing.
-        </p>
+        <p>{t("subhead")}</p>
         <div className="participation__point">
           <span>01</span>
           <div>
-            <h3>Know what brings people in.</h3>
-            <p>
-              See which QR placements make sharing a natural part of your event.
-            </p>
+            <h3>{t("point1Title")}</h3>
+            <p>{t("point1Description")}</p>
           </div>
         </div>
         <div className="participation__point">
           <span>02</span>
           <div>
-            <h3>Make room for every perspective.</h3>
-            <p>
-              Understand participation, then give guests a gentle nudge when the
-              time is right.
-            </p>
+            <h3>{t("point2Title")}</h3>
+            <p>{t("point2Description")}</p>
           </div>
         </div>
-        <p className="participation__note">
-          Product concept · Analytics and QR source tracking are not live yet.
-        </p>
+        <p className="participation__note">{t("conceptNote")}</p>
       </div>
       <Reveal className="participation-dashboard">
         <div className="participation-dashboard__heading">
           <div>
-            <span className="eyebrow">YOUR EVENT, AT A GLANCE</span>
+            <span className="eyebrow">{t("dashboardEyebrow")}</span>
             <h3>{sampleEvent.name}</h3>
           </div>
-          <span className="pill">Concept preview</span>
-        </div>
-        <div className="participation-dashboard__stat-head">
-          <span>
-            <Users size={15} aria-hidden="true" /> {participation.guests}{" "}
-            expected guests
-          </span>
-          <span>Illustrative data</span>
-        </div>
-        <div className="participation-dashboard__primary">
-          <div>
-            <strong>{participation.contributors}</strong>
-            <span>guests sharing memories</span>
-          </div>
-          <div
-            className="participation-dashboard__ring"
-            style={{
-              background: `conic-gradient(var(--primary) ${rate}%, var(--sage) 0)`,
-            }}
-          >
-            <span>
-              <strong>{rate}%</strong>
-              <small>participation</small>
+          <div className="participation-dashboard__stat">
+            <span className="participation-dashboard__number">
+              {format.number(rate, { style: "percent" })}
+            </span>
+            <span className="participation-dashboard__label">
+              {t("participationLabel")}
             </span>
           </div>
         </div>
-        <div className="participation-dashboard__media-stats">
-          <span>
-            <strong>{participation.photos}</strong> photos
-          </span>
-          <span>
-            <strong>{participation.videos}</strong> videos
-          </span>
-          <span>Every perspective counts.</span>
+        <div className="participation-dashboard__metrics">
+          <div>
+            <span className="participation-dashboard__metric-value">
+              {format.number(participation.contributors)}
+            </span>
+            <span className="participation-dashboard__metric-label">
+              {t("contributorsCol")}
+            </span>
+          </div>
+          <div>
+            <span className="participation-dashboard__metric-value">
+              {format.number(participation.guests)}
+            </span>
+            <span className="participation-dashboard__metric-label">
+              {t("expectedGuests")}
+            </span>
+          </div>
+          <div>
+            <span className="participation-dashboard__metric-value">
+              {format.number(participation.photos)}
+            </span>
+            <span className="participation-dashboard__metric-label">
+              {t("photos")}
+            </span>
+          </div>
+          <div>
+            <span className="participation-dashboard__metric-value">
+              {format.number(participation.videos)}
+            </span>
+            <span className="participation-dashboard__metric-label">
+              {t("videos")}
+            </span>
+          </div>
         </div>
-        <div className="participation-dashboard__source-heading">
-          <h4>Where the memories begin</h4>
-          <span>Contributors</span>
+        <div className="participation-dashboard__breakdown-title">
+          <Users size={16} aria-hidden="true" />
+          <span>{t("sourcesHeading")}</span>
         </div>
-        <table className="participation-dashboard__source-table">
-          <caption className="sr-only">
-            Illustrative contributors by QR source
-          </caption>
+        <table className="participation-dashboard__sources">
+          <caption className="sr-only">{t("tableCaption")}</caption>
           <thead className="sr-only">
             <tr>
-              <th scope="col">Source</th>
-              <th scope="col">Contributors</th>
+              <th scope="col">{t("thSource")}</th>
+              <th scope="col">{t("contributorsCol")}</th>
             </tr>
           </thead>
           <tbody>
             {participation.sources.map((source) => (
-              <tr key={source.label}>
+              <tr key={source.key}>
                 <th scope="row">
-                  <span>{source.label}</span>
+                  <span>{tSources(source.key as SourceKey)}</span>
                   <span
                     className="participation-dashboard__source-track"
                     aria-hidden="true"
@@ -119,7 +124,7 @@ export function ParticipationPreview() {
                   </span>
                 </th>
                 <td>
-                  {source.contributors}{" "}
+                  {format.number(source.contributors)}{" "}
                   <ArrowUpRight size={13} aria-hidden="true" />
                 </td>
               </tr>
