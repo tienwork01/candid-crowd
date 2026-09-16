@@ -9,7 +9,7 @@
 export const DEFAULT_ERROR_MESSAGE =
   "An unexpected error occurred. Please try again.";
 
-export const ERROR_MESSAGES: Record<string, string> = {
+const RAW_ERROR_MESSAGES: Record<string, string> = {
   // Authentication & Account
   USER_ALREADY_EXISTS:
     "An account with this email already exists. Please log in instead.",
@@ -57,6 +57,27 @@ export const ERROR_MESSAGES: Record<string, string> = {
   REQUEST_FAILED: "The request could not be completed. Please try again.",
   UNKNOWN: DEFAULT_ERROR_MESSAGE,
 };
+
+const ERROR_MESSAGES_LOOKUP = { ...RAW_ERROR_MESSAGES };
+
+export const ERROR_MESSAGES: Record<string, string> = new Proxy(
+  ERROR_MESSAGES_LOOKUP,
+  {
+    get(target, prop: string | symbol) {
+      if (typeof prop === "string") {
+        const key = prop.toUpperCase();
+
+        if (key in target) return target[key];
+
+        const lowerKey = prop.toLowerCase();
+
+        if (lowerKey in target) return target[lowerKey];
+      }
+
+      return target[prop as string];
+    },
+  },
+);
 
 const ERROR_CODE_ALIASES: Record<string, string> = {
   EMAIL_EXISTS: "USER_ALREADY_EXISTS",
@@ -127,6 +148,10 @@ export function getErrorMessage(
   customFallback?: string,
   translator?: (key: string) => string,
 ): string {
+  if (!errorOrCode && customFallback) {
+    return customFallback;
+  }
+
   const code = resolveErrorCode(errorOrCode);
 
   if (translator) {
@@ -137,6 +162,10 @@ export function getErrorMessage(
     } catch {
       // Fall through to dictionary or fallback
     }
+  }
+
+  if (code === "UNKNOWN" && customFallback) {
+    return customFallback;
   }
 
   return ERROR_MESSAGES[code] ?? customFallback ?? ERROR_MESSAGES.UNKNOWN;

@@ -8,9 +8,14 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   images: { qualities: [75, 85, 90] },
   experimental: {
-    // Keep production builds reliable on constrained developer/CI machines.
-    cpus: 1,
-    optimizePackageImports: ["@phosphor-icons/react"],
+    ...(process.env.BUILD_CPUS
+      ? { cpus: parseInt(process.env.BUILD_CPUS, 10) }
+      : {}),
+    optimizePackageImports: [
+      "@phosphor-icons/react",
+      "@phosphor-icons/react/dist/ssr",
+      "@base-ui/react",
+    ],
   },
 };
 

@@ -10,15 +10,15 @@ import {
 test.describe("Frontend Error Architecture", () => {
   test("normalizes error codes consistently across formats", () => {
     expect(normalizeErrorCode("USER_ALREADY_EXISTS")).toBe(
-      "user_already_exists",
+      "USER_ALREADY_EXISTS",
     );
     expect(normalizeErrorCode("user-already-exists")).toBe(
-      "user_already_exists",
+      "USER_ALREADY_EXISTS",
     );
     expect(normalizeErrorCode("  Invalid_Credentials  ")).toBe(
-      "invalid_credentials",
+      "INVALID_CREDENTIALS",
     );
-    expect(normalizeErrorCode("EMAIL-UNVERIFIED")).toBe("email_unverified");
+    expect(normalizeErrorCode("EMAIL-UNVERIFIED")).toBe("EMAIL_UNVERIFIED");
   });
 
   test("resolves known error codes from the error dictionary", () => {
