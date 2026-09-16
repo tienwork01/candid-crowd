@@ -19,17 +19,34 @@ function origins(value: string): string[] {
     .filter(Boolean);
 }
 
+const dbUrl = process.env.BETTER_AUTH_DATABASE_URL || "";
+const isCloudDb =
+  dbUrl.includes("neon.tech") ||
+  dbUrl.includes("supabase.co") ||
+  dbUrl.includes("pooler.supabase.com") ||
+  dbUrl.includes("amazonaws.com") ||
+  dbUrl.includes("sslmode=require");
+
 const database = new Pool({
-  connectionString: required("BETTER_AUTH_DATABASE_URL"),
+  connectionString: dbUrl || "postgres://localhost:5432/candidcrowd",
+  ...(isCloudDb || process.env.NODE_ENV === "production"
+    ? { ssl: { rejectUnauthorized: false } }
+    : {}),
 });
 
-// Better Auth Infrastructure dashboard plugin (reads BETTER_AUTH_API_KEY from process.env)
+const baseURL = process.env.BETTER_AUTH_URL || "https://candidcrowd.life";
+const secret =
+  process.env.BETTER_AUTH_SECRET ||
+  "replace-with-a-long-random-secret-for-jwt-signing-key";
+const trustedOrigins = process.env.BETTER_AUTH_TRUSTED_ORIGINS
+  ? origins(process.env.BETTER_AUTH_TRUSTED_ORIGINS)
+  : ["https://candidcrowd.life", "https://dash.better-auth.com"];
 
 export const auth = betterAuth({
   database,
-  secret: required("BETTER_AUTH_SECRET"),
-  baseURL: required("BETTER_AUTH_URL"),
-  trustedOrigins: origins(required("BETTER_AUTH_TRUSTED_ORIGINS")),
+  secret,
+  baseURL,
+  trustedOrigins,
   rateLimit: {
     enabled: true,
     storage: "database",
@@ -114,8 +131,8 @@ export const auth = betterAuth({
         gracePeriod: 60 * 60 * 24 * 30,
       },
       jwt: {
-        issuer: required("BETTER_AUTH_JWT_ISSUER"),
-        audience: required("BETTER_AUTH_JWT_AUDIENCE"),
+        issuer: process.env.BETTER_AUTH_JWT_ISSUER || baseURL,
+        audience: process.env.BETTER_AUTH_JWT_AUDIENCE || "candidcrowd-api",
         expirationTime: process.env.BETTER_AUTH_JWT_EXPIRATION || "10m",
         definePayload: ({ user }) => ({
           email: user.email,
