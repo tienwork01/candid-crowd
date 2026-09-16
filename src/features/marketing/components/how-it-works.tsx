@@ -1,4 +1,4 @@
-import { QrCode, Smartphone, Heart } from "lucide-react";
+import { QrCode, DeviceMobile, Heart } from "@phosphor-icons/react/dist/ssr";
 
 const steps = [
   {
@@ -17,7 +17,7 @@ const steps = [
     title: "Everyone contributes",
     description: "Guests upload from their phones without installing anything.",
     detail: "During the fun, or when they get home.",
-    Icon: Smartphone,
+    Icon: DeviceMobile,
   },
 ];
 
@@ -49,7 +49,7 @@ export function HowItWorks() {
             <article className="how-step" key={title}>
               <div className="how-step__top">
                 <span>0{index + 1}</span>
-                <Icon size={29} strokeWidth={1.2} aria-hidden="true" />
+                <Icon size={29} aria-hidden="true" />
               </div>
               <h3>{title}</h3>
               <p>{description}</p>

@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { Aperture, ArrowUpRight } from "lucide-react";
+import { Aperture, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 
 export function FinalCta() {
   return (
     <section className="final-cta" aria-labelledby="final-title">
-      <Aperture size={39} strokeWidth={1.1} aria-hidden="true" />
+      <Aperture size={39} aria-hidden="true" />
       <span className="eyebrow">EVERY GUEST. EVERY PERSPECTIVE.</span>
       <h2 id="final-title">
         Your guests are already

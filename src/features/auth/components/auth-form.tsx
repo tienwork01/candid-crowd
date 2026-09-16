@@ -4,9 +4,9 @@ import { FormEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Eye, EyeOff } from "lucide-react";
-import { Brand } from "@/components/shared/brand";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
+import { Brand } from "@/components/shared";
+import { Button } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { getErrorMessage } from "@/lib/errors";
 
@@ -244,7 +244,7 @@ export function AuthForm({
               onClick={() => setShowPassword((value) => !value)}
             >
               {showPassword ? (
-                <EyeOff aria-hidden="true" />
+                <EyeSlash aria-hidden="true" />
               ) : (
                 <Eye aria-hidden="true" />
               )}

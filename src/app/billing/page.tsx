@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { CreditCard } from "lucide-react";
-import { HostShell } from "@/features/host/components/host-shell";
+import { CreditCard } from "@phosphor-icons/react/dist/ssr";
+import { HostShell } from "@/features/host/components";
 
 export const metadata: Metadata = { title: "Plan & billing — CandidCrowd" };
 

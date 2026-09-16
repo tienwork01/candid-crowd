@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Lock } from "lucide-react";
-import { Header } from "@/features/marketing/components/header";
-import { Footer } from "@/features/marketing/components/footer";
+import { Lock } from "@phosphor-icons/react/dist/ssr";
+import { Header, Footer } from "@/features/marketing/components";
 import {
   TableOfContents,
   BackToTop,
   type TocItem,
-} from "@/features/legal/components/table-of-contents";
+} from "@/features/legal/components";
 import { siteConfig } from "@/lib/config";
 import "@/features/legal/components/legal.css";
 

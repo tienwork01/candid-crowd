@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Brand } from "@/components/shared/brand";
+import { Brand } from "@/components/shared";
 import { navigation } from "../data/marketing";
 
 export function Footer() {

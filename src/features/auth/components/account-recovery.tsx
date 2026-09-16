@@ -6,13 +6,13 @@ import {
   ArrowLeft,
   ArrowRight,
   Eye,
-  EyeOff,
-  KeyRound,
-  MailCheck,
-  RefreshCw,
-} from "lucide-react";
-import { Brand } from "@/components/shared/brand";
-import { Button } from "@/components/ui/button";
+  EyeSlash,
+  Key,
+  EnvelopeSimple,
+  ArrowsClockwise,
+} from "@phosphor-icons/react";
+import { Brand } from "@/components/shared";
+import { Button } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { getErrorMessage } from "@/lib/errors";
 
@@ -245,8 +245,8 @@ export function AccountRecovery({
             <div className="recovery-form__resend">
               <span>Didn’t receive the email?</span>
               <span>
-                <RefreshCw size={14} aria-hidden="true" /> Use the button above
-                to resend securely.
+                <ArrowsClockwise size={14} aria-hidden="true" /> Use the button
+                above to resend securely.
               </span>
             </div>
           )}
@@ -305,7 +305,11 @@ function PasswordField({
           aria-pressed={visible}
           onClick={onVisibilityChange}
         >
-          {visible ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+          {visible ? (
+            <EyeSlash aria-hidden="true" />
+          ) : (
+            <Eye aria-hidden="true" />
+          )}
         </Button>
       </div>
     </div>
@@ -320,7 +324,7 @@ function RecoverySuccess({
   onReset: () => void;
 }) {
   const forgot = mode === "forgot-password";
-  const Icon = forgot ? MailCheck : KeyRound;
+  const Icon = forgot ? EnvelopeSimple : Key;
 
   return (
     <div className="recovery-form__success" role="status">

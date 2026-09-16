@@ -488,6 +488,20 @@ All custom CSS classes must strictly adhere to the **BEM (Block Element Modifier
 - **Global / Utility**: Shared layout classes should remain standard and semantic (e.g., `container`, `section-pad`, `skip-link`, `eyebrow`, `center-heading`).
 - **Feature-first organization**: Component classes should reflect their feature/block context. Do not invent loose, un-scoped ad-hoc class names.
 
+### Icon Library Convention (Phosphor Icons)
+
+All icons across the project must use **Phosphor Icons (`@phosphor-icons/react`)**:
+- **React Server Components (RSC)** (any file without `"use client"`): Import strictly from `@phosphor-icons/react/dist/ssr` (e.g. `import { Aperture } from "@phosphor-icons/react/dist/ssr";`) to avoid React Context errors on the server.
+- **Client Components** (files with `"use client"`): Import from `@phosphor-icons/react` (e.g. `import { X } from "@phosphor-icons/react";`).
+- **Never use `lucide-react`** or any other icon library. All future components and icons must follow this Phosphor icon standard.
+
+### Component Barrel Export & Import Convention
+
+All `components` directories across features and shared folders (e.g. `src/features/<feature>/components`, `src/components/shared`, `src/components/ui`) must maintain a barrel export entrypoint (`index.ts`):
+- **Always provide `index.ts`**: Every component folder must include an `index.ts` that re-exports its public components, subcomponents, and related public types.
+- **Import from the folder, never deep paths**: Always import from the component folder path (e.g. `import { Header, Footer } from "@/features/marketing/components";` or `import { Button } from "@/components/ui";`). Never use deep relative or deep alias imports targeting individual component files (e.g. do **not** do `import { Header } from "@/features/marketing/components/header";`).
+- **Styles and non-JS assets**: Asset/style imports that cannot be re-exported through TypeScript (such as `.css` files like `auth.css` or `legal.css`) remain direct imports.
+
 ## Backend
 
 Preferred:

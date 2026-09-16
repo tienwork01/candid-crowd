@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { EventDraftForm } from "@/features/event/components/event-draft-form";
-import { HostShell } from "@/features/host/components/host-shell";
+import { EventDraftForm } from "@/features/event/components";
+import { HostShell } from "@/features/host/components";
 
 export const metadata: Metadata = { title: "Create an event — CandidCrowd" };
 

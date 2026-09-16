@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import { Brand } from "@/components/shared/brand";
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { Brand } from "@/components/shared";
 import { navigation } from "../data/marketing";
 import { MobileNav } from "./mobile-nav";
 

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarDays, Plus } from "lucide-react";
-import { HostShell } from "@/features/host/components/host-shell";
+import { CalendarDots, Plus } from "@phosphor-icons/react/dist/ssr";
+import { HostShell } from "@/features/host/components";
 
 export const metadata: Metadata = { title: "Your events — CandidCrowd" };
 
@@ -21,7 +21,7 @@ export default function EventsPage() {
         </div>
         <div className="host-events__empty">
           <span className="host-events__empty-icon">
-            <CalendarDays size={24} aria-hidden="true" />
+            <CalendarDots size={24} aria-hidden="true" />
           </span>
           <h2>Your event shelf is waiting.</h2>
           <p>

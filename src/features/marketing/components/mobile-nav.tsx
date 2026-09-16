@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { List, X } from "@phosphor-icons/react";
 import { navigation } from "../data/marketing";
 
 export function MobileNav() {
@@ -54,7 +54,7 @@ export function MobileNav() {
         aria-expanded={open}
         aria-controls="mobile-nav"
       >
-        <Menu
+        <List
           className="mobile-nav__icon mobile-nav__icon--open"
           aria-hidden="true"
         />

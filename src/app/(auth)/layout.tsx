@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Sparkles } from "lucide-react";
+import { Sparkle } from "@phosphor-icons/react/dist/ssr";
 import "@/features/auth/components/auth.css";
 
 export default function AuthLayout({
@@ -56,7 +56,7 @@ export default function AuthLayout({
 
           {/* Floating live participation badge */}
           <div className="auth-page__badge">
-            <Sparkles size={13} className="auth-page__badge-icon" />
+            <Sparkle size={13} className="auth-page__badge-icon" />
             <span>184 candid moments captured</span>
           </div>
         </div>

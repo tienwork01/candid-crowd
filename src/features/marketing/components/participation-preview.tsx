@@ -1,5 +1,5 @@
-import { ArrowUpRight, Users } from "lucide-react";
-import { Reveal } from "@/components/shared/reveal";
+import { ArrowUpRight, Users } from "@phosphor-icons/react/dist/ssr";
+import { Reveal } from "@/components/shared";
 import { participation, sampleEvent } from "../data/marketing";
 
 export function ParticipationPreview() {

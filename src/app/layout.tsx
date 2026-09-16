@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Cormorant_Garamond } from "next/font/google";
+import { QueryProvider } from "@/components/providers";
 import "./globals.css";
 
 const sans = DM_Sans({
@@ -35,7 +36,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );

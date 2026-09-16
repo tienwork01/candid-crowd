@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, Check } from "lucide-react";
+import { ArrowUpRight, Check } from "@phosphor-icons/react/dist/ssr";
 import { pricingPlans } from "../data/marketing";
 
 export function Pricing() {

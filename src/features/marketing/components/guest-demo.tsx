@@ -6,12 +6,12 @@ import { m, useInView, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   Check,
-  ImagePlus,
-  LockKeyhole,
-  RotateCcw,
+  ImageSquare,
+  LockKey,
+  ArrowCounterClockwise,
   X,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from "@phosphor-icons/react";
+import { Button } from "@/components/ui";
 import { guestDemo, sampleEvent, type MarketingPhoto } from "../data/marketing";
 import { useUploadPreview } from "../hooks/use-upload-preview";
 import { DemoQr } from "./demo-qr";
@@ -260,11 +260,7 @@ export function GuestDemo() {
                       ))
                     ) : (
                       <div className="guest-phone__placeholder">
-                        <ImagePlus
-                          size={30}
-                          strokeWidth={1.2}
-                          aria-hidden="true"
-                        />
+                        <ImageSquare size={30} aria-hidden="true" />
                         <span>Your perspective belongs here.</span>
                       </div>
                     )}
@@ -289,7 +285,7 @@ export function GuestDemo() {
                           reading || selected.length >= guestDemo.maxPhotos
                         }
                       >
-                        <ImagePlus aria-hidden="true" /> Add photos
+                        <ImageSquare aria-hidden="true" /> Add photos
                       </Button>
                       <button
                         className="text-button"
@@ -386,7 +382,7 @@ export function GuestDemo() {
               )}
             </div>
             <button className="text-button guest-phone__reset" onClick={reset}>
-              <RotateCcw size={14} aria-hidden="true" /> Reset demo
+              <ArrowCounterClockwise size={14} aria-hidden="true" /> Reset demo
             </button>
           </div>
           <div id="demo-gallery" className="guest-demo__gallery-wrap">
@@ -402,7 +398,7 @@ export function GuestDemo() {
           </div>
         </div>
         <p className="guest-demo__disclosure">
-          <LockKeyhole size={14} aria-hidden="true" /> Simulated experience · No
+          <LockKey size={14} aria-hidden="true" /> Simulated experience · No
           photos are uploaded · Reloading clears the demo
         </p>
       </div>

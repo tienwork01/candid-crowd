@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Aperture, Plus } from "lucide-react";
-import { HostAccountMenu } from "@/features/host/components/host-account-menu";
+import { Aperture, Plus } from "@phosphor-icons/react/dist/ssr";
+import { HostAccountMenu } from "./host-account-menu";
 import { siteConfig } from "@/lib/config";
 
 type HostShellProps = {

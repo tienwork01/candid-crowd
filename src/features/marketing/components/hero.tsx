@@ -3,9 +3,9 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  LockKeyhole,
-  Sparkles,
-} from "lucide-react";
+  LockKey,
+  Sparkle,
+} from "@phosphor-icons/react/dist/ssr";
 import { HeroScene } from "./hero-scene";
 
 export function Hero() {
@@ -39,10 +39,10 @@ export function Hero() {
             <Check aria-hidden="true" /> No app
           </span>
           <span>
-            <LockKeyhole aria-hidden="true" /> Private
+            <LockKey aria-hidden="true" /> Private
           </span>
           <span>
-            <Sparkles aria-hidden="true" /> Original quality
+            <Sparkle aria-hidden="true" /> Original quality
           </span>
         </div>
       </div>

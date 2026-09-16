@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import { m, useReducedMotion } from "motion/react";
-import { LockKeyhole, Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { LockKey, Plus } from "@phosphor-icons/react";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui";
 import { type MarketingPhoto, sampleEvent, guestDemo } from "../data/marketing";
 
 export function DemoGallery({ photos }: { photos: MarketingPhoto[] }) {
@@ -18,7 +18,7 @@ export function DemoGallery({ photos }: { photos: MarketingPhoto[] }) {
           <span className="eyebrow">THE SHARED GALLERY</span>
           <h3>{sampleEvent.name}</h3>
         </div>
-        <LockKeyhole size={17} aria-hidden="true" />
+        <LockKey size={17} aria-hidden="true" />
       </div>
       <div className="demo-gallery__label">
         <span>Our memories</span>

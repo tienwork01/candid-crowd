@@ -1,4 +1,4 @@
-import { Check, LockKeyhole } from "lucide-react";
+import { Check, LockKey } from "@phosphor-icons/react/dist/ssr";
 
 const assurances = [
   "No guest account",
@@ -17,7 +17,7 @@ export function PrivacySection() {
       aria-labelledby="privacy-title"
     >
       <div className="privacy-section__intro">
-        <LockKeyhole size={30} strokeWidth={1.2} aria-hidden="true" />
+        <LockKey size={30} aria-hidden="true" />
         <div>
           <span className="eyebrow">YOUR PEOPLE. YOUR MOMENTS.</span>
           <h2 id="privacy-title">

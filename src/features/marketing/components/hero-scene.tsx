@@ -6,12 +6,12 @@ import { m, useInView, useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   Check,
-  ImagePlus,
-  LockKeyhole,
-  RotateCcw,
-  RotateCw,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
+  ImageSquare,
+  LockKey,
+  ArrowCounterClockwise,
+  ArrowClockwise,
+} from "@phosphor-icons/react";
+import { Button } from "@/components/ui";
 import { photos, sampleEvent } from "../data/marketing";
 import { useUploadPreview } from "../hooks/use-upload-preview";
 import { HeroThree } from "./hero-three";
@@ -60,7 +60,7 @@ export function HeroScene() {
             disabled={angle <= -0.4}
             onClick={() => setAngle((value) => Math.max(-0.4, value - 0.4))}
           >
-            <RotateCcw aria-hidden="true" />
+            <ArrowCounterClockwise aria-hidden="true" />
           </Button>
           <Button
             variant="outline"
@@ -70,7 +70,7 @@ export function HeroScene() {
             disabled={angle >= 0.4}
             onClick={() => setAngle((value) => Math.min(0.4, value + 0.4))}
           >
-            <RotateCw aria-hidden="true" />
+            <ArrowClockwise aria-hidden="true" />
           </Button>
         </div>
       )}
@@ -80,7 +80,7 @@ export function HeroScene() {
             <span className="eyebrow">THE SHARED GALLERY</span>
             <h2>{sampleEvent.name}</h2>
           </div>
-          <LockKeyhole size={14} aria-hidden="true" />
+          <LockKey size={14} aria-hidden="true" />
         </div>
         <div className="hero-scene__gallery-photos">
           <div className="hero-scene__cover">
@@ -116,7 +116,7 @@ export function HeroScene() {
               </m.div>
             ) : (
               <>
-                <ImagePlus size={22} strokeWidth={1.3} aria-hidden="true" />
+                <ImageSquare size={22} aria-hidden="true" />
                 <span>Your next memory</span>
               </>
             )}
@@ -142,7 +142,7 @@ export function HeroScene() {
           />
         </div>
         <div className="hero-scene__phone-action">
-          <ImagePlus size={16} aria-hidden="true" />
+          <ImageSquare size={16} aria-hidden="true" />
           <span>One little moment.</span>
         </div>
         <Button
@@ -153,7 +153,7 @@ export function HeroScene() {
         >
           {done ? (
             <>
-              <RotateCcw aria-hidden="true" /> Try again
+              <ArrowCounterClockwise aria-hidden="true" /> Try again
             </>
           ) : upload.phase === "uploading" ? (
             `Sharing… ${upload.progress}%`
@@ -166,7 +166,7 @@ export function HeroScene() {
         <span className="hero-scene__phone-footnote">Interactive preview</span>
       </div>
       <div className="hero-scene__connection" aria-hidden="true">
-        <ArrowRight size={25} strokeWidth={1.3} />
+        <ArrowRight size={25} />
       </div>
       <m.div
         className="hero-scene__status"
@@ -178,7 +178,7 @@ export function HeroScene() {
           {done ? (
             <Check size={18} aria-hidden="true" />
           ) : (
-            <ImagePlus size={18} aria-hidden="true" />
+            <ImageSquare size={18} aria-hidden="true" />
           )}
         </span>
         <div>

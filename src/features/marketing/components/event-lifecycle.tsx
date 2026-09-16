@@ -1,6 +1,11 @@
 import Image from "next/image";
-import { ArrowRight, QrCode, Heart, Send } from "lucide-react";
-import { Reveal } from "@/components/shared/reveal";
+import {
+  ArrowRight,
+  QrCode,
+  Heart,
+  PaperPlaneTilt,
+} from "@phosphor-icons/react/dist/ssr";
+import { Reveal } from "@/components/shared";
 
 export function EventLifecycle() {
   return (
@@ -29,7 +34,7 @@ export function EventLifecycle() {
                   <br />
                   <em>memories.</em>
                 </strong>
-                <QrCode size={56} strokeWidth={1.1} aria-hidden="true" />
+                <QrCode size={56} aria-hidden="true" />
                 <small>Scan. Share. Celebrate.</small>
               </div>
               <span className="lifecycle-card__tag">
@@ -94,7 +99,7 @@ export function EventLifecycle() {
                 </span>
               </div>
               <span className="lifecycle-card__reminder-icon">
-                <Send size={20} strokeWidth={1.3} aria-hidden="true" />
+                <PaperPlaneTilt size={20} aria-hidden="true" />
               </span>
             </div>
             <span className="eyebrow">03 — AFTER</span>

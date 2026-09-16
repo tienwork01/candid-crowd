@@ -7,7 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/components/ui";
 import { previewNotices } from "../data/marketing";
 
 export function PreviewNotice({

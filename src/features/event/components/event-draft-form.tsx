@@ -2,9 +2,16 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, ImagePlus, QrCode } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  ImageSquare,
+  QrCode,
+} from "@phosphor-icons/react";
 import { eventTypes, type EventDraft } from "@/features/event/types/event";
-import { APIError, apiFetch } from "@/lib/api-client";
+import { useCreateEvent } from "@/features/event/hooks";
+import { APIError } from "@/lib/api-client";
 import { getErrorMessage } from "@/lib/errors";
 
 type Basics = { name: string; date: string; type: EventDraft["type"] };
@@ -28,6 +35,7 @@ export function EventDraftForm() {
     [qrImage, setQrImage] = useState(""),
     [guestUrl, setGuestUrl] = useState("");
   const nameInput = useRef<HTMLInputElement>(null);
+  const { mutateAsync: createEvent, isPending: isCreating } = useCreateEvent();
   const update = (key: keyof Basics, value: string) =>
     setBasics({ ...basics, [key]: value });
 
@@ -78,22 +86,12 @@ export function EventDraftForm() {
     }
 
     try {
-      const response = await apiFetch("/api/v1/events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: basics.name.trim(),
-          event_date: `${basics.date}T00:00:00Z`,
-          event_type: basics.type,
-          expected_guest_count: 50,
-        }),
+      const created = await createEvent({
+        name: basics.name.trim(),
+        event_date: `${basics.date}T00:00:00Z`,
+        event_type: basics.type,
+        expected_guest_count: 50,
       });
-      const created = (await response.json()) as {
-        id: string;
-        slug?: string;
-        public_url?: string;
-        guest_url?: string;
-      };
       const publicPath =
         created.public_url ||
         created.guest_url ||
@@ -241,8 +239,14 @@ export function EventDraftForm() {
                   {error}
                 </p>
               )}
-              <button className="button" type="button" onClick={next}>
-                Create event <ArrowRight size={17} aria-hidden="true" />
+              <button
+                className="button"
+                type="button"
+                onClick={next}
+                disabled={isCreating}
+              >
+                {isCreating ? "Creating event..." : "Create event"}{" "}
+                <ArrowRight size={17} aria-hidden="true" />
               </button>
             </div>
           ) : (
@@ -284,7 +288,7 @@ export function EventDraftForm() {
               <div className="event-form__field">
                 <label htmlFor="event-cover">Optional cover photo</label>
                 <label className="event-form__cover" htmlFor="event-cover">
-                  <ImagePlus aria-hidden="true" />
+                  <ImageSquare aria-hidden="true" />
                   <span>{cover || "Choose a photo"}</span>
                   <small>JPG, PNG or WebP</small>
                 </label>
@@ -333,7 +337,7 @@ export function EventDraftForm() {
           </div>
           <div className="event-overview__cover">
             {cover ? (
-              <ImagePlus aria-hidden="true" />
+              <ImageSquare aria-hidden="true" />
             ) : (
               <span>YOUR COVER PHOTO</span>
             )}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AccountRecovery } from "@/features/auth/components/account-recovery";
+import { AccountRecovery } from "@/features/auth/components";
 
 export const metadata: Metadata = { title: "Verify email - CandidCrowd" };
 

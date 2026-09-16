@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { ArrowDown, Aperture } from "lucide-react";
-import { Reveal } from "@/components/shared/reveal";
+import { ArrowDown, Aperture } from "@phosphor-icons/react/dist/ssr";
+import { Reveal } from "@/components/shared";
 import { photos } from "../data/marketing";
 
 export function ProblemSection() {
@@ -62,10 +62,10 @@ export function ProblemSection() {
           <span>One more unforgettable moment</span>
         </div>
         <div className="problem-section__summary">
-          <ArrowDown size={30} strokeWidth={1} aria-hidden="true" />
+          <ArrowDown size={30} aria-hidden="true" />
           <span>
-            <Aperture size={23} strokeWidth={1.3} aria-hidden="true" /> All
-            those perspectives. One CandidCrowd gallery.
+            <Aperture size={23} aria-hidden="true" /> All those perspectives.
+            One CandidCrowd gallery.
           </span>
         </div>
       </Reveal>

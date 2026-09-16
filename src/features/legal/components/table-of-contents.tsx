@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDown, ListFilter, ArrowUp } from "lucide-react";
+import { CaretDown, ListBullets, ArrowUp } from "@phosphor-icons/react";
 
 export interface TocItem {
   id: string;
@@ -79,17 +79,14 @@ export function TableOfContents({
         >
           <summary className="legal-toc-mobile__summary">
             <span className="legal-toc-mobile__badge">
-              <ListFilter size={16} aria-hidden="true" />
+              <ListBullets size={16} aria-hidden="true" />
               <span>
                 {activeItem
                   ? `${activeItem.number ? `${activeItem.number}. ` : ""}${activeItem.title}`
                   : title}
               </span>
             </span>
-            <ChevronDown
-              className="legal-toc-mobile__icon"
-              aria-hidden="true"
-            />
+            <CaretDown className="legal-toc-mobile__icon" aria-hidden="true" />
           </summary>
           <div className="legal-toc-mobile__content">
             {items.map((item) => (

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useInView } from "motion/react";
-import { QrCode } from "lucide-react";
+import { QrCode } from "@phosphor-icons/react";
 
 export function DemoQr() {
   const ref = useRef<HTMLDivElement>(null);
@@ -57,7 +57,6 @@ export function DemoQr() {
         ) : (
           <QrCode
             size={90}
-            strokeWidth={1}
             aria-label={
               failed
                 ? "QR unavailable; use Try without scanning"

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, CreditCard, LogOut, UserRound } from "lucide-react";
+import { CaretDown, CreditCard, SignOut, User } from "@phosphor-icons/react";
 import { authClient } from "@/lib/auth-client";
 
 function initials(value: string) {
@@ -43,7 +43,7 @@ export function HostAccountMenu({
           <strong>{name}</strong>
           <small>Free plan</small>
         </span>
-        <ChevronDown
+        <CaretDown
           className="host-account-menu__chevron"
           size={16}
           aria-hidden="true"
@@ -72,7 +72,7 @@ export function HostAccountMenu({
             aria-current={active === "profile" ? "page" : undefined}
             href="/profile"
           >
-            <UserRound size={16} aria-hidden="true" /> Profile
+            <User size={16} aria-hidden="true" /> Profile
           </Link>
           <Link
             aria-current={active === "billing" ? "page" : undefined}
@@ -90,7 +90,7 @@ export function HostAccountMenu({
             router.refresh();
           }}
         >
-          <LogOut size={16} aria-hidden="true" />
+          <SignOut size={16} aria-hidden="true" />
           Log out
         </button>
       </div>
