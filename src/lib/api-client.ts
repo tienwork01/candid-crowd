@@ -165,11 +165,6 @@ privateClient.interceptors.response.use(
 );
 
 /**
- * Default apiClient alias pointing to privateClient for host operations.
- */
-export const apiClient = privateClient;
-
-/**
  * Backward-compatible fetch wrapper using Better Auth token.
  */
 async function authorizedFetch(

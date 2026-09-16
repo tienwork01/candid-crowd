@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { apiClient, APIError } from "@/lib/api-client";
+import { APIError, privateClient } from "@/lib/api-client";
 import type { EventType } from "../types/event";
 
 export type CreateEventInput = {
@@ -22,7 +22,7 @@ export type CreateEventResponse = {
 export function useCreateEvent() {
   return useMutation<CreateEventResponse, APIError, CreateEventInput>({
     mutationFn: async (input) => {
-      const response = await apiClient.post<CreateEventResponse>(
+      const response = await privateClient.post<CreateEventResponse>(
         "/api/v1/events",
         input,
       );
