@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Cormorant_Garamond } from "next/font/google";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { QueryProvider } from "@/components/providers";
@@ -68,6 +69,7 @@ export default async function RootLayout({
           <QueryProvider>{children}</QueryProvider>
         </NextIntlClientProvider>
       </body>
+      <GoogleAnalytics gaId="G-REK9J5QXX2" />
     </html>
   );
 }
