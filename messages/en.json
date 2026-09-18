@@ -149,21 +149,36 @@
           "description": "For trying CandidCrowd.",
           "priceLabel": "Free",
           "billing": "Explore the preview",
-          "cta": "Try it free"
+          "cta": "Try it free",
+          "features": {
+            "f1": "Interactive guest experience",
+            "f2": "Try your own photos locally",
+            "f3": "Save an event draft"
+          }
         },
         "essential": {
           "name": "Essential",
           "description": "One celebration. Every perspective.",
           "priceLabel": "Coming soon",
           "billing": "Pay once per event · Price to be announced",
-          "cta": "Explore the demo"
+          "cta": "Explore the demo",
+          "features": {
+            "f1": "Your private event gallery",
+            "f2": "A guest link & printable QR",
+            "f3": "Original-quality photo downloads"
+          }
         },
         "plus": {
           "name": "Plus",
           "description": "For the moments that need more room.",
           "priceLabel": "Coming soon",
           "billing": "Pay once per event · Price to be announced",
-          "cta": "Explore the demo"
+          "cta": "Explore the demo",
+          "features": {
+            "f1": "Everything planned for Essential",
+            "f2": "More space for your memories",
+            "f3": "Video sharing & more event features"
+          }
         }
       }
     },
@@ -219,7 +234,9 @@
       "eventsTitle": "Events",
       "essentialsTitle": "The essentials",
       "previewLabel": "Official policies",
-      "bottomNote": "First chapter · Product preview"
+      "bottomNote": "First chapter · Product preview",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
     },
     "lifecycle": {
       "eyebrow": "IT’S MORE THAN ONE DAY",
@@ -253,8 +270,8 @@
       "titleLine1": "Don’t just create an album.",
       "titleLine2": "Get people to contribute.",
       "subhead": "A shared gallery is only the beginning. We’re designing CandidCrowd to help you see what gets your guests sharing.",
-      "point1Title": "Know what brings people in.",
-      "point1Description": "See which QR placements make sharing a natural part of your event.",
+      "point1Title": "Know how guests join.",
+      "point1Description": "See whether guests contribute by scanning your event QR code or opening the shared link.",
       "point2Title": "Make room for every perspective.",
       "point2Description": "Understand participation, then give guests a gentle nudge when the time is right.",
       "conceptNote": "Product concept · Analytics and QR source tracking are not live yet.",
@@ -265,12 +282,10 @@
       "videos": "videos",
       "sourcesHeading": "Where the memories begin",
       "contributorsCol": "Contributors",
-      "tableCaption": "Illustrative contributors by QR source",
+      "tableCaption": "Illustrative contributors by access source",
       "thSource": "Source",
       "sources": {
-        "entrance": "Entrance QR",
-        "table": "Table QR",
-        "bar": "Bar QR",
+        "qr": "Event QR code",
         "link": "Shared link"
       }
     },
@@ -475,70 +490,95 @@
   },
   "event": {
     "create": {
-      "title": "Create your event",
-      "name": "Event name",
-      "type": "Event type",
-      "date": "Event date"
+      "pageTitle": "Create your event",
+      "pageSubtitle": "One QR code gives everyone at your event a simple place to share photos and videos. You can customize the details later.",
+      "nameLabel": "Event name",
+      "namePlaceholder": "e.g. Emma's 30th Birthday",
+      "nameRequired": "Please enter an event name to continue.",
+      "typeLabel": "Event type",
+      "typePlaceholder": "Select event type",
+      "dateLabel": "Event date",
+      "dateUnknown": "I don't know the date yet",
+      "cta": "Create event",
+      "creating": "Creating your event...",
+      "under30s": "Takes under 30 seconds"
     },
     "types": {
       "Wedding": "Wedding",
       "Birthday": "Birthday",
       "Anniversary": "Anniversary",
+      "Graduation": "Graduation",
+      "Baby Shower": "Baby Shower",
       "Reunion": "Reunion",
-      "Trip": "Trip",
-      "Team celebration": "Team celebration",
+      "Party": "Party",
+      "Corporate": "Corporate",
+      "Conference": "Conference",
       "Other": "Other"
     },
-    "setup": {
-      "nameRequired": "Give your event a name to continue.",
-      "dateRequired": "Choose an event date to continue.",
-      "signInRequired": "Please sign in to create and save your event.",
-      "previewEyebrow": "EVENT PREVIEW",
-      "readyEyebrow": "YOUR EVENT IS READY",
-      "readyTitleSuffix": "is ready.",
-      "previewDescription": "This is a local preview. Sign in when you are ready to save and share a real event.",
-      "readyDescription": "Share this QR code and guests can start adding their perspective.",
-      "qrAltPrefix": "QR code for",
-      "makeItYoursCta": "Want to make it yours?",
-      "introEyebrow": "CREATE AN EVENT",
-      "introTitleLine1": "Make a home for",
-      "introTitleLine2": "the moments.",
-      "introDescription": "Start simple. You can refine every detail later.",
-      "progressAria": "Event setup progress",
-      "step1": "Event basics",
-      "step2": "Your event is ready",
-      "startHere": "START HERE",
-      "step1Sub": "The essentials your guests will see.",
-      "nameLabel": "Event name",
-      "namePlaceholder": "e.g. Emma & James",
-      "typeLabel": "Event type",
-      "dateLabel": "When is it?",
-      "creating": "Creating event...",
-      "create": "Create event",
-      "step2Eyebrow": "STEP 2 OF 2",
-      "step2Heading": "Make it yours",
-      "step2Sub": "Optional touches for your guest experience.",
-      "qrStyleLabel": "QR style",
-      "qrClassic": "Classic",
-      "qrModernFrame": "Modern frame",
-      "qrEditorial": "Editorial",
-      "colorLegend": "Event color",
-      "themeOlive": "Olive",
-      "themeRose": "Rose",
-      "themeMidnight": "Midnight",
-      "coverLabel": "Optional cover photo",
-      "choosePhoto": "Choose a photo",
-      "coverFormatHint": "JPG, PNG or WebP",
-      "back": "Back",
-      "continue": "Continue",
-      "skipForNow": "Skip for now",
-      "overviewAria": "Event overview",
-      "overviewTitle": "EVENT OVERVIEW",
-      "coverPlaceholder": "YOUR COVER PHOTO",
-      "nameFallback": "Your event name",
-      "dateFallback": "Choose a date",
-      "qrSuffix": "QR",
-      "privateEvent": "Private event"
+    "ready": {
+      "heroBadge": "Ready to share",
+      "heroTitle": "Your event is ready 🎉",
+      "heroSubtitle": "Guests can now scan your QR code to share their photos and videos.",
+      "noDate": "Date to be decided",
+      "qrCta": "Scan to share your photos & videos",
+      "noAppNeeded": "No app needed · No account needed",
+      "downloadQr": "Download QR",
+      "copyLink": "Copy link",
+      "linkCopied": "Guest link copied to clipboard!",
+      "openGuestPage": "Open guest page",
+      "previewAsGuest": "Preview as guest",
+      "previewNotice": "Opens in preview mode so test uploads don't affect your stats",
+      "goToOverview": "Go to event"
+    },
+    "checklist": {
+      "title": "Make your event ready",
+      "subtitle": "Optional steps to personalize your event and track participation.",
+      "itemCreated": "Event created",
+      "itemQrReady": "QR code generated",
+      "itemPreview": "Test guest experience",
+      "itemGuestCount": "Add expected guest count",
+      "itemCustomizeQr": "Customize QR card",
+      "itemCustomizePage": "Customize guest page",
+      "completed": "Completed",
+      "optional": "Optional",
+      "comingSoon": "Coming soon"
+    },
+    "guestCount": {
+      "heading": "How many guests are you expecting?",
+      "description": "An estimate is fine. We'll use this to measure participation.",
+      "placeholder": "e.g. 120",
+      "save": "Save estimate",
+      "skip": "Skip for now",
+      "savedToast": "Expected guest count saved"
+    },
+    "overview": {
+      "breadcrumb": "All events",
+      "lifecycleBefore": "Before event",
+      "lifecycleDuring": "During event",
+      "lifecycleAfter": "After event",
+      "lifecycleNote": "CandidCrowd automatically adapts based on your event timing.",
+      "daysUntil": "{count, plural, =0 {Today is the day!} =1 {1 day to go} other {# days to go}}",
+      "eventReadyBanner": "Your event is live and ready for guests.",
+      "statMemories": "Memories collected",
+      "statContributors": "Contributors",
+      "statParticipation": "Participation rate",
+      "statScans": "QR scans",
+      "recentUploads": "Recent uploads",
+      "afterPromptHeading": "Got photos from last night?",
+      "afterPromptSub": "Send a friendly morning-after reminder to collect photos guests forgot to share.",
+      "copyReminderLink": "Copy reminder link",
+      "reminderCopied": "Reminder link copied to clipboard!"
+    },
+    "guest": {
+      "testSessionBanner": "Preview Mode · Uploads in this mode are marked as test and will not affect event analytics.",
+      "removeTestUploads": "Remove test uploads",
+      "testRemovedToast": "Test uploads removed",
+      "trustLine": "No app needed · No account needed · Original quality",
+      "welcomeCta": "Share your photos & videos",
+      "dropzoneSub": "JPG, PNG, HEIC, or MP4 up to 50 MB",
+      "selectFiles": "Select from camera roll",
+      "uploading": "Uploading memories...",
+      "uploadSuccess": "Thank you! Your memories have been shared."
     }
   },
   "guest": {
@@ -574,8 +614,6 @@
       "brandAria": "CandidCrowd host workspace",
       "navAria": "Host workspace",
       "events": "Events",
-      "createEventAria": "Create a new event",
-      "newEvent": "New event",
       "footerAria": "Workspace footer",
       "help": "Help",
       "privacy": "Privacy",
@@ -585,12 +623,15 @@
       "openMenuAria": "Open account menu",
       "yourAccount": "Your account",
       "signInToManage": "Sign in to manage your account",
-      "freePlan": "Free plan",
       "currentPlan": "Current plan",
       "planFree": "Free",
+      "planEssential": "Essential",
+      "planPlus": "Plus",
+      "newEvent": "New event",
       "menuAria": "Account menu",
       "profile": "Profile",
       "planAndBilling": "Plan & billing",
+      "language": "Language",
       "logOut": "Log out"
     },
     "pages": {

@@ -1,15 +1,16 @@
 import Link from "next/link";
-import { Aperture, Plus } from "@phosphor-icons/react/dist/ssr";
+import { Aperture } from "@phosphor-icons/react/dist/ssr";
 import { getTranslations } from "next-intl/server";
-import { HostAccountMenu } from "./host-account-menu";
+import { HostAccountMenu, type UserPlan } from "./host-account-menu";
 import { siteConfig } from "@/lib/config";
 
 type HostShellProps = {
   active: "events" | "new" | "profile" | "billing";
+  plan?: UserPlan;
   children: React.ReactNode;
 };
 
-export async function HostShell({ active, children }: HostShellProps) {
+export async function HostShell({ active, plan, children }: HostShellProps) {
   const t = await getTranslations("host.shell");
   const privacyHref = siteConfig.marketingUrl
     ? `${siteConfig.marketingUrl}/privacy`
@@ -47,21 +48,13 @@ export async function HostShell({ active, children }: HostShellProps) {
             ))}
           </nav>
           <div className="host-shell__account">
-            <Link
-              aria-current={active === "new" ? "page" : undefined}
-              aria-label={t("createEventAria")}
-              className="host-shell__create"
-              href="/events/new"
-            >
-              <Plus size={16} aria-hidden="true" />
-              <span>{t("newEvent")}</span>
-            </Link>
             <HostAccountMenu
               active={
-                active === "profile" || active === "billing"
+                active === "profile" || active === "billing" || active === "new"
                   ? active
                   : undefined
               }
+              plan={plan}
             />
           </div>
         </div>

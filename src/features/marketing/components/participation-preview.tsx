@@ -10,11 +10,9 @@ export async function ParticipationPreview() {
     getFormatter(),
   ]);
 
-  type SourceKey = "entrance" | "table" | "bar" | "link";
+  type SourceKey = "qr" | "link";
 
-  const rate = Math.round(
-    (participation.contributors / participation.guests) * 100,
-  );
+  const rate = participation.contributors / participation.guests;
 
   return (
     <section
@@ -24,10 +22,8 @@ export async function ParticipationPreview() {
     >
       <div className="participation__copy">
         <span className="eyebrow">{t("eyebrow")}</span>
-        <h2 id="participation-title">
-          {t("titleLine1")}
-          <br />
-          <em>{t("titleLine2")}</em>
+        <h2 id="participation-title" className="participation__title">
+          <span>{t("titleLine1")}</span> <em>{t("titleLine2")}</em>
         </h2>
         <p>{t("subhead")}</p>
         <div className="participation__point">
@@ -54,7 +50,10 @@ export async function ParticipationPreview() {
           </div>
           <div className="participation-dashboard__stat">
             <span className="participation-dashboard__number">
-              {format.number(rate, { style: "percent" })}
+              {format.number(rate, {
+                style: "percent",
+                maximumFractionDigits: 0,
+              })}
             </span>
             <span className="participation-dashboard__label">
               {t("participationLabel")}
@@ -99,7 +98,7 @@ export async function ParticipationPreview() {
           <Users size={16} aria-hidden="true" />
           <span>{t("sourcesHeading")}</span>
         </div>
-        <table className="participation-dashboard__sources">
+        <table className="participation-dashboard__source-table">
           <caption className="sr-only">{t("tableCaption")}</caption>
           <thead className="sr-only">
             <tr>

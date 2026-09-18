@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { m, useInView, useReducedMotion } from "motion/react";
+import { m, useInView } from "motion/react";
 import {
   ArrowRight,
   Check,
@@ -11,7 +11,7 @@ import {
   ArrowCounterClockwise,
   X,
 } from "@phosphor-icons/react";
-import { Button } from "@/components/ui";
+import { Button, Progress } from "@/components/ui";
 import { useTranslations } from "next-intl";
 import {
   guestDemo,
@@ -37,7 +37,6 @@ export function GuestDemo() {
   const addButton = useRef<HTMLButtonElement>(null);
   const section = useRef<HTMLElement>(null);
   const urls = useRef<string[]>([]);
-  const reduced = useReducedMotion();
   const inView = useInView(section, { amount: 0.15 });
   const upload = useUploadPreview(inView);
   const busy = upload.phase === "uploading";
@@ -350,21 +349,11 @@ export function GuestDemo() {
                         <span>{t("sharingMoments")}</span>
                         <span>{upload.progress}%</span>
                       </div>
-                      <div
-                        className="guest-phone__upload-track"
-                        role="progressbar"
+                      <Progress
+                        value={upload.progress}
                         aria-label={t("progressBarAria")}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                        aria-valuenow={upload.progress}
-                      >
-                        <m.div
-                          style={{ transformOrigin: "left" }}
-                          initial={false}
-                          animate={{ scaleX: upload.progress / 100 }}
-                          transition={{ duration: reduced ? 0 : 0.2 }}
-                        />
-                      </div>
+                        className="my-2"
+                      />
                       <button
                         className="text-button"
                         onClick={upload.interrupt}

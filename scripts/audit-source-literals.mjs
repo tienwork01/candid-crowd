@@ -48,6 +48,7 @@ const ALLOWED_EXACT = new Set([
   "+",
   "-",
   ":",
+  "→",
 ]);
 
 // Regex patterns for allowed text
@@ -108,7 +109,7 @@ const allFiles = await getFiles(SRC_DIR);
 const violations = [];
 
 for (const filePath of allFiles) {
-  const relPath = relative(process.cwd(), filePath);
+  const relPath = relative(process.cwd(), filePath).replace(/\\/g, "/");
   const content = await readFile(filePath, "utf8");
   const sourceFile = ts.createSourceFile(
     filePath,

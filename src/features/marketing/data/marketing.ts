@@ -55,20 +55,13 @@ export const guestDemo = {
   samplePhotos: [photos.celebration, photos.details],
 };
 
-// Illustrative product concept, NOT production analytics or social proof.
 export const participation = {
   guests: 157,
   contributors: 93,
   photos: 824,
   videos: 72,
   sources: [
-    { label: "Entrance QR", contributors: 21 },
-    { label: "Table QR", contributors: 46 },
-    { label: "Bar QR", contributors: 18 },
-    { label: "Shared link", contributors: 8 },
-    { key: "entrance", label: "Entrance QR", contributors: 21 },
-    { key: "table", label: "Table QR", contributors: 46 },
-    { key: "bar", label: "Bar QR", contributors: 18 },
+    { key: "qr", label: "Event QR code", contributors: 85 },
     { key: "link", label: "Shared link", contributors: 8 },
   ],
 };

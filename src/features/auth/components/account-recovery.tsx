@@ -13,7 +13,7 @@ import {
 } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { Brand } from "@/components/shared";
-import { Button } from "@/components/ui";
+import { Alert, AlertDescription, Button, Input, Label } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { getSafeAuthRedirect, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
@@ -168,10 +168,10 @@ export function AccountRecovery({
           <form className="recovery-form__fields" onSubmit={submit}>
             {mode === "forgot-password" && (
               <div className="recovery-form__field">
-                <label htmlFor="recovery-email">
+                <Label htmlFor="recovery-email">
                   {t("recovery.emailAddress")}
-                </label>
-                <input
+                </Label>
+                <Input
                   id="recovery-email"
                   name="email"
                   type="email"
@@ -210,13 +210,9 @@ export function AccountRecovery({
                   inputRef={confirmPasswordRef}
                 />
                 {passwordError && (
-                  <p
-                    className="recovery-form__error"
-                    id="password-error"
-                    role="alert"
-                  >
-                    {passwordError}
-                  </p>
+                  <Alert variant="destructive" className="my-2">
+                    <AlertDescription>{passwordError}</AlertDescription>
+                  </Alert>
                 )}
               </>
             )}
@@ -253,9 +249,11 @@ export function AccountRecovery({
             </div>
           )}
 
-          <p className="recovery-form__notice" role="status" aria-live="polite">
-            {notice}
-          </p>
+          {notice && (
+            <Alert className="mt-4">
+              <AlertDescription>{notice}</AlertDescription>
+            </Alert>
+          )}
         </>
       )}
     </section>
@@ -285,9 +283,9 @@ function PasswordField({
 
   return (
     <div className="recovery-form__field">
-      <label htmlFor={id}>{label}</label>
-      <div className="recovery-form__password">
-        <input
+      <Label htmlFor={id}>{label}</Label>
+      <div className="recovery-form__password relative">
+        <Input
           id={id}
           name={name}
           type={visible ? "text" : "password"}

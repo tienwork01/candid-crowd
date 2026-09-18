@@ -2,9 +2,48 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CaretDown, CreditCard, SignOut, User } from "@phosphor-icons/react";
-import { useTranslations } from "next-intl";
+import {
+  CaretDown,
+  Check,
+  CreditCard,
+  Globe,
+  Plus,
+  SignOut,
+  User,
+} from "@phosphor-icons/react";
+import { useLocale, useTranslations } from "next-intl";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Badge,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui";
+import { localeLabels, locales, type AppLocale } from "@/i18n/locales";
 import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
+
+export type UserPlan = "free" | "essential" | "plus";
+
+function getPlanBadgeStyle(plan: string) {
+  switch (plan) {
+    case "plus":
+      return "border-0 bg-amber-500/15 text-amber-900 dark:text-amber-200";
+    case "essential":
+      return "border-0 bg-primary text-primary-foreground";
+    case "free":
+    default:
+      return "border-0 bg-sage text-primary";
+  }
+}
 
 function initials(value: string) {
   return value
@@ -16,86 +55,234 @@ function initials(value: string) {
     .toUpperCase();
 }
 
+function setLocaleCookie(locale: AppLocale) {
+  document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000;samesite=lax`;
+}
+
 export function HostAccountMenu({
   active,
+  plan,
 }: {
-  active?: "profile" | "billing";
+  active?: "profile" | "billing" | "new";
+  plan?: UserPlan;
 }) {
+  const locale = useLocale() as AppLocale;
   const t = useTranslations("host.accountMenu");
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
+
+  function handleLocaleChange(nextLocale: AppLocale) {
+    if (nextLocale === locale) {
+      return;
+    }
+
+    setLocaleCookie(nextLocale);
+    window.location.reload();
+  }
+
+  const userPlan = (
+    plan ||
+    (session?.user as { plan?: string } | undefined)?.plan ||
+    "free"
+  ).toLowerCase();
+
+  const planLabels: Record<string, string> = {
+    free: t("planFree"),
+    essential: t("planEssential"),
+    plus: t("planPlus"),
+  };
+
+  const planLabel = planLabels[userPlan] || t("planFree");
+
+  if (isPending) {
+    return (
+      <div
+        className="inline-flex items-center gap-2.5 bg-transparent p-1 select-none animate-pulse"
+        aria-hidden="true"
+      >
+        <div className="size-8 rounded-full bg-muted/20 shrink-0" />
+        <div className="flex flex-col gap-1 text-left min-w-[76px]">
+          <div className="h-3 w-16 rounded bg-muted/25" />
+          <div className="h-2.5 w-10 rounded bg-muted/15" />
+        </div>
+        <div className="size-3 rounded-full bg-muted/20 shrink-0 ml-1" />
+      </div>
+    );
+  }
+
   const name = session?.user.name || t("yourAccount");
   const email = session?.user.email || t("signInToManage");
-  const avatarStyle = session?.user.image
-    ? { backgroundImage: `url("${session.user.image}")` }
-    : undefined;
-  const avatarClassName = `host-account-menu__avatar${session?.user.image ? " host-account-menu__avatar--image" : ""}`;
 
   return (
-    <details className="host-account-menu">
-      <summary aria-label={t("openMenuAria")}>
-        <span
-          className={avatarClassName}
-          style={avatarStyle}
-          aria-hidden="true"
-        >
-          {initials(name) || "CC"}
-        </span>
-        <span className="host-account-menu__summary-copy">
-          <strong>{name}</strong>
-          <small>{t("freePlan")}</small>
-        </span>
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        aria-label={t("openMenuAria")}
+        className="group inline-flex items-center gap-2.5 bg-transparent p-1 text-foreground transition-opacity duration-150 hover:opacity-85 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-lg cursor-pointer select-none"
+      >
+        {/* Column 1: Avatar */}
+        <Avatar size="default" className="size-8 text-xs font-bold shrink-0">
+          {session?.user.image ? (
+            <AvatarImage src={session.user.image} alt={name} />
+          ) : null}
+          <AvatarFallback className="bg-sage text-primary font-bold">
+            {initials(name) || "CC"}
+          </AvatarFallback>
+        </Avatar>
+
+        {/* Column 2: User Name (top) and Plan Badge (bottom) */}
+        <div className="flex min-w-0 flex-col items-start leading-tight text-left">
+          <span className="max-w-[120px] truncate text-xs font-semibold text-foreground">
+            {name}
+          </span>
+          <Badge
+            variant="secondary"
+            className={cn(
+              "mt-0.5 h-3.5 px-1.5 text-[9px] font-bold uppercase tracking-wider shrink-0 rounded-full border-0",
+              getPlanBadgeStyle(userPlan),
+            )}
+          >
+            {planLabel}
+          </Badge>
+        </div>
+
+        {/* Trailing chevron */}
         <CaretDown
-          className="host-account-menu__chevron"
-          size={16}
+          size={12}
+          weight="bold"
+          className="text-muted-foreground transition-transform duration-200 group-data-[popup-open]:rotate-180 group-hover:text-foreground shrink-0 ml-0.5"
           aria-hidden="true"
         />
-      </summary>
-      <div className="host-account-menu__panel">
-        <div className="host-account-menu__identity">
-          <span
-            className={avatarClassName}
-            style={avatarStyle}
-            aria-hidden="true"
-          >
-            {initials(name) || "CC"}
-          </span>
-          <span>
-            <strong>{name}</strong>
-            <small>{email}</small>
-          </span>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        aria-label={t("menuAria")}
+        className="w-70 p-1.5 bg-card border border-border shadow-xl rounded-xl"
+      >
+        <div className="flex items-center gap-2.5 px-2.5 py-2">
+          <Avatar size="default" className="size-9 text-xs font-bold shrink-0">
+            {session?.user.image ? (
+              <AvatarImage src={session.user.image} alt={name} />
+            ) : null}
+            <AvatarFallback className="bg-sage text-primary font-bold">
+              {initials(name) || "CC"}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex min-w-0 flex-1 flex-col leading-tight">
+            <strong className="truncate text-xs font-semibold text-foreground">
+              {name}
+            </strong>
+            <span className="truncate text-[11px] text-muted-foreground mt-0.5">
+              {email}
+            </span>
+          </div>
         </div>
-        <div className="host-account-menu__plan">
-          <span>{t("currentPlan")}</span>
-          <strong>{t("planFree")}</strong>
+
+        <div className="my-1 mx-1 flex items-center justify-between rounded-lg bg-muted/40 px-2.5 py-2 text-xs">
+          <span className="text-[11px] font-medium text-muted-foreground">
+            {t("currentPlan")}
+          </span>
+          <Badge
+            variant="secondary"
+            className={cn(
+              "h-5 rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wider border-0",
+              getPlanBadgeStyle(userPlan),
+            )}
+          >
+            {planLabel}
+          </Badge>
         </div>
-        <nav aria-label={t("menuAria")}>
-          <Link
-            aria-current={active === "profile" ? "page" : undefined}
-            href="/profile"
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          <DropdownMenuItem
+            render={<Link href="/events/new" />}
+            nativeButton={false}
+            className={
+              active === "new"
+                ? "bg-accent text-accent-foreground font-medium"
+                : ""
+            }
           >
-            <User size={16} aria-hidden="true" /> {t("profile")}
-          </Link>
-          <Link
-            aria-current={active === "billing" ? "page" : undefined}
-            href="/billing"
+            <Plus size={16} />
+            <span>{t("newEvent")}</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={<Link href="/profile" />}
+            nativeButton={false}
+            className={
+              active === "profile"
+                ? "bg-accent text-accent-foreground font-medium"
+                : ""
+            }
           >
-            <CreditCard size={16} aria-hidden="true" /> {t("planAndBilling")}
-          </Link>
-        </nav>
-        <button
-          className="host-account-menu__sign-out"
-          type="button"
+            <User size={16} />
+            <span>{t("profile")}</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            render={<Link href="/billing" />}
+            nativeButton={false}
+            className={
+              active === "billing"
+                ? "bg-accent text-accent-foreground font-medium"
+                : ""
+            }
+          >
+            <CreditCard size={16} />
+            <span>{t("planAndBilling")}</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger>
+            <Globe size={16} />
+            <span>{t("language")}</span>
+            <span className="ml-auto text-xs text-muted-foreground">
+              {localeLabels[locale]}
+            </span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="min-w-36">
+            {locales.map((loc) => {
+              const isSelected = loc === locale;
+
+              return (
+                <DropdownMenuItem
+                  key={loc}
+                  onClick={() => handleLocaleChange(loc)}
+                  className="flex items-center justify-between"
+                >
+                  <span
+                    className={isSelected ? "font-semibold text-primary" : ""}
+                  >
+                    {localeLabels[loc]}
+                  </span>
+                  {isSelected && (
+                    <Check size={13} weight="bold" className="text-primary" />
+                  )}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem
+          variant="destructive"
           onClick={async () => {
             await authClient.signOut();
             router.replace("/login");
             router.refresh();
           }}
         >
-          <SignOut size={16} aria-hidden="true" />
-          {t("logOut")}
-        </button>
-      </div>
-    </details>
+          <SignOut size={16} />
+          <span>{t("logOut")}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

@@ -149,21 +149,36 @@
           "description": "Zum Ausprobieren von CandidCrowd.",
           "priceLabel": "Kostenlos",
           "billing": "Vorschau erkunden",
-          "cta": "Kostenlos testen"
+          "cta": "Kostenlos testen",
+          "features": {
+            "f1": "Interaktives Gästeerlebnis",
+            "f2": "Eigene Fotos lokal ausprobieren",
+            "f3": "Event-Entwurf speichern"
+          }
         },
         "essential": {
           "name": "Essential",
           "description": "Eine Feier. Jede Perspektive.",
           "priceLabel": "Demnächst verfügbar",
           "billing": "Einmalzahlung pro Event · Preis wird noch bekanntgegeben",
-          "cta": "Demo erkunden"
+          "cta": "Demo erkunden",
+          "features": {
+            "f1": "Ihre private Event-Galerie",
+            "f2": "Gästelink & druckbarer QR-Code",
+            "f3": "Foto-Downloads in Originalqualität"
+          }
         },
         "plus": {
           "name": "Plus",
           "description": "Für Momente, die mehr Raum brauchen.",
           "priceLabel": "Demnächst verfügbar",
           "billing": "Einmalzahlung pro Event · Preis wird noch bekanntgegeben",
-          "cta": "Demo erkunden"
+          "cta": "Demo erkunden",
+          "features": {
+            "f1": "Alles aus dem Essential-Paket",
+            "f2": "Mehr Platz für Ihre Erinnerungen",
+            "f3": "Video-Sharing & erweiterte Event-Funktionen"
+          }
         }
       }
     },
@@ -219,7 +234,9 @@
       "eventsTitle": "Events",
       "essentialsTitle": "Das Wesentliche",
       "previewLabel": "Offizielle Richtlinien",
-      "bottomNote": "Erstes Kapitel · Produkt-Vorschau"
+      "bottomNote": "Erstes Kapitel · Produkt-Vorschau",
+      "privacyPolicy": "Datenschutzrichtlinie",
+      "termsOfService": "Nutzungsbedingungen"
     },
     "lifecycle": {
       "eyebrow": "ES IST MEHR ALS NUR EIN TAG",
@@ -253,8 +270,8 @@
       "titleLine1": "Erstellen Sie nicht nur ein Album.",
       "titleLine2": "Bringen Sie Menschen dazu beizutragen.",
       "subhead": "Eine geteilte Galerie ist erst der Anfang. CandidCrowd hilft Ihnen zu verstehen, was Ihre Gäste zum Teilen motiviert.",
-      "point1Title": "Erfahren Sie, was die Gäste anspricht.",
-      "point1Description": "Sehen Sie, welche QR-Platzierungen das Teilen ganz natürlich in Ihr Event einbinden.",
+      "point1Title": "Erfahren Sie, wie Gäste beitreten.",
+      "point1Description": "Sehen Sie, ob Gäste durch Scannen Ihres Event-QR-Codes oder über den geteilten Link beitragen.",
       "point2Title": "Geben Sie jeder Perspektive Raum.",
       "point2Description": "Verstehen Sie die Beteiligung und geben Sie Gästen zum richtigen Zeitpunkt einen sanften Impuls.",
       "conceptNote": "Produktkonzept · Analysen und QR-Quellen-Tracking sind noch nicht live.",
@@ -265,12 +282,10 @@
       "videos": "Videos",
       "sourcesHeading": "Wo die Erinnerungen beginnen",
       "contributorsCol": "Beitragende",
-      "tableCaption": "Illustrative Beitragende nach QR-Quelle",
+      "tableCaption": "Beispielhafte Mitwirkende nach Beitrittsmethode",
       "thSource": "Quelle",
       "sources": {
-        "entrance": "Eingangs-QR",
-        "table": "Tisch-QR",
-        "bar": "Bar-QR",
+        "qr": "Event-QR-Code",
         "link": "Geteilter Link"
       }
     },
@@ -475,70 +490,95 @@
   },
   "event": {
     "create": {
-      "title": "Event erstellen",
-      "name": "Eventname",
-      "type": "Eventtyp",
-      "date": "Eventdatum"
+      "pageTitle": "Erstellen Sie Ihr Event",
+      "pageSubtitle": "Ein QR-Code gibt allen auf Ihrem Event einen einfachen Ort zum Teilen von Fotos und Videos. Sie können die Details später anpassen.",
+      "nameLabel": "Eventname",
+      "namePlaceholder": "z. B. Emmas 30. Geburtstag",
+      "nameRequired": "Bitte geben Sie einen Eventnamen ein, um fortzufahren.",
+      "typeLabel": "Eventtyp",
+      "typePlaceholder": "Eventtyp auswählen",
+      "dateLabel": "Eventdatum",
+      "dateUnknown": "Ich kenne das Datum noch nicht",
+      "cta": "Event erstellen",
+      "creating": "Ihr Event wird erstellt...",
+      "under30s": "Dauert unter 30 Sekunden"
     },
     "types": {
       "Wedding": "Hochzeit",
       "Birthday": "Geburtstag",
       "Anniversary": "Jubiläum",
-      "Reunion": "Wiedersehen",
-      "Trip": "Reise",
-      "Team celebration": "Teamfeier",
+      "Graduation": "Abschlussfeier",
+      "Baby Shower": "Babyparty",
+      "Reunion": "Klassentreffen",
+      "Party": "Party",
+      "Corporate": "Firmen-Event",
+      "Conference": "Konferenz",
       "Other": "Sonstiges"
     },
-    "setup": {
-      "nameRequired": "Geben Sie Ihrem Event einen Namen, um fortzufahren.",
-      "dateRequired": "Wählen Sie ein Eventdatum, um fortzufahren.",
-      "signInRequired": "Bitte melden Sie sich an, um Ihr Event zu erstellen und zu speichern.",
-      "previewEyebrow": "EVENT-VORSCHAU",
-      "readyEyebrow": "IHR EVENT IST BEREIT",
-      "readyTitleSuffix": "ist bereit.",
-      "previewDescription": "Dies ist eine lokale Vorschau. Melden Sie sich an, wenn Sie bereit sind, ein echtes Event zu speichern und zu teilen.",
-      "readyDescription": "Teilen Sie diesen QR-Code und die Gäste können ihre Perspektive beisteuern.",
-      "qrAltPrefix": "QR-Code für",
-      "makeItYoursCta": "Möchten Sie es anpassen?",
-      "introEyebrow": "EVENT ERSTELLEN",
-      "introTitleLine1": "Schaffen Sie ein Zuhause für",
-      "introTitleLine2": "die Momente.",
-      "introDescription": "Starten Sie einfach. Sie können jedes Detail später verfeinern.",
-      "progressAria": "Fortschritt der Event-Einrichtung",
-      "step1": "Event-Grundlagen",
-      "step2": "Ihr Event ist bereit",
-      "startHere": "HIER STARTEN",
-      "step1Sub": "Das Wesentliche, was Ihre Gäste sehen werden.",
-      "nameLabel": "Eventname",
-      "namePlaceholder": "z.B. Emma & James",
-      "typeLabel": "Event-Typ",
-      "dateLabel": "Wann findet es statt?",
-      "creating": "Event wird erstellt...",
-      "create": "Event erstellen",
-      "step2Eyebrow": "SCHRITT 2 VON 2",
-      "step2Heading": "Machen Sie es zu Ihrem",
-      "step2Sub": "Optionale Details für das Gästeerlebnis.",
-      "qrStyleLabel": "QR-Stil",
-      "qrClassic": "Klassisch",
-      "qrModernFrame": "Moderner Rahmen",
-      "qrEditorial": "Editorial",
-      "colorLegend": "Event-Farbe",
-      "themeOlive": "Olive",
-      "themeRose": "Rose",
-      "themeMidnight": "Mitternacht",
-      "coverLabel": "Optionales Titelbild",
-      "choosePhoto": "Foto auswählen",
-      "coverFormatHint": "JPG, PNG oder WebP",
-      "back": "Zurück",
-      "continue": "Weiter",
-      "skipForNow": "Erstmal überspringen",
-      "overviewAria": "Event-Übersicht",
-      "overviewTitle": "EVENT-ÜBERSICHT",
-      "coverPlaceholder": "IHR TITELBILD",
-      "nameFallback": "Ihr Eventname",
-      "dateFallback": "Datum wählen",
-      "qrSuffix": "QR",
-      "privateEvent": "Privates Event"
+    "ready": {
+      "heroBadge": "Bereit zum Teilen",
+      "heroTitle": "Ihr Event ist bereit 🎉",
+      "heroSubtitle": "Gäste können jetzt Ihren QR-Code scannen, um Fotos und Videos zu teilen.",
+      "noDate": "Datum wird noch bekannt gegeben",
+      "qrCta": "Scannen, um Fotos & Videos zu teilen",
+      "noAppNeeded": "Keine App erforderlich · Kein Konto nötig",
+      "downloadQr": "QR-Code herunterladen",
+      "copyLink": "Link kopieren",
+      "linkCopied": "Gästelink in die Zwischenablage kopiert!",
+      "openGuestPage": "Gästeseite öffnen",
+      "previewAsGuest": "Als Gast ansehen",
+      "previewNotice": "Öffnet im Vorschaumodus, damit Test-Uploads Ihre Statistiken nicht beeinflussen",
+      "goToOverview": "Zum Event"
+    },
+    "checklist": {
+      "title": "Machen Sie Ihr Event bereit",
+      "subtitle": "Optionale Schritte zur Personalisierung Ihres Events und Messung der Beteiligung.",
+      "itemCreated": "Event erstellt",
+      "itemQrReady": "QR-Code generiert",
+      "itemPreview": "Gäste-Erlebnis testen",
+      "itemGuestCount": "Erwartete Gästeanzahl hinzufügen",
+      "itemCustomizeQr": "QR-Karte anpassen",
+      "itemCustomizePage": "Gästeseite anpassen",
+      "completed": "Abgeschlossen",
+      "optional": "Optional",
+      "comingSoon": "Demnächst"
+    },
+    "guestCount": {
+      "heading": "Wie viele Gäste erwarten Sie?",
+      "description": "Eine Schätzung reicht aus. Wir verwenden diese Zahl zur Messung der Beteiligung.",
+      "placeholder": "z. B. 120",
+      "save": "Schätzung speichern",
+      "skip": "Vorerst überspringen",
+      "savedToast": "Gästeanzahl gespeichert"
+    },
+    "overview": {
+      "breadcrumb": "Alle Events",
+      "lifecycleBefore": "Vor dem Event",
+      "lifecycleDuring": "Während des Events",
+      "lifecycleAfter": "Nach dem Event",
+      "lifecycleNote": "CandidCrowd passt sich automatisch dem Zeitplan Ihres Events an.",
+      "daysUntil": "{count, plural, =0 {Heute ist der Tag!} =1 {Noch 1 Tag} other {Noch # Tage}}",
+      "eventReadyBanner": "Ihr Event ist live und bereit für Gäste.",
+      "statMemories": "Gesammelte Erinnerungen",
+      "statContributors": "Beitragende",
+      "statParticipation": "Beteiligungsrate",
+      "statScans": "QR-Scans",
+      "recentUploads": "Neueste Uploads",
+      "afterPromptHeading": "Noch Fotos von gestern Abend?",
+      "afterPromptSub": "Senden Sie am nächsten Morgen eine freundliche Erinnerung für Fotos, die Gäste vergessen haben zu teilen.",
+      "copyReminderLink": "Erinnerungslink kopieren",
+      "reminderCopied": "Erinnerungslink kopiert!"
+    },
+    "guest": {
+      "testSessionBanner": "Vorschaumodus · Uploads in diesem Modus sind Testdaten und fließen nicht in Analysen ein.",
+      "removeTestUploads": "Test-Uploads entfernen",
+      "testRemovedToast": "Test-Uploads entfernt",
+      "trustLine": "Keine App · Kein Konto · Originalqualität",
+      "welcomeCta": "Fotos & Videos teilen",
+      "dropzoneSub": "JPG, PNG, HEIC oder MP4 bis zu 50 MB",
+      "selectFiles": "Aus Fotos auswählen",
+      "uploading": "Erinnerungen werden hochgeladen...",
+      "uploadSuccess": "Vielen Dank! Ihre Erinnerungen wurden geteilt."
     }
   },
   "guest": {
@@ -574,8 +614,6 @@
       "brandAria": "CandidCrowd Gastgeber-Bereich",
       "navAria": "Gastgeber-Arbeitsbereich",
       "events": "Events",
-      "createEventAria": "Neues Event erstellen",
-      "newEvent": "Neues Event",
       "footerAria": "Arbeitsbereich-Fußzeile",
       "help": "Hilfe",
       "privacy": "Datenschutz",
@@ -585,12 +623,15 @@
       "openMenuAria": "Konto-Menü öffnen",
       "yourAccount": "Ihr Konto",
       "signInToManage": "Anmelden, um Ihr Konto zu verwalten",
-      "freePlan": "Kostenloser Tarif",
       "currentPlan": "Aktueller Tarif",
       "planFree": "Kostenlos",
+      "planEssential": "Essential",
+      "planPlus": "Plus",
+      "newEvent": "Neues Event",
       "menuAria": "Konto-Menü",
       "profile": "Profil",
       "planAndBilling": "Tarif & Abrechnung",
+      "language": "Sprache",
       "logOut": "Abmelden"
     },
     "pages": {

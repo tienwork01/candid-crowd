@@ -149,21 +149,36 @@
           "description": "Pour essayer CandidCrowd.",
           "priceLabel": "Gratuit",
           "billing": "Explorez l'aperçu",
-          "cta": "Essayer gratuitement"
+          "cta": "Essayer gratuitement",
+          "features": {
+            "f1": "Expérience invité interactive",
+            "f2": "Essayez vos propres photos localement",
+            "f3": "Enregistrez un brouillon d'événement"
+          }
         },
         "essential": {
           "name": "Essentiel",
           "description": "Une célébration. Chaque perspective.",
           "priceLabel": "Bientôt disponible",
           "billing": "Paiement unique par événement · Prix à venir",
-          "cta": "Explorer la démo"
+          "cta": "Explorer la démo",
+          "features": {
+            "f1": "Votre galerie d'événement privée",
+            "f2": "Lien invité et QR code imprimable",
+            "f3": "Téléchargements de photos en qualité originale"
+          }
         },
         "plus": {
           "name": "Plus",
           "description": "Pour les moments qui méritent plus d'espace.",
           "priceLabel": "Bientôt disponible",
           "billing": "Paiement unique par événement · Prix à venir",
-          "cta": "Explorer la démo"
+          "cta": "Explorer la démo",
+          "features": {
+            "f1": "Tout ce qui est prévu pour Essentiel",
+            "f2": "Plus d'espace pour vos souvenirs",
+            "f3": "Partage vidéo et fonctionnalités avancées"
+          }
         }
       }
     },
@@ -219,7 +234,9 @@
       "eventsTitle": "Événements",
       "essentialsTitle": "L'essentiel",
       "previewLabel": "Politiques officielles",
-      "bottomNote": "Premier chapitre · Aperçu du produit"
+      "bottomNote": "Premier chapitre · Aperçu du produit",
+      "privacyPolicy": "Politique de confidentialité",
+      "termsOfService": "Conditions d'utilisation"
     },
     "lifecycle": {
       "eyebrow": "C'EST BIEN PLUS QU'UN SEUL JOUR",
@@ -253,8 +270,8 @@
       "titleLine1": "Ne créez pas simplement un album.",
       "titleLine2": "Incitez les gens à participer.",
       "subhead": "Une galerie partagée n'est que le début. CandidCrowd vous aide à comprendre ce qui incite vos invités à partager.",
-      "point1Title": "Comprenez ce qui attire les participants.",
-      "point1Description": "Découvrez quels emplacements de QR codes rendent le partage naturel durant l'événement.",
+      "point1Title": "Comprenez comment vos invités rejoignent.",
+      "point1Description": "Voyez si les invités contribuent en scannant le code QR de l'événement ou en ouvrant le lien partagé.",
       "point2Title": "Faites de la place à chaque point de vue.",
       "point2Description": "Mesurez la participation, puis donnez un coup de pouce bienveillant au bon moment.",
       "conceptNote": "Concept de produit · Les analyses et le suivi des sources QR ne sont pas encore actifs.",
@@ -265,12 +282,10 @@
       "videos": "vidéos",
       "sourcesHeading": "Où les souvenirs commencent",
       "contributorsCol": "Contributeurs",
-      "tableCaption": "Contributeurs illustratifs par source de QR code",
+      "tableCaption": "Contributeurs indicatifs selon le mode d'accès",
       "thSource": "Source",
       "sources": {
-        "entrance": "QR de l'entrée",
-        "table": "QR de table",
-        "bar": "QR du bar",
+        "qr": "Code QR de l'événement",
         "link": "Lien partagé"
       }
     },
@@ -475,70 +490,95 @@
   },
   "event": {
     "create": {
-      "title": "Créez votre événement",
-      "name": "Nom de l’événement",
-      "type": "Type d’événement",
-      "date": "Date de l’événement"
+      "pageTitle": "Créez votre événement",
+      "pageSubtitle": "Un code QR offre à tous vos invités un endroit simple pour partager photos et vidéos. Vous pourrez personnaliser les détails plus tard.",
+      "nameLabel": "Nom de l’événement",
+      "namePlaceholder": "ex. 30e anniversaire d'Emma",
+      "nameRequired": "Veuillez entrer un nom d'événement pour continuer.",
+      "typeLabel": "Type d’événement",
+      "typePlaceholder": "Sélectionnez le type d'événement",
+      "dateLabel": "Date de l’événement",
+      "dateUnknown": "Je ne connais pas encore la date",
+      "cta": "Créer l'événement",
+      "creating": "Création de votre événement...",
+      "under30s": "Prend moins de 30 secondes"
     },
     "types": {
       "Wedding": "Mariage",
       "Birthday": "Anniversaire",
       "Anniversary": "Anniversaire de mariage",
+      "Graduation": "Diplôme",
+      "Baby Shower": "Fête prénatale",
       "Reunion": "Retrouvailles",
-      "Trip": "Voyage",
-      "Team celebration": "Célébration d'équipe",
+      "Party": "Fête",
+      "Corporate": "Entreprise",
+      "Conference": "Conférence",
       "Other": "Autre"
     },
-    "setup": {
-      "nameRequired": "Donnez un nom à votre événement pour continuer.",
-      "dateRequired": "Choisissez une date d'événement pour continuer.",
-      "signInRequired": "Veuillez vous connecter pour créer et enregistrer votre événement.",
-      "previewEyebrow": "APERÇU DE L'ÉVÉNEMENT",
-      "readyEyebrow": "VOTRE ÉVÉNEMENT EST PRÊT",
-      "readyTitleSuffix": "est prêt.",
-      "previewDescription": "Ceci est un aperçu local. Connectez-vous lorsque vous êtes prêt à enregistrer et partager un événement réel.",
-      "readyDescription": "Partagez ce code QR et les invités pourront commencer à partager leur perspective.",
-      "qrAltPrefix": "Code QR pour",
-      "makeItYoursCta": "Envie de le personnaliser ?",
-      "introEyebrow": "CRÉER UN ÉVÉNEMENT",
-      "introTitleLine1": "Créez un écrin pour",
-      "introTitleLine2": "les moments.",
-      "introDescription": "Commencez simplement. Vous pourrez affiner chaque détail plus tard.",
-      "progressAria": "Progression de la configuration de l'événement",
-      "step1": "Informations de base",
-      "step2": "Votre événement est prêt",
-      "startHere": "COMMENCEZ ICI",
-      "step1Sub": "L'essentiel que vos invités verront.",
-      "nameLabel": "Nom de l'événement",
-      "namePlaceholder": "ex. Emma & James",
-      "typeLabel": "Type d'événement",
-      "dateLabel": "Quand cela a-t-il lieu ?",
-      "creating": "Création de l'événement...",
-      "create": "Créer l'événement",
-      "step2Eyebrow": "ÉTAPE 2 SUR 2",
-      "step2Heading": "Personnalisez-le",
-      "step2Sub": "Touches facultatives pour l'expérience de vos invités.",
-      "qrStyleLabel": "Style de QR",
-      "qrClassic": "Classique",
-      "qrModernFrame": "Cadre moderne",
-      "qrEditorial": "Éditorial",
-      "colorLegend": "Couleur de l'événement",
-      "themeOlive": "Olive",
-      "themeRose": "Rose",
-      "themeMidnight": "Minuit",
-      "coverLabel": "Photo de couverture facultative",
-      "choosePhoto": "Choisir une photo",
-      "coverFormatHint": "JPG, PNG ou WebP",
-      "back": "Retour",
-      "continue": "Continuer",
-      "skipForNow": "Ignorer pour l'instant",
-      "overviewAria": "Aperçu de l'événement",
-      "overviewTitle": "APERÇU DE L'ÉVÉNEMENT",
-      "coverPlaceholder": "VOTRE PHOTO DE COUVERTURE",
-      "nameFallback": "Nom de votre événement",
-      "dateFallback": "Choisir une date",
-      "qrSuffix": "QR",
-      "privateEvent": "Événement privé"
+    "ready": {
+      "heroBadge": "Prêt à partager",
+      "heroTitle": "Votre événement est prêt 🎉",
+      "heroSubtitle": "Vos invités peuvent désormais scanner votre code QR pour partager leurs photos et vidéos.",
+      "noDate": "Date à préciser",
+      "qrCta": "Scannez pour partager vos photos & vidéos",
+      "noAppNeeded": "Aucune application · Aucun compte requis",
+      "downloadQr": "Télécharger le QR",
+      "copyLink": "Copier le lien",
+      "linkCopied": "Lien invité copié dans le presse-papiers !",
+      "openGuestPage": "Ouvrir la page invité",
+      "previewAsGuest": "Aperçu en tant qu'invité",
+      "previewNotice": "S'ouvre en mode aperçu afin que les tests n'affectent pas vos statistiques",
+      "goToOverview": "Accéder à l'événement"
+    },
+    "checklist": {
+      "title": "Préparez votre événement",
+      "subtitle": "Étapes optionnelles pour personnaliser votre événement et suivre la participation.",
+      "itemCreated": "Événement créé",
+      "itemQrReady": "Code QR généré",
+      "itemPreview": "Tester l'expérience invité",
+      "itemGuestCount": "Ajouter le nombre estimé d'invités",
+      "itemCustomizeQr": "Personnaliser la carte QR",
+      "itemCustomizePage": "Personnaliser la page invité",
+      "completed": "Terminé",
+      "optional": "Optionnel",
+      "comingSoon": "Bientôt disponible"
+    },
+    "guestCount": {
+      "heading": "Combien d'invités attendez-vous ?",
+      "description": "Une estimation suffit. Nous l'utiliserons pour mesurer la participation.",
+      "placeholder": "ex. 120",
+      "save": "Enregistrer l'estimation",
+      "skip": "Passer pour l'instant",
+      "savedToast": "Nombre d'invités enregistré"
+    },
+    "overview": {
+      "breadcrumb": "Tous les événements",
+      "lifecycleBefore": "Avant l'événement",
+      "lifecycleDuring": "Pendant l'événement",
+      "lifecycleAfter": "Après l'événement",
+      "lifecycleNote": "CandidCrowd s'adapte automatiquement en fonction du calendrier de votre événement.",
+      "daysUntil": "{count, plural, =0 {C'est le grand jour !} =1 {Encore 1 jour} other {Encore # jours}}",
+      "eventReadyBanner": "Votre événement est en ligne et prêt à accueillir les invités.",
+      "statMemories": "Souvenirs collectés",
+      "statContributors": "Contributeurs",
+      "statParticipation": "Taux de participation",
+      "statScans": "Scans QR",
+      "recentUploads": "Ajouts récents",
+      "afterPromptHeading": "Des photos d'hier soir ?",
+      "afterPromptSub": "Envoyez un rappel amical le lendemain matin pour récupérer les photos que vos invités ont oublié de partager.",
+      "copyReminderLink": "Copier le lien de rappel",
+      "reminderCopied": "Lien de rappel copié dans le presse-papiers !"
+    },
+    "guest": {
+      "testSessionBanner": "Mode Aperçu · Les ajouts dans ce mode sont des tests et ne compteront pas dans les statistiques.",
+      "removeTestUploads": "Supprimer les photos de test",
+      "testRemovedToast": "Photos de test supprimées",
+      "trustLine": "Sans appli · Sans compte · Qualité originale",
+      "welcomeCta": "Partagez vos photos & vidéos",
+      "dropzoneSub": "JPG, PNG, HEIC ou MP4 jusqu'à 50 Mo",
+      "selectFiles": "Sélectionner depuis la galerie",
+      "uploading": "Téléversement des souvenirs...",
+      "uploadSuccess": "Merci ! Vos souvenirs ont été partagés."
     }
   },
   "guest": {
@@ -574,8 +614,6 @@
       "brandAria": "Espace hôte CandidCrowd",
       "navAria": "Espace de travail de l'hôte",
       "events": "Événements",
-      "createEventAria": "Créer un nouvel événement",
-      "newEvent": "Nouvel événement",
       "footerAria": "Pied de page de l'espace",
       "help": "Aide",
       "privacy": "Confidentialité",
@@ -585,12 +623,15 @@
       "openMenuAria": "Ouvrir le menu du compte",
       "yourAccount": "Votre compte",
       "signInToManage": "Connectez-vous pour gérer votre compte",
-      "freePlan": "Forfait gratuit",
       "currentPlan": "Forfait actuel",
       "planFree": "Gratuit",
+      "planEssential": "Essential",
+      "planPlus": "Plus",
+      "newEvent": "Nouvel événement",
       "menuAria": "Menu du compte",
       "profile": "Profil",
       "planAndBilling": "Forfait et facturation",
+      "language": "Langue",
       "logOut": "Se déconnecter"
     },
     "pages": {

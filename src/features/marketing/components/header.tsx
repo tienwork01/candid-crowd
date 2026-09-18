@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import { Brand } from "@/components/shared";
 import { LanguageSwitcher } from "@/components/shared";
 import { getLocale, getTranslations } from "next-intl/server";
@@ -34,14 +33,13 @@ export async function Header() {
           ))}
         </nav>
         <div className="site-header__actions">
-          <Link href="/login" className="site-header__login">
+          <LanguageSwitcher />
+          <Link
+            href="/login"
+            className="site-header__login inline-flex h-8.5 items-center justify-center rounded-full border border-border bg-card px-4 text-xs font-semibold text-foreground transition-colors hover:bg-secondary hover:border-foreground/40 focus-visible:outline-2 focus-visible:outline-primary"
+          >
             {t("header.login")}
           </Link>
-          <Link className="button button--small" href="/events/new">
-            {t("header.createEvent")}{" "}
-            <ArrowUpRight size={16} aria-hidden="true" />
-          </Link>
-          <LanguageSwitcher />
         </div>
         <MobileNav navigation={navigation} />
       </div>

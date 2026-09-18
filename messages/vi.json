@@ -149,21 +149,36 @@
           "description": "Dành cho trải nghiệm thử CandidCrowd.",
           "priceLabel": "Miễn phí",
           "billing": "Khám phá bản xem trước",
-          "cta": "Dùng thử miễn phí"
+          "cta": "Dùng thử miễn phí",
+          "features": {
+            "f1": "Trải nghiệm tương tác dành cho khách",
+            "f2": "Thử ảnh của riêng bạn trên máy",
+            "f3": "Lưu bản nháp sự kiện"
+          }
         },
         "essential": {
           "name": "Cơ bản",
           "description": "Một ngày vui. Trọn vẹn mọi góc nhìn.",
           "priceLabel": "Sắp ra mắt",
           "billing": "Trả một lần theo sự kiện · Giá sẽ sớm công bố",
-          "cta": "Khám phá bản xem thử"
+          "cta": "Khám phá bản xem thử",
+          "features": {
+            "f1": "Thư viện sự kiện riêng tư của bạn",
+            "f2": "Liên kết khách mời & mã QR có thể in",
+            "f3": "Tải ảnh với chất lượng gốc"
+          }
         },
         "plus": {
           "name": "Nâng cao",
           "description": "Dành cho những kỷ niệm cần nhiều không gian hơn.",
           "priceLabel": "Sắp ra mắt",
           "billing": "Trả một lần theo sự kiện · Giá sẽ sớm công bố",
-          "cta": "Khám phá bản xem thử"
+          "cta": "Khám phá bản xem thử",
+          "features": {
+            "f1": "Bao gồm tất cả tính năng gói Cơ bản",
+            "f2": "Thêm dung lượng lưu giữ kỷ niệm",
+            "f3": "Chia sẻ video & nhiều tính năng sự kiện hơn"
+          }
         }
       }
     },
@@ -219,7 +234,9 @@
       "eventsTitle": "Sự kiện",
       "essentialsTitle": "Thông tin cần biết",
       "previewLabel": "Chính sách chính thức",
-      "bottomNote": "Chương đầu tiên · Bản xem trước sản phẩm"
+      "bottomNote": "Chương đầu tiên · Bản xem trước sản phẩm",
+      "privacyPolicy": "Chính sách quyền riêng tư",
+      "termsOfService": "Điều khoản dịch vụ"
     },
     "lifecycle": {
       "eyebrow": "HƠN CẢ MỘT NGÀY VUI",
@@ -253,8 +270,8 @@
       "titleLine1": "Đừng chỉ tạo một album ảnh đơn thuần.",
       "titleLine2": "Hãy khuyến khích mọi người cùng sẻ chia.",
       "subhead": "Thư viện chung chỉ là bước khởi đầu. CandidCrowd được tạo ra để giúp bạn thấu hiểu điều gì thúc đẩy khách mời chia sẻ.",
-      "point1Title": "Biết được điều gì thu hút mọi người.",
-      "point1Description": "Xem vị trí đặt mã QR nào khiến việc chia sẻ trở nên tự nhiên nhất trong sự kiện.",
+      "point1Title": "Biết cách khách mời tham gia.",
+      "point1Description": "Theo dõi khách mời đóng góp qua việc quét mã QR sự kiện hay mở liên kết chia sẻ.",
       "point2Title": "Tạo không gian cho mọi góc nhìn.",
       "point2Description": "Nắm bắt mức độ tham gia, rồi gửi lời nhắn nhẹ nhàng tới khách vào đúng thời điểm.",
       "conceptNote": "Ý tưởng sản phẩm · Số liệu phân tích và theo dõi nguồn mã QR chưa hoạt động.",
@@ -265,12 +282,10 @@
       "videos": "video",
       "sourcesHeading": "Nơi kỷ niệm bắt đầu",
       "contributorsCol": "Người đóng góp",
-      "tableCaption": "Minh họa người đóng góp theo nguồn mã QR",
+      "tableCaption": "Minh họa người đóng góp theo phương thức tham gia",
       "thSource": "Nguồn",
       "sources": {
-        "entrance": "QR Lối vào",
-        "table": "QR Bàn tiệc",
-        "bar": "QR Quầy bar",
+        "qr": "Mã QR sự kiện",
         "link": "Liên kết chia sẻ"
       }
     },
@@ -475,70 +490,95 @@
   },
   "event": {
     "create": {
-      "title": "Tạo sự kiện",
-      "name": "Tên sự kiện",
-      "type": "Loại sự kiện",
-      "date": "Ngày sự kiện"
+      "pageTitle": "Tạo sự kiện của bạn",
+      "pageSubtitle": "Một mã QR mang lại cho mọi khách mời một nơi đơn giản để chia sẻ ảnh và video. Bạn có thể tùy chỉnh chi tiết sau.",
+      "nameLabel": "Tên sự kiện",
+      "namePlaceholder": "vd: Sinh nhật lần thứ 30 của Emma",
+      "nameRequired": "Vui lòng nhập tên sự kiện để tiếp tục.",
+      "typeLabel": "Loại sự kiện",
+      "typePlaceholder": "Chọn loại sự kiện",
+      "dateLabel": "Ngày sự kiện",
+      "dateUnknown": "Tôi chưa biết ngày cụ thể",
+      "cta": "Tạo sự kiện",
+      "creating": "Đang tạo sự kiện...",
+      "under30s": "Chỉ mất dưới 30 giây"
     },
     "types": {
       "Wedding": "Đám cưới",
       "Birthday": "Sinh nhật",
-      "Anniversary": "Kỷ niệm ngày cưới",
+      "Anniversary": "Kỷ niệm",
+      "Graduation": "Tốt nghiệp",
+      "Baby Shower": "Tiệc mừng em bé",
       "Reunion": "Họp mặt",
-      "Trip": "Chuyến đi",
-      "Team celebration": "Liên hoan đội ngũ",
+      "Party": "Bữa tiệc",
+      "Corporate": "Doanh nghiệp",
+      "Conference": "Hội nghị",
       "Other": "Khác"
     },
-    "setup": {
-      "nameRequired": "Đặt tên cho sự kiện của bạn để tiếp tục.",
-      "dateRequired": "Chọn ngày diễn ra sự kiện để tiếp tục.",
-      "signInRequired": "Vui lòng đăng nhập để tạo và lưu sự kiện của bạn.",
-      "previewEyebrow": "XEM TRƯỚC SỰ KIỆN",
-      "readyEyebrow": "SỰ KIỆN CỦA BẠN ĐÃ SẴN SÀNG",
-      "readyTitleSuffix": "đã sẵn sàng.",
-      "previewDescription": "Đây là bản xem trước cục bộ. Đăng nhập khi bạn sẵn sàng lưu và chia sẻ một sự kiện thực tế.",
-      "readyDescription": "Chia sẻ mã QR này và khách mời có thể bắt đầu đóng góp góc nhìn của họ.",
-      "qrAltPrefix": "Mã QR cho",
-      "makeItYoursCta": "Bạn muốn tùy chỉnh theo ý mình?",
-      "introEyebrow": "TẠO SỰ KIỆN",
-      "introTitleLine1": "Tạo nơi lưu giữ",
-      "introTitleLine2": "những khoảnh khắc.",
-      "introDescription": "Bắt đầu thật đơn giản. Bạn có thể tinh chỉnh mọi chi tiết sau.",
-      "progressAria": "Tiến trình thiết lập sự kiện",
-      "step1": "Thông tin cơ bản",
-      "step2": "Sự kiện đã sẵn sàng",
-      "startHere": "BẮT ĐẦU TẠI ĐÂY",
-      "step1Sub": "Những thông tin thiết yếu mà khách của bạn sẽ thấy.",
-      "nameLabel": "Tên sự kiện",
-      "namePlaceholder": "vd: Emma & James",
-      "typeLabel": "Loại sự kiện",
-      "dateLabel": "Khi nào diễn ra?",
-      "creating": "Đang tạo sự kiện...",
-      "create": "Tạo sự kiện",
-      "step2Eyebrow": "BƯỚC 2 / 2",
-      "step2Heading": "Tùy biến theo phong cách của bạn",
-      "step2Sub": "Những điểm nhấn tùy chọn cho trải nghiệm khách mời.",
-      "qrStyleLabel": "Kiểu mã QR",
-      "qrClassic": "Cổ điển",
-      "qrModernFrame": "Khung hiện đại",
-      "qrEditorial": "Biên tập",
-      "colorLegend": "Màu sắc sự kiện",
-      "themeOlive": "Oliu",
-      "themeRose": "Hồng",
-      "themeMidnight": "Nửa đêm",
-      "coverLabel": "Ảnh bìa tùy chọn",
-      "choosePhoto": "Chọn một bức ảnh",
-      "coverFormatHint": "JPG, PNG hoặc WebP",
-      "back": "Quay lại",
-      "continue": "Tiếp tục",
-      "skipForNow": "Bỏ qua lúc này",
-      "overviewAria": "Tổng quan sự kiện",
-      "overviewTitle": "TỔNG QUAN SỰ KIỆN",
-      "coverPlaceholder": "ẢNH BÌA CỦA BẠN",
-      "nameFallback": "Tên sự kiện của bạn",
-      "dateFallback": "Chọn một ngày",
-      "qrSuffix": "QR",
-      "privateEvent": "Sự kiện riêng tư"
+    "ready": {
+      "heroBadge": "Sẵn sàng chia sẻ",
+      "heroTitle": "Sự kiện của bạn đã sẵn sàng 🎉",
+      "heroSubtitle": "Khách mời giờ đây có thể quét mã QR để chia sẻ ảnh và video của họ.",
+      "noDate": "Ngày sẽ được thông báo sau",
+      "qrCta": "Quét để chia sẻ ảnh & video",
+      "noAppNeeded": "Không cần ứng dụng · Không cần tài khoản",
+      "downloadQr": "Tải mã QR",
+      "copyLink": "Sao chép liên kết",
+      "linkCopied": "Đã sao chép liên kết khách mời!",
+      "openGuestPage": "Mở trang khách mời",
+      "previewAsGuest": "Xem trước với tư cách khách",
+      "previewNotice": "Mở ở chế độ xem trước để ảnh tải lên thử nghiệm không ảnh hưởng đến số liệu",
+      "goToOverview": "Đi đến sự kiện"
+    },
+    "checklist": {
+      "title": "Hoàn thiện sự kiện của bạn",
+      "subtitle": "Các bước tùy chọn để cá nhân hóa sự kiện và theo dõi mức độ tham gia.",
+      "itemCreated": "Sự kiện đã tạo",
+      "itemQrReady": "Mã QR đã sẵn sàng",
+      "itemPreview": "Trải nghiệm thử khách mời",
+      "itemGuestCount": "Thêm số lượng khách dự kiến",
+      "itemCustomizeQr": "Tùy chỉnh thẻ QR",
+      "itemCustomizePage": "Tùy chỉnh trang khách",
+      "completed": "Đã hoàn thành",
+      "optional": "Tùy chọn",
+      "comingSoon": "Sắp ra mắt"
+    },
+    "guestCount": {
+      "heading": "Bạn dự kiến có bao nhiêu khách?",
+      "description": "Ước tính tương đối là được. Chúng tôi sẽ dùng con số này để đo lường mức độ đóng góp.",
+      "placeholder": "vd: 120",
+      "save": "Lưu ước tính",
+      "skip": "Bỏ qua lúc này",
+      "savedToast": "Đã lưu số lượng khách dự kiến"
+    },
+    "overview": {
+      "breadcrumb": "Tất cả sự kiện",
+      "lifecycleBefore": "Trước sự kiện",
+      "lifecycleDuring": "Trong sự kiện",
+      "lifecycleAfter": "Sau sự kiện",
+      "lifecycleNote": "CandidCrowd tự động thích ứng dựa trên thời gian diễn ra sự kiện của bạn.",
+      "daysUntil": "{count, plural, =0 {Hôm nay là ngày diễn ra!} =1 {Còn 1 ngày nữa} other {Còn # ngày nữa}}",
+      "eventReadyBanner": "Sự kiện của bạn đang hoạt động và sẵn sàng đón khách.",
+      "statMemories": "Kỷ niệm đã thu thập",
+      "statContributors": "Người đóng góp",
+      "statParticipation": "Tỷ lệ tham gia",
+      "statScans": "Lượt quét QR",
+      "recentUploads": "Ảnh mới tải lên",
+      "afterPromptHeading": "Còn ảnh từ tối qua không?",
+      "afterPromptSub": "Gửi lời nhắc sáng hôm sau thân thiện để thu thập những bức ảnh khách chưa kịp gửi.",
+      "copyReminderLink": "Sao chép liên kết nhắc nhở",
+      "reminderCopied": "Đã sao chép liên kết nhắc nhở!"
+    },
+    "guest": {
+      "testSessionBanner": "Chế độ xem trước · Ảnh tải lên ở chế độ này là thử nghiệm và không tính vào phân tích.",
+      "removeTestUploads": "Xóa ảnh thử nghiệm",
+      "testRemovedToast": "Đã xóa ảnh thử nghiệm",
+      "trustLine": "Không cần ứng dụng · Không cần tài khoản · Chất lượng gốc",
+      "welcomeCta": "Chia sẻ ảnh & video của bạn",
+      "dropzoneSub": "JPG, PNG, HEIC, hoặc MP4 tối đa 50 MB",
+      "selectFiles": "Chọn từ thư viện ảnh",
+      "uploading": "Đang tải lên kỷ niệm...",
+      "uploadSuccess": "Cảm ơn bạn! Kỷ niệm của bạn đã được chia sẻ."
     }
   },
   "guest": {
@@ -574,8 +614,6 @@
       "brandAria": "Không gian tổ chức CandidCrowd",
       "navAria": "Khu vực làm việc của người tổ chức",
       "events": "Sự kiện",
-      "createEventAria": "Tạo sự kiện mới",
-      "newEvent": "Sự kiện mới",
       "footerAria": "Chân trang khu vực làm việc",
       "help": "Trợ giúp",
       "privacy": "Quyền riêng tư",
@@ -585,12 +623,15 @@
       "openMenuAria": "Mở menu tài khoản",
       "yourAccount": "Tài khoản của bạn",
       "signInToManage": "Đăng nhập để quản lý tài khoản",
-      "freePlan": "Gói miễn phí",
       "currentPlan": "Gói hiện tại",
       "planFree": "Miễn phí",
+      "planEssential": "Essential",
+      "planPlus": "Plus",
+      "newEvent": "Sự kiện mới",
       "menuAria": "Menu tài khoản",
       "profile": "Hồ sơ",
       "planAndBilling": "Gói & thanh toán",
+      "language": "Ngôn ngữ",
       "logOut": "Đăng xuất"
     },
     "pages": {

@@ -7,7 +7,14 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { Brand } from "@/components/shared";
-import { Button } from "@/components/ui";
+import {
+  Alert,
+  AlertDescription,
+  Button,
+  Input,
+  Label,
+  Separator,
+} from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { getSafeAuthRedirect, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
@@ -173,8 +180,11 @@ export function AuthForm({
             <Link href="/terms">{t("ui.terms")}</Link> {t("ui.and")}{" "}
             <Link href="/privacy">{t("ui.privacyPolicy")}</Link>.
           </p>
-          <div className="auth-form__divider">
-            <span>{t("ui.orWithEmail")}</span>
+          <div className="relative my-6 flex items-center justify-center">
+            <Separator className="absolute inset-0 m-auto" />
+            <span className="relative bg-card px-3 text-xs uppercase tracking-wider text-muted-foreground">
+              {t("ui.orWithEmail")}
+            </span>
           </div>
         </>
       )}
@@ -182,8 +192,8 @@ export function AuthForm({
       <form className="auth-form__fields" onSubmit={submit}>
         {register && (
           <div className="auth-form__field">
-            <label htmlFor="full-name">{t("register.name")}</label>
-            <input
+            <Label htmlFor="full-name">{t("register.name")}</Label>
+            <Input
               id="full-name"
               name="name"
               type="text"
@@ -195,8 +205,8 @@ export function AuthForm({
           </div>
         )}
         <div className="auth-form__field">
-          <label htmlFor="email">{t("signIn.email")}</label>
-          <input
+          <Label htmlFor="email">{t("signIn.email")}</Label>
+          <Input
             id="email"
             name="email"
             type="email"
@@ -209,7 +219,7 @@ export function AuthForm({
         </div>
         <div className="auth-form__field">
           <div className="auth-form__label-row">
-            <label htmlFor="password">{t("signIn.password")}</label>
+            <Label htmlFor="password">{t("signIn.password")}</Label>
             {!register && (
               <Link
                 className="auth-form__text-button"
@@ -219,8 +229,8 @@ export function AuthForm({
               </Link>
             )}
           </div>
-          <div className="auth-form__password">
-            <input
+          <div className="auth-form__password relative">
+            <Input
               id="password"
               name="password"
               type={showPassword ? "text" : "password"}
@@ -285,9 +295,11 @@ export function AuthForm({
             </label>
           </div>
         )}
-        <p className="auth-form__feedback" role="status" aria-live="polite">
-          {feedback}
-        </p>
+        {feedback && (
+          <Alert variant="destructive" className="mb-2">
+            <AlertDescription>{feedback}</AlertDescription>
+          </Alert>
+        )}
         <Button
           className="auth-form__submit"
           type="submit"

@@ -1,2 +1,2 @@
 export { HostShell } from "./host-shell";
-export { HostAccountMenu } from "./host-account-menu";
+export { HostAccountMenu, type UserPlan } from "./host-account-menu";

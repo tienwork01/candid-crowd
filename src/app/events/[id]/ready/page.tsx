@@ -1,0 +1,28 @@
+import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
+import { HostShell } from "@/features/host/components";
+import { ReadyPageClient } from "@/features/event/components";
+
+type Props = {
+  params: Promise<{ id: string }>;
+};
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("host.pages");
+
+  return {
+    title: t("eventsMetaTitle"),
+  };
+}
+
+export default async function EventReadyPage({ params }: Props) {
+  const { id } = await params;
+
+  return (
+    <HostShell active="events">
+      <div className="host-shell__content host-shell__content--event-ready">
+        <ReadyPageClient eventId={id} />
+      </div>
+    </HostShell>
+  );
+}

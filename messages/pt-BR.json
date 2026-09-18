@@ -149,21 +149,36 @@
           "description": "Para experimentar o CandidCrowd.",
           "priceLabel": "Gratuito",
           "billing": "Explore a prévia",
-          "cta": "Experimente grátis"
+          "cta": "Experimente grátis",
+          "features": {
+            "f1": "Experiência interativa para convidados",
+            "f2": "Experimente suas fotos localmente",
+            "f3": "Salvar rascunho do evento"
+          }
         },
         "essential": {
           "name": "Essencial",
           "description": "Uma celebração. Cada perspectiva.",
           "priceLabel": "Em breve",
           "billing": "Pagamento único por evento · Preço a ser anunciado",
-          "cta": "Explore a demonstração"
+          "cta": "Explore a demonstração",
+          "features": {
+            "f1": "Sua galeria privada do evento",
+            "f2": "Link de convidados e QR imprimível",
+            "f3": "Downloads de fotos em qualidade original"
+          }
         },
         "plus": {
           "name": "Plus",
           "description": "Para os momentos que precisam de mais espaço.",
           "priceLabel": "Em breve",
           "billing": "Pagamento único por evento · Preço a ser anunciado",
-          "cta": "Explore a demonstração"
+          "cta": "Explore a demonstração",
+          "features": {
+            "f1": "Tudo o que está planejado para o Essencial",
+            "f2": "Mais espaço para suas memórias",
+            "f3": "Compartilhamento de vídeos e mais recursos"
+          }
         }
       }
     },
@@ -219,7 +234,9 @@
       "eventsTitle": "Eventos",
       "essentialsTitle": "O essencial",
       "previewLabel": "Políticas oficiais",
-      "bottomNote": "Primeiro capítulo · Prévia do produto"
+      "bottomNote": "Primeiro capítulo · Prévia do produto",
+      "privacyPolicy": "Política de privacidade",
+      "termsOfService": "Termos de serviço"
     },
     "lifecycle": {
       "eyebrow": "É MAIS DO QUE UM DIA SÓ",
@@ -253,8 +270,8 @@
       "titleLine1": "Não crie apenas um álbum.",
       "titleLine2": "Faça as pessoas contribuírem.",
       "subhead": "Uma galeria compartilhada é só o começo. O CandidCrowd ajuda você a ver o que faz seus convidados compartilharem.",
-      "point1Title": "Saiba o que atrai as pessoas.",
-      "point1Description": "Veja quais posições do QR tornam o compartilhamento natural no seu evento.",
+      "point1Title": "Saiba como os convidados participam.",
+      "point1Description": "Veja se os convidados contribuem escaneando o código QR do evento ou abrindo o link compartilhado.",
       "point2Title": "Dê espaço para cada perspectiva.",
       "point2Description": "Entenda a participação e envie um lembrete sutil no momento certo.",
       "conceptNote": "Conceito de produto · Análises e rastreamento de fontes de QR ainda não estão ativos.",
@@ -265,12 +282,10 @@
       "videos": "vídeos",
       "sourcesHeading": "Onde as memórias começam",
       "contributorsCol": "Colaboradores",
-      "tableCaption": "Colaboradores ilustrativos por fonte do QR",
+      "tableCaption": "Colaboradores ilustrativos por método de acesso",
       "thSource": "Fonte",
       "sources": {
-        "entrance": "QR da entrada",
-        "table": "QR da mesa",
-        "bar": "QR do bar",
+        "qr": "Código QR do evento",
         "link": "Link compartilhado"
       }
     },
@@ -475,70 +490,95 @@
   },
   "event": {
     "create": {
-      "title": "Crie seu evento",
-      "name": "Nome do evento",
-      "type": "Tipo de evento",
-      "date": "Data do evento"
+      "pageTitle": "Crie seu evento",
+      "pageSubtitle": "Um código QR oferece a todos no seu evento um lugar simples para compartilhar fotos e vídeos. Você pode personalizar os detalhes mais tarde.",
+      "nameLabel": "Nome do evento",
+      "namePlaceholder": "ex.: Aniversário de 30 anos da Emma",
+      "nameRequired": "Por favor, insira o nome do evento para continuar.",
+      "typeLabel": "Tipo de evento",
+      "typePlaceholder": "Selecione o tipo de evento",
+      "dateLabel": "Data do evento",
+      "dateUnknown": "Ainda não sei a data",
+      "cta": "Criar evento",
+      "creating": "Criando seu evento...",
+      "under30s": "Leva menos de 30 segundos"
     },
     "types": {
       "Wedding": "Casamento",
       "Birthday": "Aniversário",
-      "Anniversary": "Aniversário de casamento",
-      "Reunion": "Reunião",
-      "Trip": "Viagem",
-      "Team celebration": "Celebração de equipe",
+      "Anniversary": "Bodas / Aniversário",
+      "Graduation": "Formatura",
+      "Baby Shower": "Chá de bebê",
+      "Reunion": "Reunião de família",
+      "Party": "Festa",
+      "Corporate": "Corporativo",
+      "Conference": "Conferência",
       "Other": "Outro"
     },
-    "setup": {
-      "nameRequired": "Dê um nome ao seu evento para continuar.",
-      "dateRequired": "Escolha uma data para o evento para continuar.",
-      "signInRequired": "Faça login para criar e salvar seu evento.",
-      "previewEyebrow": "PRÉVIA DO EVENTO",
-      "readyEyebrow": "SEU EVENTO ESTÁ PRONTO",
-      "readyTitleSuffix": "está pronto.",
-      "previewDescription": "Esta é uma prévia local. Faça login quando estiver pronto para salvar e compartilhar um evento real.",
-      "readyDescription": "Compartilhe este código QR e os convidados poderão começar a adicionar suas perspectivas.",
-      "qrAltPrefix": "Código QR para",
-      "makeItYoursCta": "Quer personalizar do seu jeito?",
-      "introEyebrow": "CRIAR UM EVENTO",
-      "introTitleLine1": "Crie um lar para",
-      "introTitleLine2": "os momentos.",
-      "introDescription": "Comece de forma simples. Você pode refinar cada detalhe depois.",
-      "progressAria": "Progresso da configuração do evento",
-      "step1": "Informações básicas",
-      "step2": "Seu evento está pronto",
-      "startHere": "COMECE AQUI",
-      "step1Sub": "O essencial que seus convidados verão.",
-      "nameLabel": "Nome do evento",
-      "namePlaceholder": "ex. Emma & James",
-      "typeLabel": "Tipo de evento",
-      "dateLabel": "Quando vai ser?",
-      "creating": "Criando evento...",
-      "create": "Criar evento",
-      "step2Eyebrow": "ETAPA 2 DE 2",
-      "step2Heading": "Deixe do seu jeito",
-      "step2Sub": "Toques opcionais para a experiência dos seus convidados.",
-      "qrStyleLabel": "Estilo do QR",
-      "qrClassic": "Clássico",
-      "qrModernFrame": "Moldura moderna",
-      "qrEditorial": "Editorial",
-      "colorLegend": "Cor do evento",
-      "themeOlive": "Oliva",
-      "themeRose": "Rosa",
-      "themeMidnight": "Meia-noite",
-      "coverLabel": "Foto de capa opcional",
-      "choosePhoto": "Escolha uma foto",
-      "coverFormatHint": "JPG, PNG ou WebP",
-      "back": "Voltar",
-      "continue": "Continuar",
-      "skipForNow": "Pular por enquanto",
-      "overviewAria": "Visão geral do evento",
-      "overviewTitle": "VISÃO GERAL DO EVENTO",
-      "coverPlaceholder": "SUA FOTO DE CAPA",
-      "nameFallback": "Nome do seu evento",
-      "dateFallback": "Escolha uma data",
-      "qrSuffix": "QR",
-      "privateEvent": "Evento privado"
+    "ready": {
+      "heroBadge": "Pronto para compartilhar",
+      "heroTitle": "Seu evento está pronto 🎉",
+      "heroSubtitle": "Seus convidados já podem escanear o código QR para compartilhar fotos e vídeos.",
+      "noDate": "Data a definir",
+      "qrCta": "Escaneie para compartilhar fotos e vídeos",
+      "noAppNeeded": "Sem aplicativo · Sem conta necessária",
+      "downloadQr": "Baixar QR",
+      "copyLink": "Copiar link",
+      "linkCopied": "Link de convidados copiado para a área de transferência!",
+      "openGuestPage": "Abrir página de convidados",
+      "previewAsGuest": "Visualizar como convidado",
+      "previewNotice": "Abre no modo prévia para que envios de teste não afetem suas estatísticas",
+      "goToOverview": "Ir para o evento"
+    },
+    "checklist": {
+      "title": "Prepare seu evento",
+      "subtitle": "Etapas opcionais para personalizar seu evento e acompanhar a participação.",
+      "itemCreated": "Evento criado",
+      "itemQrReady": "Código QR gerado",
+      "itemPreview": "Testar experiência do convidado",
+      "itemGuestCount": "Adicionar número estimado de convidados",
+      "itemCustomizeQr": "Personalizar cartão QR",
+      "itemCustomizePage": "Personalizar página de convidados",
+      "completed": "Concluído",
+      "optional": "Opcional",
+      "comingSoon": "Em breve"
+    },
+    "guestCount": {
+      "heading": "Quantos convidados você espera?",
+      "description": "Uma estimativa é suficiente. Usaremos isso para medir a taxa de participação.",
+      "placeholder": "ex.: 120",
+      "save": "Salvar estimativa",
+      "skip": "Pular por enquanto",
+      "savedToast": "Estimativa de convidados salva"
+    },
+    "overview": {
+      "breadcrumb": "Todos os eventos",
+      "lifecycleBefore": "Antes do evento",
+      "lifecycleDuring": "Durante o evento",
+      "lifecycleAfter": "Após o evento",
+      "lifecycleNote": "O CandidCrowd se adapta automaticamente de acordo com o cronograma do seu evento.",
+      "daysUntil": "{count, plural, =0 {Hoje é o grande dia!} =1 {Falta 1 dia} other {Faltam # dias}}",
+      "eventReadyBanner": "Seu evento está ativo e pronto para os convidados.",
+      "statMemories": "Memórias coletadas",
+      "statContributors": "Participantes",
+      "statParticipation": "Taxa de participação",
+      "statScans": "Leituras de QR",
+      "recentUploads": "Envios recentes",
+      "afterPromptHeading": "Tem fotos da noite passada?",
+      "afterPromptSub": "Envie um lembrete amigável na manhã seguinte para coletar as fotos que os convidados esqueceram de enviar.",
+      "copyReminderLink": "Copiar link do lembrete",
+      "reminderCopied": "Link do lembrete copiado para a área de transferência!"
+    },
+    "guest": {
+      "testSessionBanner": "Modo Prévia · Os envios neste modo são testes e não contarão nas estatísticas.",
+      "removeTestUploads": "Remover fotos de teste",
+      "testRemovedToast": "Fotos de teste removidas",
+      "trustLine": "Sem app · Sem conta · Qualidade original",
+      "welcomeCta": "Compartilhe suas fotos e vídeos",
+      "dropzoneSub": "JPG, PNG, HEIC ou MP4 até 50 MB",
+      "selectFiles": "Selecionar da galeria",
+      "uploading": "Enviando memórias...",
+      "uploadSuccess": "Obrigado! Suas memórias foram compartilhadas."
     }
   },
   "guest": {
@@ -574,8 +614,6 @@
       "brandAria": "Espaço do anfitrião CandidCrowd",
       "navAria": "Área de trabalho do anfitrião",
       "events": "Eventos",
-      "createEventAria": "Criar um novo evento",
-      "newEvent": "Novo evento",
       "footerAria": "Rodapé da área de trabalho",
       "help": "Ajuda",
       "privacy": "Privacidade",
@@ -585,12 +623,15 @@
       "openMenuAria": "Abrir menu da conta",
       "yourAccount": "Sua conta",
       "signInToManage": "Faça login para gerenciar sua conta",
-      "freePlan": "Plano gratuito",
       "currentPlan": "Plano atual",
       "planFree": "Gratuito",
+      "planEssential": "Essential",
+      "planPlus": "Plus",
+      "newEvent": "Novo evento",
       "menuAria": "Menu da conta",
       "profile": "Perfil",
       "planAndBilling": "Plano e faturamento",
+      "language": "Idioma",
       "logOut": "Sair"
     },
     "pages": {

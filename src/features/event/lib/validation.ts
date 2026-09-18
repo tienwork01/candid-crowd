@@ -15,7 +15,7 @@ export function isEventDraft(value: unknown): value is EventDraft {
     typeof draft.date === "string" &&
     /^\d{4}-\d{2}-\d{2}$/.test(draft.date) &&
     !Number.isNaN(Date.parse(draft.date)) &&
-    eventTypes.includes(draft.type as EventDraft["type"]) &&
+    eventTypes.includes(draft.type as (typeof eventTypes)[number]) &&
     typeof draft.expectedGuests === "number" &&
     Number.isInteger(draft.expectedGuests) &&
     draft.expectedGuests > 0 &&

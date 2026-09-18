@@ -44,6 +44,7 @@ const dynamicNamespacePrefixes = [
   "marketing.eventTypesSection.items.", // item.key dynamic lookup
   "marketing.participation.sources.", // source.key dynamic lookup
   "common.errors.", // Error code dynamic lookup in src/lib/errors.ts
+  "event.types.", // Dynamic event type label lookup
 ];
 
 const unusedKeys = [];
