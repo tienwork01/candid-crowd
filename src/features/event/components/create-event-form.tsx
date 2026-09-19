@@ -121,7 +121,13 @@ export function CreateEventForm() {
               id="event-type"
               className="create-event-card__select h-12 w-full text-base"
             >
-              <SelectValue placeholder={t("create.typePlaceholder")} />
+              <SelectValue placeholder={t("create.typePlaceholder")}>
+                {(val) =>
+                  val
+                    ? t(`types.${val as EventType}`)
+                    : t("create.typePlaceholder")
+                }
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {eventTypes.map((type) => (
@@ -175,13 +181,13 @@ export function CreateEventForm() {
           >
             {isPending ? (
               <>
-                <Spinner className="mr-2" size="sm" />
+                <Spinner size="sm" />
                 <span>{t("create.creating")}</span>
               </>
             ) : (
               <>
                 <span>{t("create.cta")}</span>
-                <ArrowRight size={18} aria-hidden="true" className="ml-1.5" />
+                <ArrowRight size={18} aria-hidden="true" />
               </>
             )}
           </Button>

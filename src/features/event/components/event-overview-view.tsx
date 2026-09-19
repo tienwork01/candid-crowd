@@ -3,13 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft,
   CalendarCheck,
-  Camera,
-  Check,
+  ChartBar,
+  ClockAfternoon,
   Copy,
   DownloadSimple,
-  Eye,
+  Gear,
   Images,
   QrCode,
   ShareNetwork,
@@ -18,7 +17,27 @@ import {
 } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
-import type { CandidEvent, EventLifecyclePhase } from "../types/event";
+import "./event.css";
+import type {
+  CandidEvent,
+  EventLifecyclePhase,
+  EventMediaItem,
+  EventMode,
+} from "../types/event";
+import {
+  deleteStoredMediaItem,
+  toggleStoredMediaStatus,
+  updateStoredEvent,
+  updateStoredEventMode,
+} from "../lib/event-store";
+import { EventAnalyticsView } from "./event-analytics-view";
+import { EventEditDialog } from "./event-edit-dialog";
+import { EventGalleryView } from "./event-gallery-view";
+import { EventHubHeader } from "./event-hub-header";
+import { EventLiveWallModal } from "./event-live-wall-modal";
+import { EventMediaLightbox } from "./event-media-lightbox";
+import { EventModeSelector } from "./event-mode-selector";
+import { EventQrDialog } from "./event-qr-dialog";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
 import { Button, Card, CardContent } from "@/components/ui";
@@ -27,26 +46,94 @@ type EventOverviewViewProps = {
   event: CandidEvent;
 };
 
-export function EventOverviewView({ event }: EventOverviewViewProps) {
+type ActiveTab = "gallery" | "analytics" | "timeline" | "settings";
+
+export function EventOverviewView({
+  event: initialEvent,
+}: EventOverviewViewProps) {
   const t = useTranslations("event");
   const locale = useLocale() as AppLocale;
 
+  const [currentEvent, setCurrentEvent] = useState<CandidEvent>(initialEvent);
+  const [activeTab, setActiveTab] = useState<ActiveTab>("gallery");
   const [activePhase, setActivePhase] = useState<EventLifecyclePhase>(
-    event.lifecycle_phase || "before",
+    currentEvent.lifecycle_phase || "during",
   );
-  const [copiedLink, setCopiedLink] = useState(false);
+
+  // Modals state
+  const [lightboxItem, setLightboxItem] = useState<EventMediaItem | null>(null);
+  const [isLiveWallOpen, setIsLiveWallOpen] = useState(false);
+  const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const mediaItems = currentEvent.media_items || [];
+  const activeMode = currentEvent.event_mode || "social";
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const publicPath = event.public_url || `/e/${event.slug}`;
-  const fullGuestUrl = event.guest_url || `${origin}${publicPath}`;
-  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
+  const publicPath = currentEvent.public_url || `/e/${currentEvent.slug}`;
+  const fullGuestUrl = currentEvent.guest_url || `${origin}${publicPath}`;
+
+  const handleModeChange = (newMode: EventMode) => {
+    const updated = updateStoredEventMode(currentEvent.id, newMode);
+
+    if (updated) setCurrentEvent(updated);
+  };
+
+  const handleToggleMediaStatus = (mediaId: string) => {
+    const updated = toggleStoredMediaStatus(currentEvent.id, mediaId);
+
+    if (updated) {
+      setCurrentEvent(updated);
+
+      const target = updated.media_items?.find((m) => m.id === mediaId);
+
+      if (target?.status === "hidden") {
+        toast.info(t("gallery.mediaHidden"));
+      } else {
+        toast.success(t("gallery.mediaVisible"));
+      }
+    }
+  };
+
+  const handleDeleteMedia = (mediaId: string) => {
+    const updated = deleteStoredMediaItem(currentEvent.id, mediaId);
+
+    if (updated) {
+      setCurrentEvent(updated);
+      toast.success(t("gallery.mediaDeleted"));
+
+      if (lightboxItem?.id === mediaId) {
+        setLightboxItem(null);
+      }
+    }
+  };
+
+  const handleSaveSettings = (partial: Partial<CandidEvent>) => {
+    const updated = updateStoredEvent(currentEvent.id, partial);
+
+    if (updated) setCurrentEvent(updated);
+  };
+
+  // Lightbox navigation
+  const visibleItems = mediaItems.filter((m) => m.status !== "hidden");
+  const lightboxIndex = lightboxItem
+    ? visibleItems.findIndex((m) => m.id === lightboxItem.id)
+    : -1;
+  const hasPrev = lightboxIndex > 0;
+  const hasNext = lightboxIndex >= 0 && lightboxIndex < visibleItems.length - 1;
+
+  const handlePrevLightbox = () => {
+    if (hasPrev) setLightboxItem(visibleItems[lightboxIndex - 1]);
+  };
+
+  const handleNextLightbox = () => {
+    if (hasNext) setLightboxItem(visibleItems[lightboxIndex + 1]);
+  };
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(fullGuestUrl);
-      setCopiedLink(true);
       toast.success(t("ready.linkCopied"));
-      setTimeout(() => setCopiedLink(false), 2400);
     } catch {
       toast.error(t("ready.copyLink"));
     }
@@ -63,19 +150,18 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
     }
   };
 
-  const formattedDate = event.event_date
-    ? formatDate(event.event_date, locale, {
+  const formattedDate = currentEvent.event_date
+    ? formatDate(currentEvent.event_date, locale, {
         month: "long",
         day: "numeric",
         year: "numeric",
       })
     : t("ready.noDate");
 
-  // Calculate days remaining if date is available
   let daysRemaining: number | null = null;
 
-  if (event.event_date) {
-    const target = new Date(event.event_date).getTime();
+  if (currentEvent.event_date) {
+    const target = new Date(currentEvent.event_date).getTime();
     const now = new Date().getTime();
 
     daysRemaining = Math.max(
@@ -84,7 +170,7 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
     );
   }
 
-  const expectedGuests = event.expected_guest_count || 100;
+  const expectedGuests = currentEvent.expected_guest_count || 100;
   const mockContributors =
     activePhase === "during" ? 38 : activePhase === "after" ? 76 : 0;
   const mockMemories =
@@ -94,376 +180,439 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
   const mockRate = Math.round((mockContributors / expectedGuests) * 100);
 
   return (
-    <div className="event-overview-board max-w-5xl mx-auto pb-16">
-      {/* Top Breadcrumb Navigation */}
-      <nav aria-label={t("overview.breadcrumb")} className="mb-6">
-        <Link
-          href="/events"
-          className="text-xs text-muted-foreground hover:text-ink inline-flex items-center gap-1.5 transition-colors"
-        >
-          <ArrowLeft size={14} aria-hidden="true" />
-          <span>{t("overview.breadcrumb")}</span>
-        </Link>
-      </nav>
+    <div className="event-hub">
+      {/* Top Editorial Header */}
+      <EventHubHeader
+        event={currentEvent}
+        onOpenQr={() => setIsQrDialogOpen(true)}
+        onOpenEdit={() => setIsEditDialogOpen(true)}
+        onLaunchLiveWall={() => setIsLiveWallOpen(true)}
+      />
 
-      {/* Main Header */}
-      <div className="event-overview-board__header flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-line">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-surface border border-line text-muted-foreground">
-              {t(`types.${event.event_type}`)}
-            </span>
-            <span className="text-xs text-subtle font-medium">
-              {formattedDate}
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-heading text-ink">
-            {event.name}
-          </h1>
-        </div>
+      {/* 5 Event Modes Selector Bar */}
+      <EventModeSelector
+        activeMode={activeMode}
+        onModeChange={handleModeChange}
+      />
 
-        {/* Header Action Shortcuts */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCopyLink}
-            className="text-xs h-9"
-          >
-            {copiedLink ? (
-              <Check size={14} className="text-primary mr-1" />
-            ) : (
-              <Copy size={14} className="mr-1" />
-            )}
-            <span>{t("ready.copyLink")}</span>
-          </Button>
-
-          <Link
-            href={`/events/${encodeURIComponent(event.id)}/ready`}
-            className="button button--secondary text-xs h-9 inline-flex items-center gap-1.5 px-3 rounded-md"
-          >
-            <QrCode size={16} aria-hidden="true" />
-            <span>{t("ready.downloadQr")}</span>
-          </Link>
-
-          <a
-            href={testGuestUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button button--primary text-xs h-9 inline-flex items-center gap-1.5 px-3.5 rounded-md"
-          >
-            <Eye size={16} weight="bold" aria-hidden="true" />
-            <span>{t("ready.previewAsGuest")}</span>
-          </a>
-        </div>
-      </div>
-
-      {/* Lifecycle Phase Switcher Tabs */}
-      <div
-        role="tablist"
-        className="event-overview-board__lifecycle mt-8 p-1.5 bg-surface border border-line rounded-xl inline-flex flex-wrap gap-1"
-      >
+      {/* Event Navigation Tabs */}
+      <div className="event-hub__tabs" role="tablist" aria-label="Event views">
         <button
           type="button"
           role="tab"
-          aria-selected={activePhase === "before"}
-          onClick={() => setActivePhase("before")}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-            activePhase === "before"
-              ? "bg-primary text-primary-foreground shadow-subtle"
-              : "text-muted-foreground hover:text-ink"
+          aria-selected={activeTab === "gallery"}
+          onClick={() => setActiveTab("gallery")}
+          className={`event-hub__tab ${
+            activeTab === "gallery" ? "event-hub__tab--active" : ""
           }`}
         >
-          {t("overview.lifecycleBefore")}
+          <Images size={16} aria-hidden="true" />
+          <span>{t("hub.tabGallery")}</span>
+          <span className="ml-1 px-1.5 py-0.2 rounded-full text-[11px] bg-primary/10 text-primary font-semibold">
+            {mediaItems.length}
+          </span>
         </button>
 
         <button
           type="button"
           role="tab"
-          aria-selected={activePhase === "during"}
-          onClick={() => setActivePhase("during")}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-            activePhase === "during"
-              ? "bg-primary text-primary-foreground shadow-subtle"
-              : "text-muted-foreground hover:text-ink"
+          aria-selected={activeTab === "analytics"}
+          onClick={() => setActiveTab("analytics")}
+          className={`event-hub__tab ${
+            activeTab === "analytics" ? "event-hub__tab--active" : ""
           }`}
         >
-          {t("overview.lifecycleDuring")}
+          <ChartBar size={16} aria-hidden="true" />
+          <span>{t("hub.tabAnalytics")}</span>
         </button>
 
         <button
           type="button"
           role="tab"
-          aria-selected={activePhase === "after"}
-          onClick={() => setActivePhase("after")}
-          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-            activePhase === "after"
-              ? "bg-primary text-primary-foreground shadow-subtle"
-              : "text-muted-foreground hover:text-ink"
+          aria-selected={activeTab === "timeline"}
+          onClick={() => setActiveTab("timeline")}
+          className={`event-hub__tab ${
+            activeTab === "timeline" ? "event-hub__tab--active" : ""
           }`}
         >
-          {t("overview.lifecycleAfter")}
+          <ClockAfternoon size={16} aria-hidden="true" />
+          <span>{t("hub.tabTimeline")}</span>
+        </button>
+
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "settings"}
+          onClick={() => setActiveTab("settings")}
+          className={`event-hub__tab ${
+            activeTab === "settings" ? "event-hub__tab--active" : ""
+          }`}
+        >
+          <Gear size={16} aria-hidden="true" />
+          <span>{t("hub.tabSettings")}</span>
         </button>
       </div>
-      <p className="text-xs text-subtle mt-2 ml-1">
-        {t("overview.lifecycleNote")}
-      </p>
 
-      {/* PHASE CONTENT */}
+      {/* TAB CONTENT 1: GALLERY & MEDIA */}
+      {activeTab === "gallery" && (
+        <EventGalleryView
+          items={mediaItems}
+          onOpenLightbox={(item) => setLightboxItem(item)}
+          onToggleStatus={handleToggleMediaStatus}
+          onDeleteMedia={handleDeleteMedia}
+        />
+      )}
 
-      {/* Phase 1: Before Event */}
-      {activePhase === "before" && (
+      {/* TAB CONTENT 2: PARTICIPATION & QR ANALYTICS */}
+      {activeTab === "analytics" && <EventAnalyticsView event={currentEvent} />}
+
+      {/* TAB CONTENT 3: TIMELINE & PHASES */}
+      {activeTab === "timeline" && (
         <div className="mt-8 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Days remaining countdown */}
-            <Card className="bg-surface border-line shadow-card">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between text-muted-foreground mb-2">
-                  <span className="text-xs font-semibold uppercase tracking-wider">
-                    {t("create.dateLabel")}
-                  </span>
-                  <CalendarCheck size={20} className="text-primary" />
-                </div>
-                <div className="text-2xl font-heading text-ink">
-                  {daysRemaining !== null
-                    ? t("overview.daysUntil", { count: daysRemaining })
-                    : t("ready.noDate")}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formattedDate}
-                </p>
-              </CardContent>
-            </Card>
+          <div
+            role="tablist"
+            className="p-1.5 bg-surface border border-line rounded-xl inline-flex flex-wrap gap-1"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activePhase === "before"}
+              onClick={() => setActivePhase("before")}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+                activePhase === "before"
+                  ? "bg-primary text-primary-foreground shadow-subtle"
+                  : "text-muted-foreground hover:text-ink"
+              }`}
+            >
+              {t("overview.lifecycleBefore")}
+            </button>
 
-            {/* Expected guest count baseline */}
-            <Card className="bg-surface border-line shadow-card">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between text-muted-foreground mb-2">
-                  <span className="text-xs font-semibold uppercase tracking-wider">
-                    {t("guestCount.heading")}
-                  </span>
-                  <Users size={20} className="text-primary" />
-                </div>
-                <div className="text-2xl font-heading text-ink">
-                  {event.expected_guest_count
-                    ? `${event.expected_guest_count}`
-                    : "100"}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t("guestCount.description")}
-                </p>
-              </CardContent>
-            </Card>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activePhase === "during"}
+              onClick={() => setActivePhase("during")}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+                activePhase === "during"
+                  ? "bg-primary text-primary-foreground shadow-subtle"
+                  : "text-muted-foreground hover:text-ink"
+              }`}
+            >
+              {t("overview.lifecycleDuring")}
+            </button>
 
-            {/* Event readiness */}
-            <Card className="bg-surface border-line shadow-card">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between text-muted-foreground mb-2">
-                  <span className="text-xs font-semibold uppercase tracking-wider">
-                    {t("checklist.title")}
-                  </span>
-                  <Sparkle size={20} className="text-primary" />
-                </div>
-                <div className="text-2xl font-heading text-primary">
-                  {t("checklist.completed")}
-                </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t("overview.eventReadyBanner")}
-                </p>
-              </CardContent>
-            </Card>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activePhase === "after"}
+              onClick={() => setActivePhase("after")}
+              className={`px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
+                activePhase === "after"
+                  ? "bg-primary text-primary-foreground shadow-subtle"
+                  : "text-muted-foreground hover:text-ink"
+              }`}
+            >
+              {t("overview.lifecycleAfter")}
+            </button>
           </div>
+          <p className="text-xs text-subtle ml-1">
+            {t("overview.lifecycleNote")}
+          </p>
 
-          {/* Quick Share Callout */}
-          <div className="p-6 bg-surface border border-line rounded-2xl shadow-card flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                <QrCode size={26} aria-hidden="true" />
+          {/* Phase: Before */}
+          {activePhase === "before" && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <Card className="bg-surface border-line shadow-card">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between text-muted-foreground mb-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider">
+                        {t("create.dateLabel")}
+                      </span>
+                      <CalendarCheck size={20} className="text-primary" />
+                    </div>
+                    <div className="text-2xl font-heading text-ink">
+                      {daysRemaining !== null
+                        ? t("overview.daysUntil", { count: daysRemaining })
+                        : t("ready.noDate")}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {formattedDate}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-surface border-line shadow-card">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between text-muted-foreground mb-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider">
+                        {t("guestCount.heading")}
+                      </span>
+                      <Users size={20} className="text-primary" />
+                    </div>
+                    <div className="text-2xl font-heading text-ink">
+                      {currentEvent.expected_guest_count
+                        ? `${currentEvent.expected_guest_count}`
+                        : "100"}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t("guestCount.description")}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-surface border-line shadow-card">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between text-muted-foreground mb-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider">
+                        {t("checklist.title")}
+                      </span>
+                      <Sparkle size={20} className="text-primary" />
+                    </div>
+                    <div className="text-2xl font-heading text-primary">
+                      {t("checklist.completed")}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {t("overview.eventReadyBanner")}
+                    </p>
+                  </CardContent>
+                </Card>
               </div>
-              <div>
-                <h3 className="font-heading text-lg text-ink">
-                  {t("ready.qrCta")}
-                </h3>
-                <p className="text-xs text-muted-foreground">
-                  {t("ready.noAppNeeded")}
-                </p>
+
+              <div className="p-6 bg-surface border border-line rounded-2xl shadow-card flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <QrCode size={26} aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading text-lg text-ink">
+                      {t("ready.qrCta")}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {t("ready.noAppNeeded")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                  <Link
+                    href={`/events/${encodeURIComponent(currentEvent.id)}/ready`}
+                    className="button button--secondary text-xs h-9 px-3.5 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
+                  >
+                    <DownloadSimple size={16} />
+                    <span>{t("ready.downloadQr")}</span>
+                  </Link>
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={handleCopyLink}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
+                  >
+                    <ShareNetwork size={16} />
+                    <span>{t("ready.copyLink")}</span>
+                  </Button>
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="flex items-center gap-2.5 w-full sm:w-auto">
-              <Link
-                href={`/events/${encodeURIComponent(event.id)}/ready`}
-                className="button button--secondary text-xs h-9 px-3.5 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
-              >
-                <DownloadSimple size={16} />
-                <span>{t("ready.downloadQr")}</span>
-              </Link>
-              <Button
-                type="button"
-                size="sm"
-                onClick={handleCopyLink}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
-              >
-                <ShareNetwork size={16} />
-                <span>{t("ready.copyLink")}</span>
-              </Button>
+          {/* Phase: During */}
+          {activePhase === "during" && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <Card className="bg-surface border-line">
+                  <CardContent className="p-5">
+                    <span className="text-xs text-muted-foreground uppercase font-semibold">
+                      {t("overview.statMemories")}
+                    </span>
+                    <div className="text-3xl font-heading text-ink mt-1">
+                      {mockMemories}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-surface border-line">
+                  <CardContent className="p-5">
+                    <span className="text-xs text-muted-foreground uppercase font-semibold">
+                      {t("overview.statContributors")}
+                    </span>
+                    <div className="text-3xl font-heading text-ink mt-1">
+                      {mockContributors}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-surface border-line">
+                  <CardContent className="p-5">
+                    <span className="text-xs text-muted-foreground uppercase font-semibold">
+                      {t("overview.statParticipation")}
+                    </span>
+                    <div className="text-3xl font-heading text-primary mt-1">
+                      {mockRate}%
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="bg-surface border-line">
+                  <CardContent className="p-5">
+                    <span className="text-xs text-muted-foreground uppercase font-semibold">
+                      {t("overview.statScans")}
+                    </span>
+                    <div className="text-3xl font-heading text-ink mt-1">
+                      {mockScans}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Phase: After */}
+          {activePhase === "after" && (
+            <div className="space-y-6">
+              <div className="p-6 sm:p-8 bg-surface border border-line rounded-2xl shadow-raised">
+                <div className="max-w-xl">
+                  <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                    {t("overview.lifecycleAfter")}
+                  </span>
+                  <h3 className="font-heading text-2xl text-ink mt-1">
+                    {t("overview.afterPromptHeading")}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    {t("overview.afterPromptSub")}
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <Button
+                      type="button"
+                      onClick={handleCopyReminder}
+                      className="inline-flex items-center gap-2"
+                    >
+                      <Copy size={16} />
+                      <span>{t("overview.copyReminderLink")}</span>
+                    </Button>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCopyLink}
+                    >
+                      <span>{t("ready.copyLink")}</span>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Phase 2: During Event */}
-      {activePhase === "during" && (
-        <div className="mt-8 space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="bg-surface border-line">
-              <CardContent className="p-5">
-                <span className="text-xs text-muted-foreground uppercase font-semibold">
-                  {t("overview.statMemories")}
-                </span>
-                <div className="text-3xl font-heading text-ink mt-1">
-                  {mockMemories}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-surface border-line">
-              <CardContent className="p-5">
-                <span className="text-xs text-muted-foreground uppercase font-semibold">
-                  {t("overview.statContributors")}
-                </span>
-                <div className="text-3xl font-heading text-ink mt-1">
-                  {mockContributors}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-surface border-line">
-              <CardContent className="p-5">
-                <span className="text-xs text-muted-foreground uppercase font-semibold">
-                  {t("overview.statParticipation")}
-                </span>
-                <div className="text-3xl font-heading text-primary mt-1">
-                  {mockRate}%
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-surface border-line">
-              <CardContent className="p-5">
-                <span className="text-xs text-muted-foreground uppercase font-semibold">
-                  {t("overview.statScans")}
-                </span>
-                <div className="text-3xl font-heading text-ink mt-1">
-                  {mockScans}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Recent Uploads Grid */}
-          <div className="bg-surface border border-line rounded-2xl p-6 shadow-card">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-heading text-lg text-ink flex items-center gap-2">
-                <Images size={20} className="text-primary" />
-                <span>{t("overview.recentUploads")}</span>
+      {/* TAB CONTENT 4: SETTINGS */}
+      {activeTab === "settings" && (
+        <div className="mt-8 max-w-xl bg-surface border border-line rounded-2xl p-6 sm:p-8 shadow-card">
+          <div className="flex items-center justify-between pb-4 border-b border-line">
+            <div>
+              <h3 className="font-heading text-xl text-ink font-medium">
+                {t("settings.title")}
               </h3>
-              <span className="text-xs text-muted-foreground">
-                {t("ready.noAppNeeded")}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[1, 2, 3, 4].map((index) => (
-                <div
-                  key={index}
-                  className="aspect-square bg-muted/30 rounded-xl border border-line flex flex-col items-center justify-center p-3 text-center"
-                >
-                  <Camera size={28} className="text-subtle mb-1" />
-                  <span className="text-[11px] text-muted-foreground">
-                    #{index}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Phase 3: After Event */}
-      {activePhase === "after" && (
-        <div className="mt-8 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <Card className="bg-surface border-line">
-              <CardContent className="p-6">
-                <span className="text-xs text-muted-foreground uppercase font-semibold">
-                  {t("overview.statMemories")}
-                </span>
-                <div className="text-3xl font-heading text-ink mt-1">
-                  {mockMemories}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-surface border-line">
-              <CardContent className="p-6">
-                <span className="text-xs text-muted-foreground uppercase font-semibold">
-                  {t("overview.statContributors")}
-                </span>
-                <div className="text-3xl font-heading text-ink mt-1">
-                  {mockContributors}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-surface border-line">
-              <CardContent className="p-6">
-                <span className="text-xs text-muted-foreground uppercase font-semibold">
-                  {t("overview.statParticipation")}
-                </span>
-                <div className="text-3xl font-heading text-primary mt-1">
-                  {mockRate}%
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Morning-After Recovery CTA */}
-          <div className="p-6 sm:p-8 bg-surface border border-line rounded-2xl shadow-raised">
-            <div className="max-w-xl">
-              <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                {t("overview.lifecycleAfter")}
-              </span>
-              <h3 className="font-heading text-2xl text-ink mt-1">
-                {t("overview.afterPromptHeading")}
-              </h3>
-              <p className="text-sm text-muted-foreground mt-2">
-                {t("overview.afterPromptSub")}
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {t("settings.sub")}
               </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setIsEditDialogOpen(true)}
+              className="text-xs h-9"
+            >
+              <Gear size={15} className="mr-1.5" />
+              <span>{t("hub.editEventBtn")}</span>
+            </Button>
+          </div>
 
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Button
-                  type="button"
-                  onClick={handleCopyReminder}
-                  className="inline-flex items-center gap-2"
-                >
-                  <Copy size={16} />
-                  <span>{t("overview.copyReminderLink")}</span>
-                </Button>
+          <div className="mt-6 space-y-4 text-xs">
+            <div className="flex items-center justify-between py-2 border-b border-line/60">
+              <span className="text-muted-foreground">
+                {t("create.nameLabel")}
+              </span>
+              <span className="font-semibold text-ink">
+                {currentEvent.name}
+              </span>
+            </div>
 
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCopyLink}
-                >
-                  <span>{t("ready.copyLink")}</span>
-                </Button>
-              </div>
+            <div className="flex items-center justify-between py-2 border-b border-line/60">
+              <span className="text-muted-foreground">
+                {t("create.typeLabel")}
+              </span>
+              <span className="font-semibold text-ink">
+                {t(`types.${currentEvent.event_type}`)}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between py-2 border-b border-line/60">
+              <span className="text-muted-foreground">
+                {t("create.dateLabel")}
+              </span>
+              <span className="font-semibold text-ink">{formattedDate}</span>
+            </div>
+
+            <div className="flex items-center justify-between py-2 border-b border-line/60">
+              <span className="text-muted-foreground">
+                {t("guestCount.heading")}
+              </span>
+              <span className="font-semibold text-ink">
+                {currentEvent.expected_guest_count || 100} guests
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between py-2">
+              <span className="text-muted-foreground">
+                {t("settings.galleryVisibilityLabel")}
+              </span>
+              <span className="font-semibold text-primary">
+                {currentEvent.gallery_enabled !== false
+                  ? "Enabled"
+                  : "Upload-only"}
+              </span>
             </div>
           </div>
         </div>
       )}
+
+      {/* Lightbox Modal */}
+      <EventMediaLightbox
+        item={lightboxItem}
+        isOpen={Boolean(lightboxItem)}
+        onClose={() => setLightboxItem(null)}
+        onPrev={handlePrevLightbox}
+        onNext={handleNextLightbox}
+        hasPrev={hasPrev}
+        hasNext={hasNext}
+        onToggleStatus={handleToggleMediaStatus}
+      />
+
+      {/* Fullscreen Live Wall */}
+      <EventLiveWallModal
+        event={currentEvent}
+        isOpen={isLiveWallOpen}
+        onClose={() => setIsLiveWallOpen(false)}
+      />
+
+      {/* Quick QR Code Dialog */}
+      <EventQrDialog
+        event={currentEvent}
+        isOpen={isQrDialogOpen}
+        onClose={() => setIsQrDialogOpen(false)}
+      />
+
+      {/* Edit Event Dialog */}
+      <EventEditDialog
+        event={currentEvent}
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        onSave={handleSaveSettings}
+      />
     </div>
   );
 }

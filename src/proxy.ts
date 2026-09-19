@@ -18,6 +18,22 @@ export async function proxy(request: NextRequest) {
 
   if (localeResponse) return localeResponse;
 
+  if (isAuthPath(request.nextUrl.pathname)) {
+    const sessionCookie = getSessionCookie(request.headers);
+
+    if (sessionCookie && (await hasValidSession(request))) {
+      const nextParam = request.nextUrl.searchParams.get("next");
+      const target =
+        nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+          ? nextParam
+          : "/profile";
+
+      return NextResponse.redirect(new URL(target, request.url));
+    }
+
+    return NextResponse.next();
+  }
+
   if (!isProtectedPath(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
@@ -37,6 +53,12 @@ export async function proxy(request: NextRequest) {
   return NextResponse.redirect(loginUrl);
 }
 
+function isAuthPath(pathname: string): boolean {
+  return (
+    pathname === "/login" || pathname === "/register" || pathname === "/signup"
+  );
+}
+
 function isProtectedPath(pathname: string): boolean {
   return (
     pathname === "/create" ||
@@ -54,7 +76,11 @@ async function hasValidSession(request: NextRequest): Promise<boolean> {
       query: { disableCookieCache: true, disableRefresh: true },
     });
 
-    return Boolean(session?.session && session.user);
+    const isDeleted = Boolean(
+      (session?.user as { deletedAt?: unknown } | undefined)?.deletedAt,
+    );
+
+    return Boolean(session?.session && session.user && !isDeleted);
   } catch (err) {
     console.error(
       "[AUTH_SESSION_ERROR]",
@@ -73,7 +99,7 @@ export const config = {
 
 /**
  * Marketing URLs are localized for SEO, while app and QR URLs intentionally stay
- * language-neutral. A rewrite lets existing route files continue to serve them.
+ * language-neutral. Localized marketing URLs now map directly to `[locale]` routes.
  */
 function resolveMarketingLocale(
   request: NextRequest,
@@ -87,25 +113,20 @@ function resolveMarketingLocale(
 
     if (!marketingPaths.has(destinationPath)) return undefined;
 
-    const rewriteUrl = request.nextUrl.clone();
+    // Sync cookie if different, but let Next.js serve the static [locale] route directly
+    if (request.cookies.get(localeCookieName)?.value !== firstSegment) {
+      const response = NextResponse.next();
 
-    rewriteUrl.pathname = destinationPath;
+      response.cookies.set(localeCookieName, firstSegment, {
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+      });
 
-    const requestHeaders = new Headers(request.headers);
+      return response;
+    }
 
-    requestHeaders.set("x-candidcrowd-locale", firstSegment);
-
-    const response = NextResponse.rewrite(rewriteUrl, {
-      request: { headers: requestHeaders },
-    });
-
-    response.cookies.set(localeCookieName, firstSegment, {
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-    });
-
-    return response;
+    return undefined;
   }
 
   if (!marketingPaths.has(pathname)) return undefined;

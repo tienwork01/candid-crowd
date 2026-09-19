@@ -18,10 +18,17 @@ const messageLoaders = {
 };
 
 export default getRequestConfig(async ({ requestLocale }) => {
+  const requested = normalizeLocale(await requestLocale);
+
+  if (requested) {
+    const messages = (await messageLoaders[requested]()).default;
+
+    return { locale: requested, messages, defaultLocale };
+  }
+
   const requestHeaders = await headers();
   const requestCookies = await cookies();
   const locale =
-    normalizeLocale(await requestLocale) ??
     normalizeLocale(requestHeaders.get("x-candidcrowd-locale")) ??
     normalizeLocale(requestCookies.get(localeCookieName)?.value) ??
     resolveAcceptLanguage(requestHeaders.get("accept-language")) ??

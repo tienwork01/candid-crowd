@@ -4,6 +4,7 @@ import { jwt } from "better-auth/plugins";
 import { dash } from "@better-auth/infra";
 import { Pool } from "pg";
 import { sendAuthEmail } from "@/lib/auth-email";
+import { siteConfig } from "@/lib/config";
 
 if (typeof dns.setDefaultResultOrder === "function") {
   dns.setDefaultResultOrder("ipv4first");
@@ -36,7 +37,7 @@ const globalForAuth = globalThis as unknown as {
   betterAuthDbPool?: Pool;
 };
 
-const database =
+export const authDbPool =
   globalForAuth.betterAuthDbPool ??
   new Pool({
     connectionString: dbUrl,
@@ -73,6 +74,8 @@ const database =
       return dns.lookup(hostname, { ...lookupOpts, family: 4 }, callback);
     },
   } as unknown as import("pg").PoolConfig);
+
+const database = authDbPool;
 
 if (process.env.NODE_ENV !== "production") {
   globalForAuth.betterAuthDbPool = database;
@@ -115,7 +118,7 @@ function isDevOrigin(origin: string): boolean {
 }
 
 export const auth = betterAuth({
-  database,
+  database: authDbPool,
   secret: required("BETTER_AUTH_SECRET"),
   baseURL: required("BETTER_AUTH_URL"),
   trustedOrigins: (request) => {
@@ -154,6 +157,7 @@ export const auth = betterAuth({
     additionalFields: {
       termsVersion: { type: "string", required: true, input: true },
       privacyVersion: { type: "string", required: true, input: true },
+      deletedAt: { type: "date", required: false, input: false },
     },
   },
   emailAndPassword: {
@@ -164,12 +168,16 @@ export const auth = betterAuth({
     resetPasswordTokenExpiresIn: 60 * 60,
     sendResetPassword: async ({ user, url }) => {
       await sendAuthEmail({
+        templateType: "reset-password",
         to: user.email,
-        subject: "Reset your CandidCrowd password",
+        subject: `Reset your ${siteConfig.name} password`,
         heading: "Choose a new password",
-        text: "Use the secure link below to reset your password.",
+        text: `We received a request to reset your password. Use the secure button below to set a new password for your ${siteConfig.name} account.`,
         action: "Reset password",
         url,
+        userName: user.name,
+        subtext: "This password reset link will expire in 60 minutes.",
+        previewText: `Reset your password for ${siteConfig.name}.`,
       });
     },
   },
@@ -179,12 +187,16 @@ export const auth = betterAuth({
     expiresIn: 60 * 60,
     sendVerificationEmail: async ({ user, url }) => {
       await sendAuthEmail({
+        templateType: "verification",
         to: user.email,
-        subject: "Verify your CandidCrowd email",
-        heading: "One last step",
-        text: "Verify your email to start collecting memories.",
-        action: "Verify email",
+        subject: `Verify your email for ${siteConfig.name}`,
+        heading: "One last step to collect your memories",
+        text: `Thank you for creating an account with ${siteConfig.name}. Please confirm your email address to activate your host dashboard and start collecting memories from your guests.`,
+        action: "Verify email address",
         url,
+        userName: user.name,
+        subtext: "This verification link will expire in 60 minutes.",
+        previewText: `Confirm your email address to start collecting event memories on ${siteConfig.name}.`,
       });
     },
   },

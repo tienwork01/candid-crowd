@@ -6,7 +6,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 export const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border text-sm font-medium transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -17,11 +17,11 @@ export const buttonVariants = cva(
           "border-transparent bg-transparent text-foreground hover:bg-secondary",
       },
       size: {
-        default: "h-12 min-h-12 px-5 py-3 text-sm",
-        sm: "h-9 min-h-9 px-3.5 py-1.5 text-xs",
-        lg: "h-14 min-h-14 px-6 py-3.5 text-base",
-        icon: "size-12 p-3",
-        "icon-sm": "size-9 p-2",
+        default: "h-12 min-h-12 px-5 py-3 text-sm gap-1.5",
+        sm: "h-9 min-h-9 px-3.5 py-1.5 text-xs gap-1 [&_svg]:size-3.5",
+        lg: "h-14 min-h-14 px-6 py-3.5 text-base gap-2 [&_svg]:size-5",
+        icon: "size-12 p-3 gap-0",
+        "icon-sm": "size-9 p-2 gap-0",
       },
     },
     defaultVariants: { variant: "default", size: "default" },

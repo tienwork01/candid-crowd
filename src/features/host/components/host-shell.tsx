@@ -19,34 +19,27 @@ export async function HostShell({ active, plan, children }: HostShellProps) {
     ? `${siteConfig.marketingUrl}/terms`
     : "/terms";
 
-  const navigation = [
-    { href: "/events", key: "events", label: t("events") },
-  ] as const;
-
   return (
     <div className="host-shell">
       <header className="host-shell__header">
         <div className="host-shell__header-inner">
-          <Link
-            className="host-shell__brand"
-            href="/events"
-            aria-label={t("brandAria")}
-          >
-            <Aperture size={21} aria-hidden="true" />
-            <span>CandidCrowd</span>
-          </Link>
-          <nav className="host-shell__nav" aria-label={t("navAria")}>
-            {navigation.map((item) => (
-              <Link
-                aria-current={active === item.key ? "page" : undefined}
-                className="host-shell__nav-link"
-                href={item.href}
-                key={item.key}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          <div className="host-shell__brand-group">
+            <Link
+              className="host-shell__brand"
+              href="/events"
+              aria-label={t("brandAria")}
+            >
+              <Aperture size={21} aria-hidden="true" />
+              <span>CandidCrowd</span>
+            </Link>
+            <span className="host-shell__divider" aria-hidden="true">
+              /
+            </span>
+            <span className="host-shell__workspace-badge">
+              <span className="host-shell__badge-dot" aria-hidden="true" />
+              <span>{t("workspace")}</span>
+            </span>
+          </div>
           <div className="host-shell__account">
             <HostAccountMenu
               active={

@@ -79,7 +79,7 @@ export async function getAuthToken(): Promise<string | null> {
 /**
  * Public Axios client:
  * Used for endpoints that do NOT require authentication:
- * - Guest event views (/api/public/events/:slug)
+ * - Guest event views (/api/v1/public/events/:slug)
  * - Guest anonymous sessions & uploads
  * - Public marketing or static content
  */
@@ -106,7 +106,7 @@ publicClient.interceptors.response.use(
 /**
  * Private Axios client:
  * Used for authenticated Host endpoints:
- * - Event management (/api/events)
+ * - Event management (/api/v1/events)
  * - Host media moderation and downloads
  * - Account settings and analytics
  *
@@ -240,4 +240,47 @@ export async function apiFetch(
   }
 
   return response;
+}
+
+/**
+ * Internal Next.js App / BFF client:
+ * Used for calling same-origin Next.js Route Handlers (/api/v1/*, /api/*)
+ * that authenticate via HTTP-only session cookies rather than external JWT.
+ * Automatically handles JSON serialization, error normalization, and types.
+ */
+export async function appFetch<T = unknown>(
+  path: string,
+  init: RequestInit = {},
+): Promise<T> {
+  const headers = new Headers(init.headers);
+
+  if (!headers.has("Content-Type") && !(init.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  const response = await fetch(path, {
+    ...init,
+    headers,
+  });
+
+  const body = (await response.json().catch(() => ({}))) as {
+    error?: string | { code?: string; message?: string };
+    code?: string;
+    message?: string;
+  };
+
+  if (!response.ok || body.error) {
+    const rawCode =
+      typeof body.error === "string"
+        ? body.error
+        : body.error?.code || body.code || "REQUEST_FAILED";
+    const message =
+      typeof body.error === "object" && body.error?.message
+        ? body.error.message
+        : body.message || getErrorMessage(rawCode);
+
+    throw new APIError(response.status, rawCode, message, body);
+  }
+
+  return body as T;
 }

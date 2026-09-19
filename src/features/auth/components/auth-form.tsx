@@ -81,15 +81,15 @@ export function AuthForm({
       callbackURL: safeNextPath,
     });
 
-    setIsPending(false);
-
     if (result.error) {
+      setIsPending(false);
       setFeedback(getErrorMessage(result.error, undefined, tErrors));
 
       return;
     }
 
     router.replace(safeNextPath);
+    router.refresh();
   }
 
   async function social(provider: "google" | "apple") {

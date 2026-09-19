@@ -22,7 +22,7 @@ export function DialogContent({
       <DialogPrimitive.Backdrop className="fixed inset-0 z-50 bg-ink/65 transition-opacity duration-200 data-ending-style:opacity-0 data-starting-style:opacity-0" />
       <DialogPrimitive.Popup
         className={cn(
-          "cc-dialog fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-border bg-card p-7 text-foreground shadow-xl outline-none",
+          "cc-dialog fixed left-1/2 top-1/2 z-50 max-h-[90dvh] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-y-auto scrollbar-thin rounded-xl border border-border bg-card p-7 text-foreground shadow-xl outline-none",
           className,
         )}
         {...props}

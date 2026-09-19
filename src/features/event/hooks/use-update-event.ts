@@ -17,7 +17,7 @@ export function useUpdateEvent() {
     mutationFn: async (input) => {
       try {
         const response = await privateClient.patch<CandidEvent>(
-          `/api/events/${encodeURIComponent(input.id)}`,
+          `/api/v1/events/${encodeURIComponent(input.id)}`,
           input,
         );
 

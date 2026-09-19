@@ -1,7 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { privateClient } from "@/lib/api-client";
+import { siteConfig } from "@/lib/config";
 import type { CandidEvent } from "../types/event";
-import { getStoredEvents, saveStoredEvent } from "../lib/event-store";
+import type { EventListParams, EventListResponse } from "../types/event-list";
+import { DEFAULT_PER_PAGE } from "../types/event-list";
+import { saveStoredEvent, getStoredEvents } from "../lib/event-store";
+import { paginateLocalEvents } from "../lib/paginate-local";
 
 type BackendEvent = {
   id: string;
@@ -19,15 +23,21 @@ type BackendEvent = {
   updated_at: string;
 };
 
-type EventsResponse = {
+type BackendEventsResponse = {
   data: BackendEvent[];
+  pagination?: {
+    page: number;
+    per_page: number;
+    total: number;
+    total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
+  };
 };
 
 function normalizeEvent(be: BackendEvent): CandidEvent {
   const origin =
-    typeof window !== "undefined"
-      ? window.location.origin
-      : "http://localhost:3000";
+    typeof window !== "undefined" ? window.location.origin : siteConfig.appUrl;
   const guestUrl = `${origin}/e/${be.slug}`;
 
   return {
@@ -55,29 +65,89 @@ function normalizeEvent(be: BackendEvent): CandidEvent {
   };
 }
 
-export function useEvents() {
-  return useQuery<CandidEvent[]>({
-    queryKey: ["events"],
-    queryFn: async () => {
+/**
+ * Fetches a paginated, searchable, filterable list of events.
+ *
+ * - Tries the backend API first (`/api/v1/events` with query params).
+ * - Falls back to client-side pagination of localStorage data when the backend is unavailable.
+ * - Uses `keepPreviousData` so the UI doesn't flash blank between page transitions.
+ */
+export function useEvents(params: EventListParams = {}) {
+  const {
+    page = 1,
+    per_page = DEFAULT_PER_PAGE,
+    q,
+    type,
+    sort = "newest",
+  } = params;
+
+  return useQuery<EventListResponse>({
+    queryKey: ["events", { page, per_page, q, type, sort }],
+    queryFn: async (): Promise<EventListResponse> => {
       try {
-        const response =
-          await privateClient.get<EventsResponse>("/api/v1/events");
+        const response = await privateClient.get<BackendEventsResponse>(
+          "/api/v1/events",
+          {
+            params: {
+              page,
+              per_page,
+              ...(q ? { q } : {}),
+              ...(type ? { type } : {}),
+              sort,
+            },
+          },
+        );
 
         if (response.data?.data) {
           const events = response.data.data.map(normalizeEvent);
 
+          // Sync to local store as cache
           for (const ev of events) {
             saveStoredEvent(ev);
           }
 
-          return events;
+          return {
+            data: events,
+            pagination: response.data.pagination ?? {
+              page,
+              per_page,
+              total: events.length,
+              total_pages: 1,
+              has_next: false,
+              has_prev: false,
+            },
+          };
         }
       } catch {
-        // Backend offline or route issue, fallback to local store
+        // Backend offline or route issue — fall back to local store
       }
 
-      return Object.values(getStoredEvents());
+      return paginateLocalEvents({ page, per_page, q, type, sort });
     },
-    initialData: () => Object.values(getStoredEvents()),
+    placeholderData: keepPreviousData,
   });
+}
+
+/**
+ * Returns the total count of all locally-stored events.
+ * Used for global metrics strip (independent of current page/filter).
+ */
+export function useEventsTotals() {
+  const events = Object.values(getStoredEvents());
+
+  const totalEvents = events.length;
+
+  const totalMemories = events.reduce((sum, ev) => {
+    const photos = ev.metrics?.photos_count || 0;
+    const videos = ev.metrics?.videos_count || 0;
+    const items = ev.media_items?.length || 0;
+
+    return sum + Math.max(photos + videos, items);
+  }, 0);
+
+  const totalContributors = events.reduce((sum, ev) => {
+    return sum + (ev.metrics?.contributors_count || 0);
+  }, 0);
+
+  return { totalEvents, totalMemories, totalContributors };
 }

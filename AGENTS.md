@@ -510,17 +510,21 @@ All translation keys across the project must be strictly maintained, actively re
 - **Strict Key Parity**: All locale files must maintain 100% key parity at all times (verified by `pnpm validate:locales`).
 - **Automated Verification Command**: Always run `pnpm audit:unused-keys` to verify that 0 dead keys exist in the codebase.
 
-## Backend
+## Backend — ABSOLUTE RULE
 
-Preferred:
+**Next.js MUST NEVER be used as a backend for business/domain API endpoints.**
+
+The backend is a **separate Go (Gin) repository**: `candidcrowd-be`.
+
+- All product API endpoints (`/api/v1/events`, `/api/v1/media`, `/api/public/events/*`, etc.) live exclusively in the Go backend.
+- Next.js API routes (`src/app/api/`) are permitted **ONLY** for authentication-related handlers (Better Auth `[...all]` catch-all) and account management that directly depend on the Next.js auth session.
+- Never create new Next.js API route handlers for event CRUD, media, guest sessions, uploads, analytics, or any other business logic.
+- The frontend communicates with the backend via `NEXT_PUBLIC_API_BASE_URL` (Axios `privateClient` / `publicClient`).
 
 ```text
-TypeScript / Node.js
+Frontend (Next.js)  ──HTTP──▶  Backend (Go / Gin)  ──SQL──▶  PostgreSQL
+                                                    ──S3──▶  Cloudflare R2
 ```
-
-Use PostgreSQL for core metadata.
-
-Keep domain logic separated from infrastructure.
 
 # Storage
 

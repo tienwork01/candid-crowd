@@ -5,11 +5,16 @@ import {
   Check,
   LockKey,
 } from "@phosphor-icons/react/dist/ssr";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import type { AppLocale } from "@/i18n/locales";
 import { HeroScene } from "./hero-scene";
 
-export async function Hero() {
-  const t = await getTranslations("marketing.hero");
+export async function Hero({ locale }: { locale?: AppLocale } = {}) {
+  const marketingLocale = locale ?? ((await getLocale()) as AppLocale);
+  const t = await getTranslations({
+    locale: marketingLocale,
+    namespace: "marketing.hero",
+  });
 
   return (
     <section className="hero container" aria-labelledby="hero-title">

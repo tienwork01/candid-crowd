@@ -78,15 +78,9 @@ export function MobileNav({
             {item.label}
           </Link>
         ))}
+
         <Link href="/login" className="mobile-nav__login" onClick={close}>
           {t("header.login")}
-        </Link>
-        <Link
-          className="button"
-          href="/register?next=/events/new"
-          onClick={close}
-        >
-          {t("header.createEvent")}
         </Link>
       </nav>
     </details>

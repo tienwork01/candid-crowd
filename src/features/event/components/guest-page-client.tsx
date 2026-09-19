@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEvent, useMounted } from "../hooks";
 import { GuestEventView } from "./guest-event-view";
 import { Spinner } from "@/components/ui";
+import { siteConfig } from "@/lib/config";
 import type { CandidEvent } from "../types/event";
 
 type GuestPageClientProps = {
@@ -43,8 +44,14 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
     expected_guest_count: 100,
     slug,
     public_url: `/e/${slug}`,
-    guest_url: `https://candidcrowd.com/e/${slug}`,
-    qr_destination: `https://candidcrowd.com/e/${slug}`,
+    guest_url:
+      typeof window !== "undefined"
+        ? `${window.location.origin}/e/${slug}`
+        : `${siteConfig.appUrl}/e/${slug}`,
+    qr_destination:
+      typeof window !== "undefined"
+        ? `${window.location.origin}/e/${slug}`
+        : `${siteConfig.appUrl}/e/${slug}`,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };

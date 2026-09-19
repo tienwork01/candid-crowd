@@ -16,3 +16,5 @@ export { EventTypes } from "./event-types";
 export { EarlyAccess } from "./early-access";
 export { FinalCta } from "./final-cta";
 export { MobileNav } from "./mobile-nav";
+export { HeaderActions } from "./header-actions";
+export { StructuredData } from "./structured-data";

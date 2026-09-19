@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation";
 import {
   CaretDown,
   Check,
+  CircleNotch,
   CreditCard,
   Globe,
   Plus,
   SignOut,
   User,
 } from "@phosphor-icons/react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import {
   Avatar,
   AvatarFallback,
@@ -27,7 +28,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui";
-import { localeLabels, locales, type AppLocale } from "@/i18n/locales";
+import { localeLabels, locales } from "@/i18n/locales";
+import { useLocaleSwitcher } from "@/i18n/use-locale-switcher";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -55,10 +57,6 @@ function initials(value: string) {
     .toUpperCase();
 }
 
-function setLocaleCookie(locale: AppLocale) {
-  document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000;samesite=lax`;
-}
-
 export function HostAccountMenu({
   active,
   plan,
@@ -66,19 +64,15 @@ export function HostAccountMenu({
   active?: "profile" | "billing" | "new";
   plan?: UserPlan;
 }) {
-  const locale = useLocale() as AppLocale;
+  const {
+    currentLocale,
+    switchLocale,
+    isPending: isLocalePending,
+    pendingLocale,
+  } = useLocaleSwitcher();
   const t = useTranslations("host.accountMenu");
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
-
-  function handleLocaleChange(nextLocale: AppLocale) {
-    if (nextLocale === locale) {
-      return;
-    }
-
-    setLocaleCookie(nextLocale);
-    window.location.reload();
-  }
 
   const userPlan = (
     plan ||
@@ -238,31 +232,42 @@ export function HostAccountMenu({
         <DropdownMenuSeparator />
 
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>
-            <Globe size={16} />
+          <DropdownMenuSubTrigger disabled={isLocalePending}>
+            {isLocalePending ? (
+              <CircleNotch size={16} className="animate-spin text-primary" />
+            ) : (
+              <Globe size={16} />
+            )}
             <span>{t("language")}</span>
             <span className="ml-auto text-xs text-muted-foreground">
-              {localeLabels[locale]}
+              {localeLabels[currentLocale]}
             </span>
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="min-w-36">
             {locales.map((loc) => {
-              const isSelected = loc === locale;
+              const isSelected = loc === currentLocale;
+              const isTargetPending = isLocalePending && pendingLocale === loc;
 
               return (
                 <DropdownMenuItem
                   key={loc}
-                  onClick={() => handleLocaleChange(loc)}
-                  className="flex items-center justify-between"
+                  disabled={isLocalePending}
+                  onClick={() => switchLocale(loc)}
+                  className="flex items-center justify-between cursor-pointer"
                 >
                   <span
                     className={isSelected ? "font-semibold text-primary" : ""}
                   >
                     {localeLabels[loc]}
                   </span>
-                  {isSelected && (
+                  {isTargetPending ? (
+                    <CircleNotch
+                      size={13}
+                      className="animate-spin text-primary"
+                    />
+                  ) : isSelected ? (
                     <Check size={13} weight="bold" className="text-primary" />
-                  )}
+                  ) : null}
                 </DropdownMenuItem>
               );
             })}
