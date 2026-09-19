@@ -41,6 +41,13 @@ export function useEventListParams() {
     const q = searchParams.get("q") || "";
     const type = (searchParams.get("type") as EventType) || undefined;
     const sort = (searchParams.get("sort") as EventSortOption) || "newest";
+    const rawDir = searchParams.get("direction");
+    const direction: import("../types/event-list").SortDirection =
+      rawDir === "asc" || rawDir === "desc"
+        ? rawDir
+        : sort === "oldest" || sort === "name" || sort === "upcoming"
+          ? "asc"
+          : "desc";
 
     return {
       page,
@@ -48,6 +55,7 @@ export function useEventListParams() {
       q,
       type: type as EventType,
       sort,
+      direction,
     };
   }, [searchParams]);
 
@@ -109,9 +117,28 @@ export function useEventListParams() {
   );
 
   const setSort = useCallback(
-    (sort: EventSortOption) => pushParams({ sort }),
+    (sort: EventSortOption) => {
+      const dir: import("../types/event-list").SortDirection =
+        sort === "oldest" || sort === "name" || sort === "upcoming"
+          ? "asc"
+          : "desc";
+
+      pushParams({ sort, direction: dir });
+    },
     [pushParams],
   );
+
+  const setDirection = useCallback(
+    (direction: import("../types/event-list").SortDirection) =>
+      pushParams({ direction }),
+    [pushParams],
+  );
+
+  const toggleDirection = useCallback(() => {
+    const nextDir = params.direction === "asc" ? "desc" : "asc";
+
+    pushParams({ direction: nextDir });
+  }, [params.direction, pushParams]);
 
   const clearSearch = useCallback(() => {
     setInputValue("");
@@ -133,6 +160,8 @@ export function useEventListParams() {
     setPage,
     setType,
     setSort,
+    setDirection,
+    toggleDirection,
     clearSearch,
   };
 }

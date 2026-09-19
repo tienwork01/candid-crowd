@@ -745,7 +745,9 @@
       "sortNewest": "Mới nhất",
       "sortOldest": "Cũ nhất",
       "sortName": "Tên A–Z",
-      "sortUpcoming": "Sắp diễn ra"
+      "sortUpcoming": "Sắp diễn ra",
+      "sortAscending": "Tăng dần",
+      "sortDescending": "Giảm dần"
     }
   },
   "legal": {

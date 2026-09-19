@@ -79,10 +79,20 @@ export function useEvents(params: EventListParams = {}) {
     q,
     type,
     sort = "newest",
+    direction,
   } = params;
 
+  const resolvedDirection =
+    direction ||
+    (sort === "oldest" || sort === "name" || sort === "upcoming"
+      ? "asc"
+      : "desc");
+
   return useQuery<EventListResponse>({
-    queryKey: ["events", { page, per_page, q, type, sort }],
+    queryKey: [
+      "events",
+      { page, per_page, q, type, sort, direction: resolvedDirection },
+    ],
     queryFn: async (): Promise<EventListResponse> => {
       try {
         const response = await privateClient.get<BackendEventsResponse>(
@@ -94,6 +104,7 @@ export function useEvents(params: EventListParams = {}) {
               ...(q ? { q } : {}),
               ...(type ? { type } : {}),
               sort,
+              direction: resolvedDirection,
             },
           },
         );
@@ -119,10 +130,17 @@ export function useEvents(params: EventListParams = {}) {
           };
         }
       } catch {
-        // Backend offline or route issue — fall back to local store
+        // Fallback: paginate localStorage data client-side
       }
 
-      return paginateLocalEvents({ page, per_page, q, type, sort });
+      return paginateLocalEvents({
+        page,
+        per_page,
+        q,
+        type,
+        sort,
+        direction: resolvedDirection,
+      });
     },
     placeholderData: keepPreviousData,
   });

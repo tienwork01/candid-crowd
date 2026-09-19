@@ -29,6 +29,8 @@ export const eventSortOptions = [
 
 export type EventSortOption = (typeof eventSortOptions)[number];
 
+export type SortDirection = "asc" | "desc";
+
 /** Query parameters accepted by the event list endpoint / hook. */
 export type EventListParams = {
   page?: number;
@@ -36,6 +38,7 @@ export type EventListParams = {
   q?: string;
   type?: EventType;
   sort?: EventSortOption;
+  direction?: SortDirection;
 };
 
 /** Shape returned by the paginated events query. */

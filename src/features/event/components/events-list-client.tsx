@@ -41,6 +41,7 @@ export function EventsListClient() {
     setPage,
     setType,
     setSort,
+    toggleDirection,
     clearSearch,
   } = useEventListParams();
 
@@ -134,6 +135,8 @@ export function EventsListClient() {
         onTypeChange={setType}
         selectedSort={params.sort}
         onSortChange={setSort}
+        selectedDirection={params.direction}
+        onDirectionToggle={toggleDirection}
         resultCount={pagination?.total ?? events.length}
         hasActiveSearch={hasActiveSearch}
       />

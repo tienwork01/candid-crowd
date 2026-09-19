@@ -745,7 +745,9 @@
       "sortNewest": "Mais recentes",
       "sortOldest": "Mais antigos",
       "sortName": "Nome A–Z",
-      "sortUpcoming": "Próximos primeiro"
+      "sortUpcoming": "Próximos primeiro",
+      "sortAscending": "Crescente",
+      "sortDescending": "Decrescente"
     }
   },
   "legal": {

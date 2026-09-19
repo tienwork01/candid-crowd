@@ -20,6 +20,7 @@ export function paginateLocalEvents(
     q,
     type,
     sort = "newest",
+    direction,
   } = params;
 
   let items = Object.values(getStoredEvents());
@@ -41,7 +42,7 @@ export function paginateLocalEvents(
   }
 
   // ── Sort ──
-  items = sortEvents(items, sort);
+  items = sortEvents(items, sort, direction);
 
   // ── Paginate ──
   const total = items.length;
@@ -66,24 +67,29 @@ export function paginateLocalEvents(
 function sortEvents(
   events: CandidEvent[],
   sort: EventSortOption,
+  direction?: import("../types/event-list").SortDirection,
 ): CandidEvent[] {
   const copy = [...events];
+  const isDesc =
+    direction === "desc" ||
+    (!direction && (sort === "newest" as EventSortOption));
 
   switch (sort) {
     case "newest":
-      return copy.sort(
-        (a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
-      );
-
     case "oldest":
-      return copy.sort(
-        (a, b) =>
-          new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
-      );
+      return copy.sort((a, b) => {
+        const diff =
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+
+        return isDesc ? diff : -diff;
+      });
 
     case "name":
-      return copy.sort((a, b) => a.name.localeCompare(b.name));
+      return copy.sort((a, b) => {
+        const diff = a.name.localeCompare(b.name);
+
+        return isDesc ? -diff : diff;
+      });
 
     case "upcoming": {
       const now = Date.now();
@@ -96,15 +102,17 @@ function sortEvents(
           ? new Date(b.event_date).getTime()
           : Infinity;
 
-        // Future events first (closest upcoming), then past events
         const aFuture = aDate >= now;
         const bFuture = bDate >= now;
 
-        if (aFuture && bFuture) return aDate - bDate;
-        if (aFuture) return -1;
-        if (bFuture) return 1;
+        let diff = 0;
 
-        return bDate - aDate; // Past events: most recent first
+        if (aFuture && bFuture) diff = aDate - bDate;
+        else if (aFuture) diff = -1;
+        else if (bFuture) diff = 1;
+        else diff = bDate - aDate;
+
+        return isDesc ? -diff : diff;
       });
     }
 

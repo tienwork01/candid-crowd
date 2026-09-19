@@ -5,6 +5,7 @@ import {
   X,
   Funnel,
   SortAscending,
+  SortDescending,
 } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import {
@@ -17,7 +18,7 @@ import {
 } from "@/components/ui";
 import { eventTypes } from "../types/event";
 import type { EventType } from "../types/event";
-import type { EventSortOption } from "../types/event-list";
+import type { EventSortOption, SortDirection } from "../types/event-list";
 import { eventSortOptions } from "../types/event-list";
 
 type EventsToolbarProps = {
@@ -28,6 +29,8 @@ type EventsToolbarProps = {
   onTypeChange: (type: EventType | undefined) => void;
   selectedSort: EventSortOption;
   onSortChange: (sort: EventSortOption) => void;
+  selectedDirection?: SortDirection;
+  onDirectionToggle?: () => void;
   resultCount: number;
   hasActiveSearch: boolean;
 };
@@ -47,6 +50,8 @@ export function EventsToolbar({
   onTypeChange,
   selectedSort,
   onSortChange,
+  selectedDirection = "desc",
+  onDirectionToggle,
   resultCount,
   hasActiveSearch,
 }: EventsToolbarProps) {
@@ -68,15 +73,16 @@ export function EventsToolbar({
           value={inputValue}
           onChange={(e) => onSearchChange(e.target.value)}
           className="host-events__search-input"
+          aria-label={t("searchEvents")}
         />
         {inputValue && (
           <button
             type="button"
             onClick={onSearchClear}
             className="host-events__search-clear"
-            aria-label={t("clearSearch")}
+            aria-label={t("searchClear")}
           >
-            <X size={13} weight="bold" aria-hidden="true" />
+            <X size={14} aria-hidden="true" />
           </button>
         )}
       </div>
@@ -124,11 +130,19 @@ export function EventsToolbar({
             className="host-events__sort-select"
             aria-label={t("sortBy")}
           >
-            <SortAscending
-              size={14}
-              className="text-muted-foreground shrink-0"
-              aria-hidden="true"
-            />
+            {selectedDirection === "asc" ? (
+              <SortAscending
+                size={14}
+                className="text-muted-foreground shrink-0"
+                aria-hidden="true"
+              />
+            ) : (
+              <SortDescending
+                size={14}
+                className="text-muted-foreground shrink-0"
+                aria-hidden="true"
+              />
+            )}
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -139,6 +153,31 @@ export function EventsToolbar({
             ))}
           </SelectContent>
         </Select>
+
+        {/* Direction toggle button */}
+        {onDirectionToggle && (
+          <button
+            type="button"
+            onClick={onDirectionToggle}
+            className="host-events__direction-btn"
+            aria-label={
+              selectedDirection === "asc"
+                ? t("sortAscending")
+                : t("sortDescending")
+            }
+            title={
+              selectedDirection === "asc"
+                ? t("sortAscending")
+                : t("sortDescending")
+            }
+          >
+            {selectedDirection === "asc" ? (
+              <SortAscending size={15} weight="bold" aria-hidden="true" />
+            ) : (
+              <SortDescending size={15} weight="bold" aria-hidden="true" />
+            )}
+          </button>
+        )}
       </div>
 
       {/* Results count */}
