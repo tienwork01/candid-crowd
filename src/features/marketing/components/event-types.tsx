@@ -76,7 +76,7 @@ export function EventTypes() {
                 <p>{selected.description}</p>
               </m.div>
             </div>
-            <Link href="/events/new" className="inline-action">
+            <Link href="/register?next=/events/new" className="inline-action">
               {t("startDraft")} <ArrowUpRight size={17} aria-hidden="true" />
             </Link>
           </div>

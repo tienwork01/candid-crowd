@@ -19,6 +19,7 @@ const ALLOWED_EXACT = new Set([
   "Cloudflare",
   "Google",
   "Apple",
+  "QR Code",
   "Emma & James",
   "May 24, 2026",
   "24/05/2026",

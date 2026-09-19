@@ -42,7 +42,7 @@ const dynamicNamespacePrefixes = [
   "formats.", // Next-intl formatting configurations
   "marketing.photos.", // photo.id dynamic lookup
   "marketing.eventTypesSection.items.", // item.key dynamic lookup
-  "marketing.participation.sources.", // source.key dynamic lookup
+  "marketing.participation.funnel.", // step.key dynamic lookup
   "common.errors.", // Error code dynamic lookup in src/lib/errors.ts
   "event.types.", // Dynamic event type label lookup
 ];

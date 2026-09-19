@@ -17,6 +17,8 @@ test("auth routes are accessible and link to each other", async ({ page }) => {
     page.getByRole("heading", { name: "Find your way back." }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Log in" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.locator("#auth-heading")).toBeVisible();
   expect(
     (
       await new AxeBuilder({ page })

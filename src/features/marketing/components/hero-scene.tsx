@@ -107,8 +107,9 @@ export function HeroScene() {
             {done ? (
               <m.div
                 className="image-fill"
-                initial={{ opacity: 0, scale: reduced ? 1 : 0.94 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, scale: reduced ? 1 : 0.92 }}
+                animate={{ opacity: 1, scale: reduced ? 1 : [0.92, 1.05, 1] }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
               >
                 <Image
                   src={photos.celebration.src}
@@ -150,7 +151,14 @@ export function HeroScene() {
           className="hero-scene__share"
           size="sm"
           disabled={upload.phase === "uploading"}
-          onClick={done ? upload.reset : upload.start}
+          aria-busy={upload.phase === "uploading"}
+          onClick={
+            upload.phase === "uploading"
+              ? undefined
+              : done
+                ? upload.reset
+                : upload.start
+          }
         >
           {done ? (
             <>
@@ -174,6 +182,8 @@ export function HeroScene() {
         initial={false}
         animate={{ scale: !reduced && done ? 1.02 : 1 }}
         role="status"
+        aria-live="polite"
+        aria-atomic="true"
       >
         <span className="hero-scene__notification-icon">
           {done ? (

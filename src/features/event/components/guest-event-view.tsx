@@ -83,7 +83,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
       {isTest && (
         <aside
           aria-label={t("guest.testSessionBanner")}
-          className="w-full bg-sage/50 border-b border-line px-4 py-2.5 flex items-center justify-between gap-3 text-xs text-ink"
+          className="guest-event-card__test-banner w-full bg-sage/50 border-b border-line px-4 py-2.5 flex items-center justify-between gap-3 text-xs text-ink"
         >
           <div className="flex items-center gap-2">
             <Eye
@@ -94,16 +94,14 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
             <span className="font-medium">{t("guest.testSessionBanner")}</span>
           </div>
 
-          {uploads.length > 0 && (
-            <button
-              type="button"
-              onClick={handleRemoveTestUploads}
-              className="text-xs text-crimson hover:underline inline-flex items-center gap-1 font-medium shrink-0"
-            >
-              <Trash size={13} aria-hidden="true" />
-              <span>{t("guest.removeTestUploads")}</span>
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleRemoveTestUploads}
+            className="text-xs text-crimson hover:underline inline-flex items-center gap-1 font-medium shrink-0"
+          >
+            <Trash size={13} aria-hidden="true" />
+            <span>{t("guest.removeTestUploads")}</span>
+          </button>
         </aside>
       )}
 

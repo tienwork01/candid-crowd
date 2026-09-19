@@ -14,10 +14,17 @@ function reducer(state: State, action: Action): State {
   if (action === "interrupt") return { ...state, phase: "error" };
   if (state.phase !== "uploading") return state;
 
-  // Small, frequent milestones give the WebGL renderer a steady target to
-  // interpolate toward. Large, slow steps made the flying photo visibly catch
-  // up to its target between ticks.
-  const progress = Math.min(state.progress + 4, 100);
+  // Realistic non-linear progress curve:
+  // 0 -> ~65% quickly, then ~90% more slowly, then 100% on completion.
+  let step = 7;
+
+  if (state.progress >= 90) {
+    step = 2;
+  } else if (state.progress >= 65) {
+    step = 3;
+  }
+
+  const progress = Math.min(state.progress + step, 100);
 
   return { progress, phase: progress === 100 ? "success" : "uploading" };
 }
@@ -39,7 +46,7 @@ export function useUploadPreview(inView: boolean) {
   useEffect(() => {
     if (state.phase !== "uploading" || !visible || !inView) return;
 
-    const timer = window.setInterval(() => dispatch("tick"), 55);
+    const timer = window.setInterval(() => dispatch("tick"), 50);
 
     return () => window.clearInterval(timer);
   }, [state.phase, visible, inView]);

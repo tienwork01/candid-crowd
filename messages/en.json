@@ -11,7 +11,7 @@
     },
     "errors": {
       "USER_ALREADY_EXISTS": "An account with this email already exists. Please log in instead.",
-      "INVALID_CREDENTIALS": "Email or password is incorrect. Please check your credentials.",
+      "INVALID_CREDENTIALS": "Incorrect email or password.",
       "INVALID_PASSWORD": "The password you entered is incorrect.",
       "PASSWORD_TOO_SHORT": "Password must be at least 8 characters.",
       "PASSWORD_TOO_LONG": "Password cannot exceed 128 characters.",
@@ -43,8 +43,8 @@
     }
   },
   "metadata": {
-    "homeTitle": "CandidCrowd — Every guest. Every perspective.",
-    "homeDescription": "Get the photos your guests already take. One QR code, one shared event gallery. No app. No guest account."
+    "homeTitle": "CandidCrowd — Event Photo Sharing with One QR Code",
+    "homeDescription": "Collect event photos and videos from every guest with one QR code. No app or guest account required. Create a private shared gallery in minutes."
   },
   "marketing": {
     "navigation": {
@@ -68,10 +68,10 @@
       "title": "Get the photos your guests already take.",
       "description": "One QR code gives everyone at your event a simple place to share their photos and videos. No app. No account.",
       "createEvent": "Create your event free",
-      "seeHowItWorks": "See how it works",
-      "trustNoApp": "No app",
+      "trustNoApp": "No app needed",
       "trustPrivate": "Private",
-      "trustOriginalQuality": "Original quality"
+      "tryGuestDemo": "Try the guest demo",
+      "trustNoAccount": "No guest account"
     },
     "photos": {
       "countryside": "A couple holding hands while walking through the countryside",
@@ -89,17 +89,14 @@
       "eyebrow": "A LITTLE SETUP. A LOT OF MEMORIES.",
       "titleLine1": "Three simple steps.",
       "titleLine2": "Then, be in the moment.",
-      "subheadLine1": "The experience we’re building,",
-      "subheadLine2": "from first scan to last dance.",
+      "subheadLine1": "From first scan to shared memories,",
+      "subheadLine2": "designed to stay in the background.",
       "step1Title": "Create your event",
-      "step1Description": "Set up an event in under a minute.",
-      "step1Detail": "A name, a date, and something to celebrate.",
-      "step2Title": "Share your QR",
-      "step2Description": "Place it on invitations, tables, signs or screens.",
-      "step2Detail": "One simple invitation to share their perspective.",
-      "step3Title": "Everyone contributes",
-      "step3Description": "Guests upload from their phones without installing anything.",
-      "step3Detail": "During the fun, or when they get home."
+      "step1Description": "Add the basic event details and your QR is ready immediately.",
+      "step2Title": "Share one QR",
+      "step2Description": "Print it, display it, or send the event link.",
+      "step3Title": "Watch memories arrive",
+      "step3Description": "Guests upload directly from their phones without an app or account."
     },
     "problem": {
       "eyebrow": "THE MOMENTS BETWEEN THE BIG MOMENTS",
@@ -132,55 +129,6 @@
       "assuranceHostControls": "Host controls the event",
       "assuranceModernBrowsers": "Modern iPhone & Android browsers",
       "disclosure": "Our product principles. Live event sharing is not available in this preview."
-    },
-    "pricing": {
-      "eyebrow": "A PLAN FOR YOUR KIND OF CELEBRATION",
-      "titleLine1": "Little gathering.",
-      "titleLine2": "Big memories.",
-      "subhead": "Start with the free preview. Find the right fit as we grow.",
-      "recommendedBadge": "Most loved for a full celebration",
-      "availableToExplore": "AVAILABLE TO EXPLORE",
-      "plannedOffering": "PLANNED OFFERING",
-      "essentialNote": "The essentials for bringing every guest perspective together.",
-      "disclosure": "Pricing preview · Paid plans and features are not available yet. No payments are collected.",
-      "plans": {
-        "free": {
-          "name": "Free",
-          "description": "For trying CandidCrowd.",
-          "priceLabel": "Free",
-          "billing": "Explore the preview",
-          "cta": "Try it free",
-          "features": {
-            "f1": "Interactive guest experience",
-            "f2": "Try your own photos locally",
-            "f3": "Save an event draft"
-          }
-        },
-        "essential": {
-          "name": "Essential",
-          "description": "One celebration. Every perspective.",
-          "priceLabel": "Coming soon",
-          "billing": "Pay once per event · Price to be announced",
-          "cta": "Explore the demo",
-          "features": {
-            "f1": "Your private event gallery",
-            "f2": "A guest link & printable QR",
-            "f3": "Original-quality photo downloads"
-          }
-        },
-        "plus": {
-          "name": "Plus",
-          "description": "For the moments that need more room.",
-          "priceLabel": "Coming soon",
-          "billing": "Pay once per event · Price to be announced",
-          "cta": "Explore the demo",
-          "features": {
-            "f1": "Everything planned for Essential",
-            "f2": "More space for your memories",
-            "f3": "Video sharing & more event features"
-          }
-        }
-      }
     },
     "eventTypesSection": {
       "eyebrow": "STARTING WITH “I DO.” MADE FOR SO MUCH MORE.",
@@ -216,6 +164,16 @@
           "label": "Company events",
           "line": "Good people. Shared moments.",
           "description": "Collect the human side of team offsites, milestones, and company celebrations."
+        },
+        "anniversaries": {
+          "label": "Anniversaries",
+          "line": "Celebrating love. Honoring the journey.",
+          "description": "Gather every generation, toast to the years passed, and collect every heartfelt toast."
+        },
+        "parties": {
+          "label": "Parties",
+          "line": "Good music. Great friends. Spontaneous shots.",
+          "description": "Capture the laughter, the dance moves, and all the moments in between."
         }
       }
     },
@@ -223,9 +181,8 @@
       "eyebrow": "EVERY GUEST. EVERY PERSPECTIVE.",
       "titleLine1": "Your guests are already",
       "titleLine2": "taking the photos.",
-      "titleLine3": "Bring them together.",
       "button": "Create your event free",
-      "subhead": "No app. No guest account. All the good stuff."
+      "subhead": "Bring them together. No app. No guest account."
     },
     "footer": {
       "brandTagline": "Shared memories for every event.",
@@ -248,63 +205,46 @@
       "invitationScan": "Scan. Share. Celebrate.",
       "invitationTag": "Invitations · Tables · Welcome signs",
       "beforeEyebrow": "01 — BEFORE",
-      "beforeTitle": "Place the QR anywhere.",
-      "beforeDescription": "On the invitation, your event website, a welcome sign, or every table. Make it easy to find.",
+      "beforeTitle": "Make sharing effortless",
+      "beforeDescription": "Your printable QR code and private guest link are ready immediately. Place it on invitations, tables, or welcome signs.",
       "liveWallLabel": "LIVE WALL CONCEPT",
       "wallNotice": "A new perspective just arrived.",
       "duringEyebrow": "02 — DURING",
-      "duringTitle": "Watch your story grow.",
-      "duringDescription": "Photos find their way into your shared gallery. A future Live Wall brings them into the room.",
-      "reminderDay": "THE MORNING AFTER",
+      "duringTitle": "Watch participation grow",
+      "duringDescription": "Guests scan and upload directly from their browser. Photos and videos appear in your shared gallery as the celebration unfolds.",
       "reminderOneMore": "One more thing…",
       "reminderPromptLine1": "Got photos from last night?",
       "reminderPromptLine2": "Share them here.",
-      "reminderLink": "Your event link",
       "afterEyebrow": "03 — AFTER",
-      "afterTitle": "The memories keep coming.",
-      "afterDescription": "Share the link once more. Collect the moments your guests were too busy enjoying to upload.",
-      "disclosure": "Illustrations of the planned experience. Live Wall and reminders are coming later."
+      "afterTitle": "Recover the photos still on their phones",
+      "afterDescription": "Guests often capture wonderful memories but forget to upload in the moment. Send one post-event reminder link to collect everything left on their camera rolls.",
+      "recoveryDuringLabel": "During event",
+      "recoveryAfterLabel": "After event",
+      "recoveryTotalLabel": "Total memories"
     },
     "participation": {
       "eyebrow": "BUILT AROUND PARTICIPATION",
       "titleLine1": "Don’t just create an album.",
       "titleLine2": "Get people to contribute.",
-      "subhead": "A shared gallery is only the beginning. We’re designing CandidCrowd to help you see what gets your guests sharing.",
-      "point1Title": "Know how guests join.",
-      "point1Description": "See whether guests contribute by scanning your event QR code or opening the shared link.",
-      "point2Title": "Make room for every perspective.",
-      "point2Description": "Understand participation, then give guests a gentle nudge when the time is right.",
-      "conceptNote": "Product concept · Analytics and QR source tracking are not live yet.",
-      "dashboardEyebrow": "YOUR EVENT, AT A GLANCE",
+      "subhead": "Most shared galleries only count photos. CandidCrowd helps you see how many guests actually contribute — and where participation drops off.",
+      "point1Title": "See the real participation rate",
+      "point1Description": "Track unique contributors against your expected guest count, not just total photo uploads.",
+      "point2Title": "Spot where guests drop off",
+      "point2Description": "Understand whether guests need a reminder card, a gentle announcement, or a post-event message.",
+      "dashboardEyebrow": "PARTICIPATION ENGINE",
+      "previewBadge": "Preview",
       "expectedGuests": "expected guests",
+      "contributorsCol": "contributors",
+      "participationRate": "participation",
       "participationLabel": "participation",
-      "photos": "photos",
-      "videos": "videos",
-      "sourcesHeading": "Where the memories begin",
-      "contributorsCol": "Contributors",
-      "tableCaption": "Illustrative contributors by access source",
-      "thSource": "Source",
-      "sources": {
-        "qr": "Event QR code",
-        "link": "Shared link"
-      }
-    },
-    "previewNotice": {
-      "dialogEyebrow": "CANDIDCROWD · FIRST CHAPTER",
-      "createDraft": "Create an event draft",
-      "notices": {
-        "login": {
-          "title": "Your host space is on its way.",
-          "body": "Host accounts aren’t available in this preview yet. You can try the guest experience or create an event draft on this device. No credentials are collected."
-        },
-        "privacy": {
-          "title": "Privacy · preview notice",
-          "body": "Photos selected in this demo stay in this browser session and are not uploaded. An event draft is stored on this device if you save one. The full privacy policy will be published before live accounts and cloud uploads launch. This notice is a placeholder, not the final policy."
-        },
-        "terms": {
-          "title": "Terms · preview notice",
-          "body": "This is an interactive product preview, not a live event-sharing service. Paid plans, host accounts, and cloud uploads are not available. Full terms will be published before the service launches. This notice is a placeholder, not the final terms."
-        }
+      "memoriesCollected": "memories collected",
+      "funnelHeading": "Contribution Funnel",
+      "funnelCaption": "CandidCrowd reveals where participation drops so hosts can recover missed moments.",
+      "funnel": {
+        "scans": "QR scans",
+        "visits": "Event page visits",
+        "opened": "Opened upload",
+        "contributed": "Shared memories"
       }
     },
     "heroScene": {
@@ -332,15 +272,14 @@
       "legendYourGallery": "Your gallery"
     },
     "demoQr": {
-      "eyebrow": "A LITTLE INVITATION",
-      "titleLine1": "Your perspective",
-      "titleLine2": "belongs here.",
+      "titleLine1": "Share your memories",
+      "titleLine2": "Scan to add photos & videos",
       "alt": "Scan to open the interactive CandidCrowd guest demo",
       "qrUnavailable": "QR unavailable; use Try without scanning",
       "qrLoading": "QR code loading",
       "failedInstruction": "Use the button below to try the demo.",
-      "scanInstruction": "Scan with your phone camera",
-      "note": "Use a publicly reachable site URL to scan from another device."
+      "note": "Scan with your phone to try the guest experience.",
+      "trust": "No app needed · No account needed"
     },
     "demoGallery": {
       "eyebrow": "THE SHARED GALLERY",
@@ -392,6 +331,32 @@
       "statusBusy": "Simulating upload. Watch your photos join the gallery.",
       "statusReady": "{count, plural, =1 {1 photo} other {# photos}} ready to share.",
       "statusEmpty": "Choose your photos or use our sample moments."
+    },
+    "trustStrip": {
+      "ariaLabel": "Core event sharing features",
+      "noApp": "No app needed",
+      "noGuestAccount": "No guest account",
+      "privateEvent": "Private event",
+      "originalQuality": "Original-quality uploads"
+    },
+    "earlyAccess": {
+      "eyebrow": "EARLY ACCESS",
+      "titleLine1": "Try CandidCrowd free.",
+      "titleLine2": "No credit card needed.",
+      "subhead": "Create an event, generate your QR, and experience the guest flow.",
+      "badge": "Free Early Access",
+      "planName": "Event Starter",
+      "price": "$0",
+      "billing": "Free during early access",
+      "description": "Everything you need to collect candid photos and videos at your celebration.",
+      "cta": "Create free event",
+      "note": "Paid event plans are coming later.",
+      "features": {
+        "oneQr": "One event QR code & guest link ready instantly",
+        "noApp": "No guest app install or account required",
+        "realtimeGallery": "Private event gallery with instant uploads",
+        "originalQuality": "Original-quality photo downloads for the host"
+      }
     }
   },
   "auth": {
@@ -431,7 +396,7 @@
     },
     "signIn": {
       "title": "Welcome back",
-      "email": "Email",
+      "email": "Email address",
       "password": "Password"
     },
     "register": {

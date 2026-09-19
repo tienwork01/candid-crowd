@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useInView } from "motion/react";
 import { QrCode } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
+import { sampleEvent } from "../data/marketing";
 
 export function DemoQr() {
   const t = useTranslations("marketing.demoQr");
@@ -41,31 +42,35 @@ export function DemoQr() {
 
   return (
     <div ref={ref} className="demo-qr">
-      <span className="eyebrow">{t("eyebrow")}</span>
-      <span className="demo-qr__title">
-        {t("titleLine1")}
-        <br />
-        <em>{t("titleLine2")}</em>
-      </span>
-      <div className="demo-qr__image">
-        {src ? (
-          <Image
-            src={src}
-            alt={t("alt")}
-            width={160}
-            height={160}
-            unoptimized
-          />
-        ) : (
-          <QrCode
-            size={90}
-            aria-label={failed ? t("qrUnavailable") : t("qrLoading")}
-          />
-        )}
+      <div className="demo-qr__card">
+        <span className="demo-qr__event-name">{sampleEvent.name}</span>
+        <span className="demo-qr__title">
+          {t("titleLine1")}
+          <br />
+          <em>{t("titleLine2")}</em>
+        </span>
+        <div className="demo-qr__image">
+          {src ? (
+            <Image
+              src={src}
+              alt={t("alt")}
+              width={160}
+              height={160}
+              unoptimized
+            />
+          ) : (
+            <QrCode
+              size={90}
+              aria-label={failed ? t("qrUnavailable") : t("qrLoading")}
+            />
+          )}
+        </div>
+        <span className="demo-qr__trust">{t("trust")}</span>
+        <span className="demo-qr__url">{sampleEvent.fullUrl}</span>
       </div>
-      <p>{failed ? t("failedInstruction") : t("scanInstruction")}</p>
-      <span className="demo-qr__brand">candidcrowd.</span>
-      <p className="demo-qr__note">{t("note")}</p>
+      <p className="demo-qr__note">
+        {failed ? t("failedInstruction") : t("note")}
+      </p>
     </div>
   );
 }

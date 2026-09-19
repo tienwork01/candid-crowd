@@ -55,7 +55,12 @@ async function hasValidSession(request: NextRequest): Promise<boolean> {
     });
 
     return Boolean(session?.session && session.user);
-  } catch {
+  } catch (err) {
+    console.error(
+      "[AUTH_SESSION_ERROR]",
+      err instanceof Error ? err.message : err,
+    );
+
     return false;
   }
 }

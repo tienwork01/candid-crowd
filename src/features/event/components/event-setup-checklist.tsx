@@ -157,7 +157,7 @@ export function EventSetupChecklist({
             variant="outline"
             size="sm"
             onClick={handlePreview}
-            className="text-xs h-8 px-3"
+            className="text-xs px-3"
           >
             {checklist.testedGuestExperience ? (
               <span>{t("checklist.completed")}</span>
@@ -202,7 +202,7 @@ export function EventSetupChecklist({
                 variant="outline"
                 size="sm"
                 onClick={() => setShowGuestCountInput(true)}
-                className="text-xs h-8 px-3"
+                className="text-xs px-3"
               >
                 <span>{t("checklist.optional")}</span>
               </Button>
@@ -239,19 +239,20 @@ export function EventSetupChecklist({
                 <Input
                   id="expected-guests-input"
                   type="number"
+                  size="sm"
                   min={1}
                   max={50000}
                   placeholder={t("guestCount.placeholder")}
                   value={guestCount}
                   onChange={(e) => setGuestCount(e.target.value)}
-                  className="h-9 w-32 text-sm bg-background"
+                  className="w-32 bg-background"
                 />
 
                 <Button
                   type="submit"
                   size="sm"
                   disabled={isUpdating}
-                  className="h-9 px-3 text-xs button"
+                  className="px-3 button"
                 >
                   <span>{t("guestCount.save")}</span>
                 </Button>
@@ -261,7 +262,7 @@ export function EventSetupChecklist({
                   variant="ghost"
                   size="sm"
                   onClick={handleSkipGuestCount}
-                  className="h-9 px-2.5 text-xs text-muted-foreground hover:text-ink"
+                  className="px-2.5 text-muted-foreground hover:text-ink"
                 >
                   <span>{t("guestCount.skip")}</span>
                 </Button>

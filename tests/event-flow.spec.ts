@@ -9,11 +9,11 @@ async function getSignedSessionCookie(): Promise<string> {
       process.env.BETTER_AUTH_DATABASE_URL ||
       "postgresql://neondb_owner:npg_3rKAwkci0lOe@ep-square-feather-b5asm686-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
     ssl: { rejectUnauthorized: false },
+    connectionTimeoutMillis: 15000,
   });
 
   const secret =
-    process.env.BETTER_AUTH_SECRET ||
-    "replace-with-a-long-random-secret-for-jwt-signing-key";
+    process.env.BETTER_AUTH_SECRET || "replace-with-a-long-random-secret";
 
   try {
     const res = await pool.query(
@@ -49,7 +49,19 @@ test.describe("CandidCrowd Event Creation and Ready Flow", () => {
     page,
     context,
   }) => {
-    const signedCookie = await getSignedSessionCookie();
+    test.setTimeout(60000);
+
+    let signedCookie = "";
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        signedCookie = await getSignedSessionCookie();
+        break;
+      } catch (err) {
+        if (attempt === 3) throw err;
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+    }
 
     await context.addCookies([
       {
@@ -87,10 +99,13 @@ test.describe("CandidCrowd Event Creation and Ready Flow", () => {
     // Select Event Type
     const typeSelect = page.getByLabel("Event type");
 
-    await typeSelect.selectOption("wedding");
+    await typeSelect.click();
+    await page.getByRole("option", { name: "Wedding" }).click();
 
     // Toggle "I don't know the date yet"
-    const dateUnknownCheckbox = page.getByLabel("I don't know the date yet");
+    const dateUnknownCheckbox = page.getByRole("checkbox", {
+      name: "I don't know the date yet",
+    });
 
     await dateUnknownCheckbox.click();
 
@@ -108,6 +123,9 @@ test.describe("CandidCrowd Event Creation and Ready Flow", () => {
     await page.waitForURL(/\/events\/[a-zA-Z0-9-]+\/ready/);
     expect(page.url()).toMatch(/\/events\/[a-zA-Z0-9-]+\/ready/);
 
+    const eventIdMatch = page.url().match(/\/events\/([a-zA-Z0-9-]+)\/ready/);
+    const createdEventId = eventIdMatch ? eventIdMatch[1] : "";
+
     // 4. Verify Event Ready Screen
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Your event is ready",
@@ -117,12 +135,16 @@ test.describe("CandidCrowd Event Creation and Ready Flow", () => {
     );
 
     // Verify QR code is rendered
-    const qrCanvas = page.locator(".event-ready-card__qr canvas");
+    const qrElement = page.locator(
+      ".event-ready-card__qr img, .event-ready-card__qr canvas",
+    );
 
-    await expect(qrCanvas).toBeVisible();
+    await expect(qrElement).toBeVisible();
 
     // Verify guest short link is displayed
-    const guestLink = page.locator(".event-ready-card__link code");
+    const guestLink = page.locator(
+      ".event-ready-card__guest-link span, .event-ready-card__link code",
+    );
 
     await expect(guestLink).toBeVisible();
 
@@ -131,7 +153,9 @@ test.describe("CandidCrowd Event Creation and Ready Flow", () => {
     expect(guestUrlText).toContain("/e/");
 
     // Verify copy link button and download QR button
-    const copyLinkBtn = page.getByRole("button", { name: "Copy link" });
+    const copyLinkBtn = page
+      .locator(".event-ready-card__qr-actions")
+      .getByRole("button", { name: "Copy link" });
 
     await expect(copyLinkBtn).toBeVisible();
 
@@ -193,23 +217,8 @@ test.describe("CandidCrowd Event Creation and Ready Flow", () => {
     await removeTestBtn.click();
 
     // 9. Navigate to Event Overview (/events/[id])
-    // Let's go to the host overview page for the created event
-    const currentUrl = page.url();
-    const slug = currentUrl.split("/e/")[1]?.split("?")[0];
-    // Find the event ID from local storage or navigation
-    const eventsJson = await page.evaluate(() =>
-      localStorage.getItem("candid_events"),
-    );
-
-    expect(eventsJson).toBeTruthy();
-
-    const events = JSON.parse(eventsJson!);
-    const createdEvent = events.find((e: { slug: string }) => e.slug === slug);
-
-    expect(createdEvent).toBeTruthy();
-
-    await page.goto(`/events/${createdEvent.id}`);
-    await expect(page).toHaveURL(new RegExp(`/events/${createdEvent.id}`));
+    await page.goto(`/events/${createdEventId}`);
+    await expect(page).toHaveURL(new RegExp(`/events/${createdEventId}`));
 
     // Verify Overview board
     await expect(page.getByRole("heading", { level: 1 })).toContainText(

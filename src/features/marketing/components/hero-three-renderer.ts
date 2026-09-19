@@ -34,7 +34,7 @@ export async function createHeroRenderer(
     powerPreference: "high-performance",
   });
 
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
   renderer.shadowMap.enabled = true;
   // PCFSoft keeps the physical depth cue without VSM's extra blur pass.
@@ -465,7 +465,7 @@ export async function createHeroRenderer(
     prints.visible = !compact;
     renderer.shadowMap.enabled = !compact;
     shadow.visible = !compact;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, compact ? 1 : 1.25));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, compact ? 1 : 1.5));
     renderer.setSize(width, height);
     camera.aspect = width / height;
     camera.position.z = Math.max(
@@ -522,7 +522,14 @@ export async function createHeroRenderer(
       targetProgress = next;
       viewAngle = angle;
       if (next > 0 || angle !== 0) entrance = 1;
-      if (next === 0) progress = 0;
+
+      if (next === 0) {
+        progress = 0;
+        memory.visible = false;
+        uploadBar.visible = false;
+        uploadBar.scale.x = 0.001;
+      }
+
       active = visible;
       if (!active) {
         cancelAnimationFrame(frame);

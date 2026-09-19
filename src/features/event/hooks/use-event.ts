@@ -17,7 +17,7 @@ export function useEvent(idOrSlug: string) {
 
       try {
         const response = await privateClient.get<CandidEvent>(
-          `/api/events/${encodeURIComponent(idOrSlug)}`,
+          `/api/v1/events/${encodeURIComponent(idOrSlug)}`,
         );
 
         if (response.data && response.data.id) {

@@ -17,7 +17,7 @@ export function usePublicEvent(slug: string) {
     queryKey: ["public-event", slug],
     queryFn: async () => {
       const response = await publicClient.get<PublicEventData>(
-        `/api/public/events/${encodeURIComponent(slug)}`,
+        `/api/v1/public/events/${encodeURIComponent(slug)}`,
       );
 
       return response.data;

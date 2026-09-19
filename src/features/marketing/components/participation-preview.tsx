@@ -1,22 +1,21 @@
-import { ArrowUpRight, Users } from "@phosphor-icons/react/dist/ssr";
+import {
+  ArrowDown,
+  ChartLineUp,
+  Sparkle,
+} from "@phosphor-icons/react/dist/ssr";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Reveal } from "@/components/shared";
 import { participation, sampleEvent } from "../data/marketing";
 
 export async function ParticipationPreview() {
-  const [t, tSources, format] = await Promise.all([
+  const [t, format] = await Promise.all([
     getTranslations("marketing.participation"),
-    getTranslations("marketing.participation.sources"),
     getFormatter(),
   ]);
 
-  type SourceKey = "qr" | "link";
-
-  const rate = participation.contributors / participation.guests;
-
   return (
     <section
-      id="why-candidcrowd"
+      id="participation"
       className="participation container section-pad"
       aria-labelledby="participation-title"
     >
@@ -40,17 +39,23 @@ export async function ParticipationPreview() {
             <p>{t("point2Description")}</p>
           </div>
         </div>
-        <p className="participation__note">{t("conceptNote")}</p>
       </div>
+
       <Reveal className="participation-dashboard">
         <div className="participation-dashboard__heading">
           <div>
-            <span className="eyebrow">{t("dashboardEyebrow")}</span>
+            <div className="participation-dashboard__tag-wrap">
+              <span className="eyebrow">{t("dashboardEyebrow")}</span>
+              <span className="participation-dashboard__badge">
+                <Sparkle size={12} aria-hidden="true" />
+                {t("previewBadge")}
+              </span>
+            </div>
             <h3>{sampleEvent.name}</h3>
           </div>
           <div className="participation-dashboard__stat">
             <span className="participation-dashboard__number">
-              {format.number(rate, {
+              {format.number(participation.rate, {
                 style: "percent",
                 maximumFractionDigits: 0,
               })}
@@ -60,15 +65,8 @@ export async function ParticipationPreview() {
             </span>
           </div>
         </div>
+
         <div className="participation-dashboard__metrics">
-          <div>
-            <span className="participation-dashboard__metric-value">
-              {format.number(participation.contributors)}
-            </span>
-            <span className="participation-dashboard__metric-label">
-              {t("contributorsCol")}
-            </span>
-          </div>
           <div>
             <span className="participation-dashboard__metric-value">
               {format.number(participation.guests)}
@@ -79,57 +77,85 @@ export async function ParticipationPreview() {
           </div>
           <div>
             <span className="participation-dashboard__metric-value">
-              {format.number(participation.photos)}
+              {format.number(participation.contributors)}
             </span>
             <span className="participation-dashboard__metric-label">
-              {t("photos")}
+              {t("contributorsCol")}
             </span>
           </div>
           <div>
             <span className="participation-dashboard__metric-value">
-              {format.number(participation.videos)}
+              {format.number(participation.rate, {
+                style: "percent",
+                maximumFractionDigits: 0,
+              })}
             </span>
             <span className="participation-dashboard__metric-label">
-              {t("videos")}
+              {t("participationRate")}
+            </span>
+          </div>
+          <div>
+            <span className="participation-dashboard__metric-value">
+              {format.number(participation.photos)}
+            </span>
+            <span className="participation-dashboard__metric-label">
+              {t("memoriesCollected")}
             </span>
           </div>
         </div>
-        <div className="participation-dashboard__breakdown-title">
-          <Users size={16} aria-hidden="true" />
-          <span>{t("sourcesHeading")}</span>
+
+        <div className="participation-funnel">
+          <div className="participation-funnel__header">
+            <ChartLineUp size={16} aria-hidden="true" />
+            <span>{t("funnelHeading")}</span>
+          </div>
+
+          <div className="participation-funnel__steps">
+            {participation.funnel.map((step, index) => {
+              const funnelKey = step.key as
+                "scans" | "visits" | "opened" | "contributed";
+
+              return (
+                <div key={step.key} className="participation-funnel__step-wrap">
+                  <div className="participation-funnel__step">
+                    <div className="participation-funnel__info">
+                      <span className="participation-funnel__name">
+                        {t(`funnel.${funnelKey}`)}
+                      </span>
+                      <div className="participation-funnel__count-wrap">
+                        <span className="participation-funnel__count">
+                          {format.number(step.count)}
+                        </span>
+                        <span className="participation-funnel__percent">
+                          {step.percentage}%
+                        </span>
+                      </div>
+                    </div>
+                    <div
+                      className="participation-funnel__track"
+                      aria-hidden="true"
+                    >
+                      <div
+                        className="participation-funnel__bar"
+                        style={{ width: `${step.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                  {index < participation.funnel.length - 1 && (
+                    <div
+                      className="participation-funnel__connector"
+                      aria-hidden="true"
+                    >
+                      <ArrowDown size={14} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="participation-funnel__caption">{t("funnelCaption")}</p>
         </div>
-        <table className="participation-dashboard__source-table">
-          <caption className="sr-only">{t("tableCaption")}</caption>
-          <thead className="sr-only">
-            <tr>
-              <th scope="col">{t("thSource")}</th>
-              <th scope="col">{t("contributorsCol")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {participation.sources.map((source) => (
-              <tr key={source.key}>
-                <th scope="row">
-                  <span>{tSources(source.key as SourceKey)}</span>
-                  <span
-                    className="participation-dashboard__source-track"
-                    aria-hidden="true"
-                  >
-                    <span
-                      style={{
-                        width: `${(source.contributors / participation.contributors) * 100}%`,
-                      }}
-                    />
-                  </span>
-                </th>
-                <td>
-                  {format.number(source.contributors)}{" "}
-                  <ArrowUpRight size={13} aria-hidden="true" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </Reveal>
     </section>
   );

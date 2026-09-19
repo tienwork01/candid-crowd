@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEvent } from "../hooks";
+import { useEvent, useMounted } from "../hooks";
 import { GuestEventView } from "./guest-event-view";
 import { Spinner } from "@/components/ui";
 import type { CandidEvent } from "../types/event";
@@ -15,10 +15,11 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
   const searchParams = useSearchParams();
   const t = useTranslations("event");
   const isTest = searchParams?.get("is_test") === "true";
+  const mounted = useMounted();
 
   const { data: event, isLoading } = useEvent(slug);
 
-  if (isLoading) {
+  if (!mounted || isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <Spinner size="lg" className="text-primary mb-3" />

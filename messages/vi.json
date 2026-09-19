@@ -11,7 +11,7 @@
     },
     "errors": {
       "USER_ALREADY_EXISTS": "Tài khoản với email này đã tồn tại. Vui lòng đăng nhập.",
-      "INVALID_CREDENTIALS": "Email hoặc mật khẩu không đúng. Vui lòng kiểm tra lại thông tin đăng nhập.",
+      "INVALID_CREDENTIALS": "Email hoặc mật khẩu không chính xác.",
       "INVALID_PASSWORD": "Mật khẩu bạn đã nhập không chính xác.",
       "PASSWORD_TOO_SHORT": "Mật khẩu phải có ít nhất 8 ký tự.",
       "PASSWORD_TOO_LONG": "Mật khẩu không được vượt quá 128 ký tự.",
@@ -43,8 +43,8 @@
     }
   },
   "metadata": {
-    "homeTitle": "CandidCrowd — Mỗi vị khách. Mỗi góc nhìn.",
-    "homeDescription": "Nhận những bức ảnh khách của bạn đã chụp. Một mã QR, một thư viện sự kiện chung. Không cần ứng dụng. Không cần tài khoản khách."
+    "homeTitle": "CandidCrowd — Chia sẻ ảnh sự kiện chỉ với một mã QR",
+    "homeDescription": "Thu thập ảnh và video sự kiện từ tất cả khách mời bằng một mã QR duy nhất. Không cần ứng dụng hay tài khoản khách. Tạo album riêng tư trong vài phút."
   },
   "marketing": {
     "navigation": {
@@ -65,13 +65,13 @@
     },
     "hero": {
       "eyebrow": "TỪNG KHOẢNH KHẮC NHỎ. TRỌN VẸN CÙNG NHAU.",
-      "title": "Nhận những bức ảnh khách của bạn đã chụp.",
-      "description": "Một mã QR cho mọi người trong sự kiện của bạn nơi đơn giản để chia sẻ ảnh và video. Không cần ứng dụng. Không cần tài khoản.",
+      "title": "Nhận trọn vẹn những bức ảnh khách mời chụp.",
+      "description": "Một mã QR duy nhất mang đến cho mọi người tại sự kiện nơi chia sẻ ảnh và video dễ dàng. Không cần ứng dụng. Không cần tài khoản.",
       "createEvent": "Tạo sự kiện miễn phí",
-      "seeHowItWorks": "Xem cách hoạt động",
-      "trustNoApp": "Không cần tải app",
+      "trustNoApp": "Không cần ứng dụng",
       "trustPrivate": "Riêng tư",
-      "trustOriginalQuality": "Chất lượng gốc"
+      "tryGuestDemo": "Trải nghiệm thử",
+      "trustNoAccount": "Không cần tài khoản"
     },
     "photos": {
       "countryside": "Một cặp đôi nắm tay nhau đi dạo qua vùng nông thôn",
@@ -89,17 +89,14 @@
       "eyebrow": "CHỈ CHÚT THIẾT LẬP. TRỌN VẸN KỶ NIỆM.",
       "titleLine1": "Ba bước đơn giản.",
       "titleLine2": "Rồi thảnh thơi tận hưởng khoảnh khắc.",
-      "subheadLine1": "Trải nghiệm chúng tôi đang kiến tạo,",
-      "subheadLine2": "từ lượt quét đầu tiên đến điệu nhảy cuối cùng.",
-      "step1Title": "Tạo sự kiện của bạn",
-      "step1Description": "Thiết lập sự kiện chỉ trong vòng chưa đầy một phút.",
-      "step1Detail": "Một cái tên, một ngày và lý do để ăn mừng.",
-      "step2Title": "Chia sẻ mã QR",
-      "step2Description": "Đặt mã trên thiệp mời, bàn tiệc, biển chào mừng hoặc màn hình.",
-      "step2Detail": "Lời mời đơn giản để mọi người chia sẻ góc nhìn của mình.",
-      "step3Title": "Mọi người cùng đóng góp",
-      "step3Description": "Khách tải lên từ điện thoại mà không cần cài đặt bất kỳ ứng dụng nào.",
-      "step3Detail": "Trong lúc đang vui chơi, hoặc khi đã về đến nhà."
+      "subheadLine1": "Từ lần quét đầu tiên đến những kỷ niệm chung,",
+      "subheadLine2": "thiết kế để luôn âm thầm phục vụ bạn.",
+      "step1Title": "Tạo sự kiện",
+      "step1Description": "Nhập vài thông tin cơ bản và mã QR sẵn sàng ngay lập tức.",
+      "step2Title": "Chia sẻ một mã QR",
+      "step2Description": "In ra thiệp, để tại bàn tiệc hoặc gửi đường dẫn sự kiện.",
+      "step3Title": "Đón nhận từng kỷ niệm",
+      "step3Description": "Khách mời tải ảnh trực tiếp từ điện thoại mà không cần cài đặt gì."
     },
     "problem": {
       "eyebrow": "NHỮNG KHOẢNH KHẮC ĐAN XEN GIỮA CÁC ĐẠI LỄ",
@@ -132,55 +129,6 @@
       "assuranceHostControls": "Chủ trì toàn quyền kiểm soát sự kiện",
       "assuranceModernBrowsers": "Trình duyệt iPhone & Android hiện đại",
       "disclosure": "Nguyên tắc sản phẩm của chúng tôi. Chia sẻ sự kiện trực tiếp chưa có trong bản xem trước này."
-    },
-    "pricing": {
-      "eyebrow": "GÓI PHÙ HỢP CHO TỪNG DỊP KỶ NIỆM",
-      "titleLine1": "Dịp sum họp nhỏ.",
-      "titleLine2": "Kỷ niệm lớn lao.",
-      "subhead": "Bắt đầu với bản xem trước miễn phí. Tìm gói phù hợp khi chúng tôi phát triển.",
-      "recommendedBadge": "Được yêu thích nhất cho một sự kiện trọn vẹn",
-      "availableToExplore": "SẴN SÀNG TRẢI NGHIỆM",
-      "plannedOffering": "GÓI DỰ KIẾN",
-      "essentialNote": "Những điều cốt lõi để gắn kết mọi góc nhìn của khách mời.",
-      "disclosure": "Xem trước bảng giá · Các gói trả phí và tính năng nâng cao chưa khả dụng. Chúng tôi không thu bất kỳ khoản phí nào.",
-      "plans": {
-        "free": {
-          "name": "Miễn phí",
-          "description": "Dành cho trải nghiệm thử CandidCrowd.",
-          "priceLabel": "Miễn phí",
-          "billing": "Khám phá bản xem trước",
-          "cta": "Dùng thử miễn phí",
-          "features": {
-            "f1": "Trải nghiệm tương tác dành cho khách",
-            "f2": "Thử ảnh của riêng bạn trên máy",
-            "f3": "Lưu bản nháp sự kiện"
-          }
-        },
-        "essential": {
-          "name": "Cơ bản",
-          "description": "Một ngày vui. Trọn vẹn mọi góc nhìn.",
-          "priceLabel": "Sắp ra mắt",
-          "billing": "Trả một lần theo sự kiện · Giá sẽ sớm công bố",
-          "cta": "Khám phá bản xem thử",
-          "features": {
-            "f1": "Thư viện sự kiện riêng tư của bạn",
-            "f2": "Liên kết khách mời & mã QR có thể in",
-            "f3": "Tải ảnh với chất lượng gốc"
-          }
-        },
-        "plus": {
-          "name": "Nâng cao",
-          "description": "Dành cho những kỷ niệm cần nhiều không gian hơn.",
-          "priceLabel": "Sắp ra mắt",
-          "billing": "Trả một lần theo sự kiện · Giá sẽ sớm công bố",
-          "cta": "Khám phá bản xem thử",
-          "features": {
-            "f1": "Bao gồm tất cả tính năng gói Cơ bản",
-            "f2": "Thêm dung lượng lưu giữ kỷ niệm",
-            "f3": "Chia sẻ video & nhiều tính năng sự kiện hơn"
-          }
-        }
-      }
     },
     "eventTypesSection": {
       "eyebrow": "BẮT ĐẦU TỪ LỜI HẸN ƯỚC. DÀNH CHO MUÔN VÀN KỶ NIỆM.",
@@ -216,16 +164,25 @@
           "label": "Sự kiện công ty",
           "line": "Đồng nghiệp tuyệt vời. Khoảnh khắc sẻ chia.",
           "description": "Ghi lại những khía cạnh chân thực, gắn kết trong các buổi dã ngoại, cột mốc và sự kiện công ty."
+        },
+        "anniversaries": {
+          "label": "Kỷ niệm ngày cưới",
+          "line": "Tôn vinh tình yêu. Khắc ghi chặng đường.",
+          "description": "Gắn kết mọi thế hệ, nâng ly chúc mừng năm tháng bên nhau và gom góp từng lời chúc ý nghĩa."
+        },
+        "parties": {
+          "label": "Tiệc tùng & Họp mặt",
+          "line": "Âm nhạc rộn ràng. Bạn bè thân thiết. Khoảnh khắc bất ngờ.",
+          "description": "Lưu giữ trọn vẹn từng tiếng cười, điệu nhảy và những phút giây thăng hoa bên nhau."
         }
       }
     },
     "finalCta": {
-      "eyebrow": "MỖI VỊ KHÁCH. MỖI GÓC NHÌN.",
-      "titleLine1": "Khách của bạn vốn dĩ",
-      "titleLine2": "đang chụp rất nhiều ảnh.",
-      "titleLine3": "Hãy gom chúng lại cùng nhau.",
+      "eyebrow": "MỌI KHÁCH MỜI. MỌI GÓC NHÌN.",
+      "titleLine1": "Khách của bạn đã sẵn sàng",
+      "titleLine2": "chụp những bức ảnh tuyệt vời.",
       "button": "Tạo sự kiện miễn phí",
-      "subhead": "Không cần ứng dụng. Không cần tài khoản khách. Trọn vẹn khoảnh khắc tuyệt vời."
+      "subhead": "Gom trọn kỷ niệm về một nơi. Không cần app. Không cần tài khoản."
     },
     "footer": {
       "brandTagline": "Kỷ niệm sẻ chia cho mọi sự kiện.",
@@ -248,63 +205,46 @@
       "invitationScan": "Quét. Chia sẻ. Ăn mừng.",
       "invitationTag": "Thiệp mời · Bàn tiệc · Biển chào mừng",
       "beforeEyebrow": "01 — TRƯỚC SỰ KIỆN",
-      "beforeTitle": "Đặt mã QR ở bất cứ đâu.",
-      "beforeDescription": "Trên thiệp mời, trang web sự kiện, biển đón tiếp hoặc từng bàn tiệc. Hãy để khách dễ dàng nhìn thấy.",
+      "beforeTitle": "Chia sẻ thật nhẹ nhàng",
+      "beforeDescription": "Mã QR in được và liên kết riêng tư đã sẵn sàng ngay lập tức. Đặt lên thiệp, bàn tiệc hoặc biển đón khách.",
       "liveWallLabel": "Ý TƯỞNG BỨC TƯỜNG TRỰC TIẾP",
       "wallNotice": "Một góc nhìn mới vừa được gửi tới.",
       "duringEyebrow": "02 — TRONG SỰ KIỆN",
-      "duringTitle": "Chứng kiến câu chuyện dần đầy ắp.",
-      "duringDescription": "Ảnh sẽ tự động xuất hiện trong thư viện chung. Tính năng Live Wall sắp tới sẽ chiếu ngay lên màn hình lớn.",
-      "reminderDay": "BUỔI SÁNG HÔM SAU",
+      "duringTitle": "Chứng kiến khoảnh khắc đong đầy",
+      "duringDescription": "Khách quét và tải ảnh trực tiếp từ trình duyệt. Ảnh và video xuất hiện ngay trong bộ sưu tập chung của bữa tiệc.",
       "reminderOneMore": "Thêm một điều nữa…",
       "reminderPromptLine1": "Bạn có ảnh từ tối qua?",
       "reminderPromptLine2": "Chia sẻ tại đây nhé.",
-      "reminderLink": "Liên kết sự kiện của bạn",
       "afterEyebrow": "03 — SAU SỰ KIỆN",
-      "afterTitle": "Những kỷ niệm vẫn tiếp tục ùa về.",
-      "afterDescription": "Gửi lại liên kết một lần nữa. Thu thập những khoảnh khắc mà khách đã quá mải mê tận hưởng nên chưa kịp tải lên.",
-      "disclosure": "Hình ảnh minh họa cho trải nghiệm dự kiến. Tính năng Live Wall và nhắc nhở sau sự kiện sẽ ra mắt sau."
+      "afterTitle": "Thu gom ảnh còn sót trong máy khách",
+      "afterDescription": "Nhiều khách chụp những góc rất đẹp nhưng bận vui mà chưa kịp gửi. Một đường link nhắc nhở sau tiệc sẽ thu trọn những tấm hình đó.",
+      "recoveryDuringLabel": "Trong sự kiện",
+      "recoveryAfterLabel": "Sau sự kiện",
+      "recoveryTotalLabel": "Tổng khoảnh khắc"
     },
     "participation": {
-      "eyebrow": "THIẾT KẾ ĐỂ TĂNG SỰ THAM GIA",
+      "eyebrow": "TỐI ƯU SỰ THAM GIA",
       "titleLine1": "Đừng chỉ tạo một album ảnh đơn thuần.",
-      "titleLine2": "Hãy khuyến khích mọi người cùng sẻ chia.",
-      "subhead": "Thư viện chung chỉ là bước khởi đầu. CandidCrowd được tạo ra để giúp bạn thấu hiểu điều gì thúc đẩy khách mời chia sẻ.",
-      "point1Title": "Biết cách khách mời tham gia.",
-      "point1Description": "Theo dõi khách mời đóng góp qua việc quét mã QR sự kiện hay mở liên kết chia sẻ.",
-      "point2Title": "Tạo không gian cho mọi góc nhìn.",
-      "point2Description": "Nắm bắt mức độ tham gia, rồi gửi lời nhắn nhẹ nhàng tới khách vào đúng thời điểm.",
-      "conceptNote": "Ý tưởng sản phẩm · Số liệu phân tích và theo dõi nguồn mã QR chưa hoạt động.",
-      "dashboardEyebrow": "SỰ KIỆN CỦA BẠN, TỔNG QUAN",
+      "titleLine2": "Hãy truyền cảm hứng để mọi người cùng đóng góp.",
+      "subhead": "Hầu hết các album chia sẻ chỉ đếm tổng số ảnh. CandidCrowd giúp bạn biết bao nhiêu khách thực sự tham gia — và khoảnh khắc nào bị bỏ lỡ.",
+      "point1Title": "Nắm bắt tỷ lệ tham gia thực tế",
+      "point1Description": "Theo dõi số người đóng góp duy nhất so với lượng khách dự kiến, không chỉ đếm số ảnh tải lên.",
+      "point2Title": "Nhận biết điểm rơi tương tác",
+      "point2Description": "Hiểu rõ liệu khách mời cần thêm thiệp nhắc nhở tại bàn hay một tin nhắn sau sự kiện.",
+      "dashboardEyebrow": "CƠ CHẾ THAM GIA",
+      "previewBadge": "Bản xem trước",
       "expectedGuests": "khách dự kiến",
-      "participationLabel": "tham gia",
-      "photos": "ảnh",
-      "videos": "video",
-      "sourcesHeading": "Nơi kỷ niệm bắt đầu",
-      "contributorsCol": "Người đóng góp",
-      "tableCaption": "Minh họa người đóng góp theo phương thức tham gia",
-      "thSource": "Nguồn",
-      "sources": {
-        "qr": "Mã QR sự kiện",
-        "link": "Liên kết chia sẻ"
-      }
-    },
-    "previewNotice": {
-      "dialogEyebrow": "CANDIDCROWD · CHƯƠNG ĐẦU TIÊN",
-      "createDraft": "Tạo bản nháp sự kiện",
-      "notices": {
-        "login": {
-          "title": "Không gian tổ chức đang trên đường hoàn thiện.",
-          "body": "Tài khoản người tổ chức chưa khả dụng trong bản xem trước này. Bạn có thể thử nghiệm trải nghiệm khách mời hoặc tạo bản nháp sự kiện trên thiết bị này. Không có thông tin cá nhân nào bị thu thập."
-        },
-        "privacy": {
-          "title": "Quyền riêng tư · thông báo bản xem trước",
-          "body": "Ảnh được chọn trong bản demo này chỉ lưu lại trong phiên duyệt web và không được tải lên máy chủ. Bản nháp sự kiện được lưu trên thiết bị này nếu bạn lưu lại. Chính sách bảo mật đầy đủ sẽ được công bố trước khi tính năng tải lên đám mây ra mắt."
-        },
-        "terms": {
-          "title": "Điều khoản · thông báo bản xem trước",
-          "body": "Đây là bản xem trước sản phẩm tương tác, không phải dịch vụ chia sẻ sự kiện thực tế. Các gói trả phí, tài khoản người tổ chức và tải lên đám mây chưa khả dụng. Điều khoản đầy đủ sẽ được công bố trước khi dịch vụ ra mắt."
-        }
+      "contributorsCol": "người đóng góp",
+      "participationRate": "tỷ lệ tham gia",
+      "participationLabel": "tỷ lệ tham gia",
+      "memoriesCollected": "khoảnh khắc lưu giữ",
+      "funnelHeading": "Phễu đóng góp khoảnh khắc",
+      "funnelCaption": "CandidCrowd giúp phát hiện nơi khách mời dừng lại để chủ tiệc dễ dàng thu hồi trọn vẹn kỷ niệm.",
+      "funnel": {
+        "scans": "Lượt quét QR",
+        "visits": "Lượt vào sự kiện",
+        "opened": "Mở phần tải lên",
+        "contributed": "Đã chia sẻ ảnh"
       }
     },
     "heroScene": {
@@ -332,15 +272,14 @@
       "legendYourGallery": "Thư viện của bạn"
     },
     "demoQr": {
-      "eyebrow": "LỜI MỜI NHỎ",
-      "titleLine1": "Góc nhìn của bạn",
-      "titleLine2": "thuộc về nơi này.",
-      "alt": "Quét để mở bản dùng thử tương tác cho khách của CandidCrowd",
-      "qrUnavailable": "Mã QR chưa khả dụng; hãy dùng Thử không cần quét",
+      "titleLine1": "Chia sẻ kỷ niệm của bạn",
+      "titleLine2": "Quét để thêm ảnh & video",
+      "alt": "Quét để mở bản dùng thử khách mời CandidCrowd",
+      "qrUnavailable": "Mã QR tạm không khả dụng; hãy dùng nút bên dưới",
       "qrLoading": "Đang tải mã QR",
-      "failedInstruction": "Sử dụng nút bên dưới để trải nghiệm bản dùng thử.",
-      "scanInstruction": "Quét bằng camera điện thoại của bạn",
-      "note": "Sử dụng URL trang web công khai để quét từ thiết bị khác."
+      "failedInstruction": "Dùng nút bên dưới để trải nghiệm bản dùng thử.",
+      "note": "Quét bằng điện thoại để trải nghiệm luồng khách mời thực tế.",
+      "trust": "Không cần ứng dụng · Không cần tài khoản"
     },
     "demoGallery": {
       "eyebrow": "THƯ VIỆN CHUNG",
@@ -392,6 +331,32 @@
       "statusBusy": "Đang mô phỏng tải lên. Xem ảnh xuất hiện trong thư viện.",
       "statusReady": "Đã sẵn sàng chia sẻ {count} ảnh.",
       "statusEmpty": "Chọn ảnh của bạn hoặc sử dụng ảnh mẫu của chúng tôi."
+    },
+    "trustStrip": {
+      "ariaLabel": "Tính năng cốt lõi chia sẻ sự kiện",
+      "noApp": "Không cần ứng dụng",
+      "noGuestAccount": "Không cần tài khoản",
+      "privateEvent": "Sự kiện riêng tư",
+      "originalQuality": "Tải lên chất lượng gốc"
+    },
+    "earlyAccess": {
+      "eyebrow": "TRẢI NGHIỆM SỚM",
+      "titleLine1": "Thử CandidCrowd miễn phí.",
+      "titleLine2": "Không cần thẻ tín dụng.",
+      "subhead": "Tạo sự kiện, tạo mã QR và trải nghiệm ngay luồng dành cho khách mời.",
+      "badge": "Miễn phí trải nghiệm sớm",
+      "planName": "Khởi đầu sự kiện",
+      "price": "0đ",
+      "billing": "Miễn phí trong giai đoạn trải nghiệm sớm",
+      "description": "Tất cả những gì bạn cần để thu thập ảnh và video chân thực tại sự kiện.",
+      "cta": "Tạo sự kiện miễn phí",
+      "note": "Các gói trả phí sẽ được ra mắt sau.",
+      "features": {
+        "oneQr": "Một mã QR và liên kết sự kiện dùng được ngay",
+        "noApp": "Khách mời không cần cài ứng dụng hay tạo tài khoản",
+        "realtimeGallery": "Bộ sưu tập riêng tư tải lên tức thì",
+        "originalQuality": "Chủ tiệc tải về toàn bộ ảnh chất lượng gốc"
+      }
     }
   },
   "auth": {
@@ -431,7 +396,7 @@
     },
     "signIn": {
       "title": "Chào mừng trở lại",
-      "email": "Email",
+      "email": "Địa chỉ email",
       "password": "Mật khẩu"
     },
     "register": {

@@ -37,7 +37,7 @@ export async function Footer() {
         <p>{tFooter("brandTagline")}</p>
         <span>{tFooter("brandSub")}</span>
       </div>
-      <nav aria-label={tNav("main")}>
+      <nav aria-label={tFooter("productTitle")}>
         <h2>{tFooter("productTitle")}</h2>
         {navigation.map((item) => (
           <Link className="site-footer__link" key={item.href} href={item.href}>

@@ -4,17 +4,16 @@ import { FormEvent, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Eye, EyeSlash } from "@phosphor-icons/react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Eye,
+  EyeSlash,
+  WarningCircle,
+} from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { Brand } from "@/components/shared";
-import {
-  Alert,
-  AlertDescription,
-  Button,
-  Input,
-  Label,
-  Separator,
-} from "@/components/ui";
+import { Button, Input, Label, Separator } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { getSafeAuthRedirect, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
@@ -60,7 +59,7 @@ export function AuthForm({
       setIsPending(false);
 
       if (result.error) {
-        setFeedback(getErrorMessage(result.error.code, undefined, tErrors));
+        setFeedback(getErrorMessage(result.error, undefined, tErrors));
 
         return;
       }
@@ -85,7 +84,7 @@ export function AuthForm({
     setIsPending(false);
 
     if (result.error) {
-      setFeedback(getErrorMessage(result.error.code, undefined, tErrors));
+      setFeedback(getErrorMessage(result.error, undefined, tErrors));
 
       return;
     }
@@ -107,7 +106,7 @@ export function AuthForm({
     });
 
     if (result.error) {
-      setFeedback(getErrorMessage(result.error.code, undefined, tErrors));
+      setFeedback(getErrorMessage(result.error, undefined, tErrors));
       setIsPending(false);
     }
   }
@@ -296,9 +295,15 @@ export function AuthForm({
           </div>
         )}
         {feedback && (
-          <Alert variant="destructive" className="mb-2">
-            <AlertDescription>{feedback}</AlertDescription>
-          </Alert>
+          <div className="auth-form__error" role="alert" aria-live="polite">
+            <WarningCircle
+              size={14}
+              weight="fill"
+              className="auth-form__error-icon"
+              aria-hidden="true"
+            />
+            <span className="auth-form__error-text">{feedback}</span>
+          </div>
         )}
         <Button
           className="auth-form__submit"

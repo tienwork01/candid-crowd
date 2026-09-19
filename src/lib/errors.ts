@@ -13,8 +13,7 @@ const RAW_ERROR_MESSAGES: Record<string, string> = {
   // Authentication & Account
   USER_ALREADY_EXISTS:
     "An account with this email already exists. Please log in instead.",
-  INVALID_CREDENTIALS:
-    "Email or password is incorrect. Please check your credentials.",
+  INVALID_CREDENTIALS: "Incorrect email or password.",
   INVALID_PASSWORD: "The password you entered is incorrect.",
   PASSWORD_TOO_SHORT: "Password must be at least 8 characters.",
   PASSWORD_TOO_LONG: "Password cannot exceed 128 characters.",
@@ -123,6 +122,41 @@ export function resolveErrorCode(errorOrCode?: unknown): string {
       typeof (errorObj.error as Record<string, unknown>).code === "string"
     ) {
       rawCode = (errorObj.error as Record<string, unknown>).code as string;
+    } else if (typeof errorObj.status === "number") {
+      if (errorObj.status === 401) {
+        rawCode = "INVALID_CREDENTIALS";
+      } else if (errorObj.status === 403) {
+        rawCode = "UNAUTHORIZED";
+      } else if (errorObj.status === 404) {
+        rawCode = "USER_NOT_FOUND";
+      } else if (errorObj.status === 429) {
+        rawCode = "RATE_LIMIT_EXCEEDED";
+      } else if (errorObj.status >= 500) {
+        rawCode = "SERVER_ERROR";
+      }
+    }
+
+    if (!rawCode && typeof errorObj.message === "string") {
+      const msg = errorObj.message.toLowerCase();
+
+      if (
+        msg.includes("invalid email or password") ||
+        msg.includes("invalid password") ||
+        msg.includes("invalid credentials") ||
+        msg.includes("user not found")
+      ) {
+        rawCode = "INVALID_CREDENTIALS";
+      } else if (
+        msg.includes("too many requests") ||
+        msg.includes("rate limit")
+      ) {
+        rawCode = "RATE_LIMIT_EXCEEDED";
+      } else if (
+        msg.includes("already exists") ||
+        msg.includes("email exists")
+      ) {
+        rawCode = "USER_ALREADY_EXISTS";
+      }
     }
   }
 

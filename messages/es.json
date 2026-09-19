@@ -11,7 +11,7 @@
     },
     "errors": {
       "USER_ALREADY_EXISTS": "Ya existe una cuenta con este correo. Inicie sesión en su lugar.",
-      "INVALID_CREDENTIALS": "El correo o la contraseña son incorrectos. Verifique sus credenciales.",
+      "INVALID_CREDENTIALS": "Correo o contraseña incorrectos.",
       "INVALID_PASSWORD": "La contraseña que ingresó es incorrecta.",
       "PASSWORD_TOO_SHORT": "La contraseña debe tener al menos 8 caracteres.",
       "PASSWORD_TOO_LONG": "La contraseña no puede superar los 128 caracteres.",
@@ -43,8 +43,8 @@
     }
   },
   "metadata": {
-    "homeTitle": "CandidCrowd — Cada invitado. Cada perspectiva.",
-    "homeDescription": "Recibe las fotos que tus invitados ya toman. Un código QR, una galería compartida. Sin aplicación. Sin cuenta de invitado."
+    "homeTitle": "CandidCrowd — Comparte fotos de eventos con un solo código QR",
+    "homeDescription": "Recopila fotos y videos de cada invitado con un solo código QR. Sin app ni cuenta de invitado. Crea una galería privada en minutos."
   },
   "marketing": {
     "navigation": {
@@ -65,13 +65,13 @@
     },
     "hero": {
       "eyebrow": "PEQUEÑOS MOMENTOS. TODOS JUNTOS.",
-      "title": "Recibe las fotos que tus invitados ya toman.",
-      "description": "Un código QR ofrece a todos en tu evento un lugar sencillo para compartir fotos y videos. Sin aplicación. Sin cuenta.",
+      "title": "Consigue las fotos que tus invitados ya toman.",
+      "description": "Un código QR le da a todos en tu evento un lugar sencillo para compartir sus fotos y videos. Sin app. Sin cuenta.",
       "createEvent": "Crea tu evento gratis",
-      "seeHowItWorks": "Descubre cómo funciona",
       "trustNoApp": "Sin app",
       "trustPrivate": "Privado",
-      "trustOriginalQuality": "Calidad original"
+      "tryGuestDemo": "Probar la demo",
+      "trustNoAccount": "Sin cuenta"
     },
     "photos": {
       "countryside": "Una pareja tomada de la mano caminando por el campo",
@@ -87,19 +87,16 @@
     },
     "howItWorks": {
       "eyebrow": "UNA PEQUEÑA PREPARACIÓN. MUCHOS RECUERDOS.",
-      "titleLine1": "Tres sencillos pasos.",
-      "titleLine2": "Luego, vive el momento.",
-      "subheadLine1": "La experiencia que estamos creando,",
-      "subheadLine2": "desde el primer escaneo hasta el último baile.",
+      "titleLine1": "Tres pasos sencillos.",
+      "titleLine2": "Y a disfrutar del momento.",
+      "subheadLine1": "Desde el primer escaneo hasta los recuerdos compartidos,",
+      "subheadLine2": "diseñado para no interrumpir tu fiesta.",
       "step1Title": "Crea tu evento",
-      "step1Description": "Configura un evento en menos de un minuto.",
-      "step1Detail": "Un nombre, una fecha y algo que celebrar.",
-      "step2Title": "Comparte tu QR",
-      "step2Description": "Colócalo en invitaciones, mesas, carteles o pantallas.",
-      "step2Detail": "Una invitación sencilla para compartir su perspectiva.",
-      "step3Title": "Todos contribuyen",
-      "step3Description": "Los invitados suben fotos desde sus teléfonos sin instalar nada.",
-      "step3Detail": "Durante la fiesta o cuando regresen a casa."
+      "step1Description": "Agrega los datos básicos y tu QR estará listo de inmediato.",
+      "step2Title": "Comparte un QR",
+      "step2Description": "Imprímelo, colócalo en mesas o envía el enlace del evento.",
+      "step3Title": "Mira llegar los recuerdos",
+      "step3Description": "Los invitados suben fotos directamente desde el móvil sin instalar nada."
     },
     "problem": {
       "eyebrow": "LOS MOMENTOS ENTRE LOS GRANDES MOMENTOS",
@@ -132,55 +129,6 @@
       "assuranceHostControls": "El anfitrión controla el evento",
       "assuranceModernBrowsers": "Navegadores modernos de iPhone y Android",
       "disclosure": "Nuestros principios de producto. El uso compartido de eventos en vivo no está disponible en esta vista previa."
-    },
-    "pricing": {
-      "eyebrow": "UN PLAN PARA TU TIPO DE CELEBRACIÓN",
-      "titleLine1": "Pequeña reunión.",
-      "titleLine2": "Grandes recuerdos.",
-      "subhead": "Empieza con la vista previa gratuita. Encuentra el plan adecuado a medida que crecemos.",
-      "recommendedBadge": "El más elegido para una celebración completa",
-      "availableToExplore": "DISPONIBLE PARA EXPLORAR",
-      "plannedOffering": "OFERTA PLANIFICADA",
-      "essentialNote": "Lo esencial para reunir las perspectivas de todos los invitados.",
-      "disclosure": "Vista previa de precios · Los planes y funciones de pago aún no están disponibles. No se cobran pagos.",
-      "plans": {
-        "free": {
-          "name": "Gratis",
-          "description": "Para probar CandidCrowd.",
-          "priceLabel": "Gratis",
-          "billing": "Explora la vista previa",
-          "cta": "Pruébalo gratis",
-          "features": {
-            "f1": "Experiencia interactiva para invitados",
-            "f2": "Prueba tus propias fotos localmente",
-            "f3": "Guarda un borrador de evento"
-          }
-        },
-        "essential": {
-          "name": "Esencial",
-          "description": "Una celebración. Cada perspectiva.",
-          "priceLabel": "Próximamente",
-          "billing": "Pago único por evento · Precio por anunciar",
-          "cta": "Explora la demo",
-          "features": {
-            "f1": "Tu galería privada del evento",
-            "f2": "Enlace para invitados y QR imprimible",
-            "f3": "Descargas de fotos en calidad original"
-          }
-        },
-        "plus": {
-          "name": "Plus",
-          "description": "Para los momentos que necesitan más espacio.",
-          "priceLabel": "Próximamente",
-          "billing": "Pago único por evento · Precio por anunciar",
-          "cta": "Explora la demo",
-          "features": {
-            "f1": "Todo lo previsto para Esencial",
-            "f2": "Más espacio para tus recuerdos",
-            "f3": "Compartir vídeos y más funciones de evento"
-          }
-        }
-      }
     },
     "eventTypesSection": {
       "eyebrow": "EMPEZANDO CON EL “SÍ, QUIERO”. HECHO PARA MUCHO MÁS.",
@@ -216,16 +164,25 @@
           "label": "Eventos de empresa",
           "line": "Grandes personas. Momentos compartidos.",
           "description": "Captura el lado humano de las jornadas de equipo, aniversarios y celebraciones."
+        },
+        "anniversaries": {
+          "label": "Aniversarios",
+          "line": "Celebrar el amor. Honrar el camino.",
+          "description": "Reúne a todas las generaciones y brinda por los años compartidos."
+        },
+        "parties": {
+          "label": "Fiestas y celebraciones",
+          "line": "Buena música. Grandes amigos. Fotos espontáneas.",
+          "description": "Captura las risas, los bailes y cada momento espontáneo."
         }
       }
     },
     "finalCta": {
       "eyebrow": "CADA INVITADO. CADA PERSPECTIVA.",
       "titleLine1": "Tus invitados ya están",
-      "titleLine2": "tomando las fotos.",
-      "titleLine3": "Reúnelas todas.",
+      "titleLine2": "haciendo las fotos.",
       "button": "Crea tu evento gratis",
-      "subhead": "Sin apps. Sin cuentas de invitados. Todo lo mejor."
+      "subhead": "Únelas todas en un solo lugar. Sin app. Sin cuenta."
     },
     "footer": {
       "brandTagline": "Recuerdos compartidos para cada evento.",
@@ -248,63 +205,46 @@
       "invitationScan": "Escanea. Comparte. Celebra.",
       "invitationTag": "Invitaciones · Mesas · Carteles de bienvenida",
       "beforeEyebrow": "01 — ANTES",
-      "beforeTitle": "Coloca el QR en cualquier lugar.",
-      "beforeDescription": "En la invitación, la web del evento, un cartel o cada mesa. Haz que sea fácil de encontrar.",
+      "beforeTitle": "Compartir sin esfuerzo",
+      "beforeDescription": "Tu código QR imprimible y enlace privado están listos al instante. Colócalo en invitaciones, mesas o carteles.",
       "liveWallLabel": "CONCEPTO DE MURO EN VIVO",
       "wallNotice": "Una nueva perspectiva acaba de llegar.",
       "duringEyebrow": "02 — DURANTE",
-      "duringTitle": "Mira cómo crece tu historia.",
-      "duringDescription": "Las fotos van llegando a tu galería compartida. Un futuro Muro en Vivo las llevará a la sala.",
-      "reminderDay": "LA MAÑANA SIGUIENTE",
+      "duringTitle": "Mira crecer la participación",
+      "duringDescription": "Tus invitados escanean y suben fotos directo desde el navegador. Los recuerdos aparecen en tiempo real.",
       "reminderOneMore": "Una cosa más…",
       "reminderPromptLine1": "¿Tienes fotos de anoche?",
       "reminderPromptLine2": "Compártelas aquí.",
-      "reminderLink": "Enlace de tu evento",
       "afterEyebrow": "03 — DESPUÉS",
-      "afterTitle": "Los recuerdos siguen llegando.",
-      "afterDescription": "Comparte el enlace una vez más. Reúne los momentos que los invitados no subieron por disfrutar la fiesta.",
-      "disclosure": "Ilustraciones de la experiencia planificada. El muro en vivo y los recordatorios llegarán más adelante."
+      "afterTitle": "Recupera las fotos olvidadas en sus móviles",
+      "afterDescription": "Muchos invitados toman fotos increíbles pero olvidan subirlas en la fiesta. Un enlace recordatorio recupera todo lo que quedó en sus galerías.",
+      "recoveryDuringLabel": "Durante el evento",
+      "recoveryAfterLabel": "Después del evento",
+      "recoveryTotalLabel": "Recuerdos totales"
     },
     "participation": {
       "eyebrow": "DISEÑADO PARA LA PARTICIPACIÓN",
       "titleLine1": "No crees solo un álbum.",
-      "titleLine2": "Haz que la gente participe.",
-      "subhead": "Una galería compartida es solo el principio. Diseñamos CandidCrowd para ver qué anima a compartir a tus invitados.",
-      "point1Title": "Conoce cómo se unen tus invitados.",
-      "point1Description": "Descubre si los invitados participan escaneando el código QR del evento o abriendo el enlace compartido.",
-      "point2Title": "Haz espacio para cada perspectiva.",
-      "point2Description": "Comprende la participación y envía un recordatorio amistoso en el momento oportuno.",
-      "conceptNote": "Concepto de producto · Las analíticas y el seguimiento de fuentes QR no están activos aún.",
-      "dashboardEyebrow": "TU EVENTO, DE UN VISTAZO",
+      "titleLine2": "Consigue que la gente participe.",
+      "subhead": "La mayoría de galerías solo cuentan fotos. CandidCrowd te ayuda a ver cuántos invitados realmente colaboran y dónde se pierde la participación.",
+      "point1Title": "Conoce la tasa real de participación",
+      "point1Description": "Compara los colaboradores únicos con el total de invitados esperados, no solo el volumen de fotos.",
+      "point2Title": "Descubre dónde abandonan los invitados",
+      "point2Description": "Comprende si necesitan un cartel recordatorio en la mesa o un enlace tras el evento.",
+      "dashboardEyebrow": "MOTOR DE PARTICIPACIÓN",
+      "previewBadge": "Vista previa",
       "expectedGuests": "invitados esperados",
+      "contributorsCol": "colaboradores",
+      "participationRate": "participación",
       "participationLabel": "participación",
-      "photos": "fotos",
-      "videos": "videos",
-      "sourcesHeading": "Dónde empiezan los recuerdos",
-      "contributorsCol": "Colaboradores",
-      "tableCaption": "Colaboradores ilustrativos según método de acceso",
-      "thSource": "Fuente",
-      "sources": {
-        "qr": "Código QR del evento",
-        "link": "Enlace compartido"
-      }
-    },
-    "previewNotice": {
-      "dialogEyebrow": "CANDIDCROWD · PRIMER CAPÍTULO",
-      "createDraft": "Crear borrador de evento",
-      "notices": {
-        "login": {
-          "title": "Tu espacio de anfitrión está en camino.",
-          "body": "Las cuentas de anfitrión aún no están disponibles en esta vista previa. Puedes probar la experiencia de invitado o crear un borrador de evento en este dispositivo."
-        },
-        "privacy": {
-          "title": "Privacidad · aviso de vista previa",
-          "body": "Las fotos seleccionadas en esta demo permanecen en el navegador y no se suben. El borrador de evento se guarda en el dispositivo."
-        },
-        "terms": {
-          "title": "Términos · aviso de vista previa",
-          "body": "Esta es una vista previa interactiva, no un servicio de intercambio en vivo. Los términos completos se publicarán antes del lanzamiento."
-        }
+      "memoriesCollected": "recuerdos guardados",
+      "funnelHeading": "Embudo de colaboración",
+      "funnelCaption": "CandidCrowd revela dónde se detiene la participación para no perder ningún recuerdo.",
+      "funnel": {
+        "scans": "Escaneos QR",
+        "visits": "Visitas a la página",
+        "opened": "Pantalla de subida",
+        "contributed": "Recuerdos compartidos"
       }
     },
     "heroScene": {
@@ -332,15 +272,14 @@
       "legendYourGallery": "Tu galería"
     },
     "demoQr": {
-      "eyebrow": "UNA PEQUEÑA INVITACIÓN",
-      "titleLine1": "Tu perspectiva",
-      "titleLine2": "pertenece aquí.",
-      "alt": "Escanea para abrir la demo interactiva para invitados de CandidCrowd",
+      "titleLine1": "Comparte tus recuerdos",
+      "titleLine2": "Escanea para añadir fotos y videos",
+      "alt": "Escanear para abrir la demo interactiva de CandidCrowd",
       "qrUnavailable": "QR no disponible; usa Probar sin escanear",
       "qrLoading": "Cargando código QR",
       "failedInstruction": "Usa el botón de abajo para probar la demo.",
-      "scanInstruction": "Escanea con la cámara de tu teléfono",
-      "note": "Usa una URL pública para escanear desde otro dispositivo."
+      "note": "Escanea con tu móvil para probar la experiencia de invitado.",
+      "trust": "Sin app · Sin cuenta"
     },
     "demoGallery": {
       "eyebrow": "LA GALERÍA COMPARTIDA",
@@ -392,6 +331,32 @@
       "statusBusy": "Simulando subida. Mira cómo tus fotos se unen a la galería.",
       "statusReady": "{count, plural, =1 {1 foto lista} other {# fotos listas}} para compartir.",
       "statusEmpty": "Elige tus fotos o usa nuestros momentos de muestra."
+    },
+    "trustStrip": {
+      "ariaLabel": "Características clave de compartición de eventos",
+      "noApp": "Sin app",
+      "noGuestAccount": "Sin cuenta",
+      "privateEvent": "Evento privado",
+      "originalQuality": "Calidad original"
+    },
+    "earlyAccess": {
+      "eyebrow": "ACCESO ANTICIPADO",
+      "titleLine1": "Prueba CandidCrowd gratis.",
+      "titleLine2": "Sin tarjeta de crédito.",
+      "subhead": "Crea un evento, genera tu QR y vive la experiencia como invitado.",
+      "badge": "Acceso anticipado gratuito",
+      "planName": "Inicio de Evento",
+      "price": "$0",
+      "billing": "Gratis durante el acceso anticipado",
+      "description": "Todo lo necesario para recopilar fotos y videos espontáneos en tu celebración.",
+      "cta": "Crear evento gratis",
+      "note": "Los planes de pago se lanzarán más adelante.",
+      "features": {
+        "oneQr": "Un código QR y enlace de evento listos al instante",
+        "noApp": "Sin app ni registro para los invitados",
+        "realtimeGallery": "Galería privada con subidas en tiempo real",
+        "originalQuality": "Descarga de fotos en calidad original para el anfitrión"
+      }
     }
   },
   "auth": {
@@ -431,7 +396,7 @@
     },
     "signIn": {
       "title": "Bienvenido de nuevo",
-      "email": "Correo electrónico",
+      "email": "Dirección de correo electrónico",
       "password": "Contraseña"
     },
     "register": {

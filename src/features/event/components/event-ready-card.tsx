@@ -140,7 +140,7 @@ export function EventReadyCard({
 
       {/* Main QR Card */}
       <div className="event-ready-card__qr-box mt-8 mx-auto max-w-md bg-surface border border-line rounded-2xl p-6 sm:p-8 shadow-card text-center">
-        <div className="event-ready-card__qr-image mx-auto w-64 h-64 sm:w-72 sm:h-72 p-3 bg-white rounded-xl border border-line flex items-center justify-center shadow-subtle">
+        <div className="event-ready-card__qr event-ready-card__qr-image mx-auto w-64 h-64 sm:w-72 sm:h-72 p-3 bg-white rounded-xl border border-line flex items-center justify-center shadow-subtle">
           {qrDataUrl ? (
             <Image
               src={qrDataUrl}
@@ -158,7 +158,7 @@ export function EventReadyCard({
           )}
         </div>
 
-        <h2 className="event-ready-card__qr-event-name font-heading text-xl text-ink mt-5">
+        <h2 className="event-ready-card__name event-ready-card__qr-event-name font-heading text-xl text-ink mt-5">
           {event.name}
         </h2>
 
@@ -171,7 +171,7 @@ export function EventReadyCard({
         </p>
 
         {/* Short guest URL */}
-        <div className="event-ready-card__guest-link mt-4 p-2.5 bg-background border border-line rounded-lg flex items-center justify-between gap-2">
+        <div className="event-ready-card__guest-link mt-4 h-12 px-3 bg-background border border-line rounded-lg flex items-center justify-between gap-2">
           <span className="text-xs font-mono text-muted-foreground truncate select-all">
             {displayUrl}
           </span>
@@ -195,7 +195,7 @@ export function EventReadyCard({
             type="button"
             variant="outline"
             onClick={handleDownloadQr}
-            className="w-full text-xs sm:text-sm h-10 flex items-center justify-center gap-1.5"
+            className="w-full text-xs sm:text-sm h-12 flex items-center justify-center gap-1.5"
           >
             <DownloadSimple size={16} aria-hidden="true" />
             <span>{t("ready.downloadQr")}</span>
@@ -205,7 +205,7 @@ export function EventReadyCard({
             type="button"
             variant="outline"
             onClick={handleCopyLink}
-            className="w-full text-xs sm:text-sm h-10 flex items-center justify-center gap-1.5"
+            className="w-full text-xs sm:text-sm h-12 flex items-center justify-center gap-1.5"
           >
             {copied ? (
               <Check size={16} aria-hidden="true" className="text-primary" />
@@ -232,14 +232,16 @@ export function EventReadyCard({
 
       {/* Primary Action: Preview as guest */}
       <div className="event-ready-card__preview-section mt-6 mx-auto max-w-md text-center">
-        <Button
-          type="button"
+        <a
+          href={testGuestUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           onClick={handlePreview}
-          className="button button--primary w-full h-13 text-base font-semibold shadow-raised flex items-center justify-center gap-2"
+          className="button button--primary w-full h-12 text-base font-semibold shadow-raised flex items-center justify-center gap-2"
         >
           <Eye size={20} weight="bold" aria-hidden="true" />
           <span>{t("ready.previewAsGuest")}</span>
-        </Button>
+        </a>
         <p className="text-xs text-subtle mt-2">{t("ready.previewNotice")}</p>
       </div>
 

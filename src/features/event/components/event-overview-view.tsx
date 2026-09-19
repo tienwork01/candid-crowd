@@ -160,9 +160,14 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
       </div>
 
       {/* Lifecycle Phase Switcher Tabs */}
-      <div className="event-overview-board__lifecycle mt-8 p-1.5 bg-surface border border-line rounded-xl inline-flex flex-wrap gap-1">
+      <div
+        role="tablist"
+        className="event-overview-board__lifecycle mt-8 p-1.5 bg-surface border border-line rounded-xl inline-flex flex-wrap gap-1"
+      >
         <button
           type="button"
+          role="tab"
+          aria-selected={activePhase === "before"}
           onClick={() => setActivePhase("before")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
             activePhase === "before"
@@ -175,6 +180,8 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
 
         <button
           type="button"
+          role="tab"
+          aria-selected={activePhase === "during"}
           onClick={() => setActivePhase("during")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
             activePhase === "during"
@@ -187,6 +194,8 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
 
         <button
           type="button"
+          role="tab"
+          aria-selected={activePhase === "after"}
           onClick={() => setActivePhase("after")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
             activePhase === "after"
@@ -285,15 +294,16 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
             <div className="flex items-center gap-2.5 w-full sm:w-auto">
               <Link
                 href={`/events/${encodeURIComponent(event.id)}/ready`}
-                className="button button--secondary text-xs h-10 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
+                className="button button--secondary text-xs h-9 px-3.5 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
               >
                 <DownloadSimple size={16} />
                 <span>{t("ready.downloadQr")}</span>
               </Link>
               <Button
                 type="button"
+                size="sm"
                 onClick={handleCopyLink}
-                className="button text-xs h-10 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
               >
                 <ShareNetwork size={16} />
                 <span>{t("ready.copyLink")}</span>
@@ -436,7 +446,7 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
                 <Button
                   type="button"
                   onClick={handleCopyReminder}
-                  className="button h-11 px-5 text-sm font-medium inline-flex items-center gap-2"
+                  className="inline-flex items-center gap-2"
                 >
                   <Copy size={16} />
                   <span>{t("overview.copyReminderLink")}</span>
@@ -446,7 +456,6 @@ export function EventOverviewView({ event }: EventOverviewViewProps) {
                   type="button"
                   variant="outline"
                   onClick={handleCopyLink}
-                  className="h-11 px-4 text-sm"
                 >
                   <span>{t("ready.copyLink")}</span>
                 </Button>

@@ -330,18 +330,26 @@ export function GuestDemo() {
                     </>
                   )}
                   {selected.length > 0 && !busy && !complete && (
-                    <Button
-                      disabled={reading}
-                      onClick={() => {
-                        setError("");
-                        upload.start();
-                      }}
+                    <m.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      className="w-full"
                     >
-                      {upload.phase === "error"
-                        ? t("retryUpload")
-                        : t("uploadCount", { count: selected.length })}{" "}
-                      <ArrowRight aria-hidden="true" />
-                    </Button>
+                      <Button
+                        disabled={reading}
+                        className="guest-phone__upload-cta w-full"
+                        onClick={() => {
+                          setError("");
+                          upload.start();
+                        }}
+                      >
+                        {upload.phase === "error"
+                          ? t("retryUpload")
+                          : t("uploadCount", { count: selected.length })}{" "}
+                        <ArrowRight aria-hidden="true" />
+                      </Button>
+                    </m.div>
                   )}
                   {busy && (
                     <div className="guest-phone__upload-feedback">

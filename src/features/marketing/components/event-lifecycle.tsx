@@ -1,10 +1,5 @@
 import Image from "next/image";
-import {
-  ArrowRight,
-  QrCode,
-  Heart,
-  PaperPlaneTilt,
-} from "@phosphor-icons/react/dist/ssr";
+import { QrCode, Heart, Sparkle } from "@phosphor-icons/react/dist/ssr";
 import { getTranslations } from "next-intl/server";
 import { Reveal } from "@/components/shared";
 
@@ -77,9 +72,27 @@ export async function EventLifecycle() {
           </article>
           <article>
             <div className="lifecycle-card__art lifecycle-card__art--after">
-              <span className="lifecycle-card__reminder-day">
-                {t("reminderDay")}
-              </span>
+              <div className="lifecycle-card__recovery-stat">
+                <div className="lifecycle-card__recovery-row">
+                  <span>{t("recoveryDuringLabel")}</span>
+                  <strong>642</strong>
+                </div>
+                <div className="lifecycle-card__recovery-row lifecycle-card__recovery-row--highlight">
+                  <span>
+                    <Sparkle size={12} aria-hidden="true" />
+                    {t("recoveryAfterLabel")}
+                  </span>
+                  <strong>+184</strong>
+                </div>
+                <div
+                  className="lifecycle-card__recovery-divider"
+                  aria-hidden="true"
+                />
+                <div className="lifecycle-card__recovery-row lifecycle-card__recovery-row--total">
+                  <span>{t("recoveryTotalLabel")}</span>
+                  <strong>826</strong>
+                </div>
+              </div>
               <div className="lifecycle-card__reminder-message">
                 <span>{t("reminderOneMore")}</span>
                 <p>
@@ -87,21 +100,13 @@ export async function EventLifecycle() {
                   <br />
                   {t("reminderPromptLine2")}
                 </p>
-                <span className="lifecycle-card__reminder-link">
-                  {t("reminderLink")}{" "}
-                  <ArrowRight size={14} aria-hidden="true" />
-                </span>
               </div>
-              <span className="lifecycle-card__reminder-icon">
-                <PaperPlaneTilt size={20} aria-hidden="true" />
-              </span>
             </div>
             <span className="eyebrow">{t("afterEyebrow")}</span>
             <h3>{t("afterTitle")}</h3>
             <p>{t("afterDescription")}</p>
           </article>
         </Reveal>
-        <p className="section-disclosure">{t("disclosure")}</p>
       </div>
     </section>
   );

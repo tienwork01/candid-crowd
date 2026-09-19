@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarDots, Plus } from "@phosphor-icons/react/dist/ssr";
+import { Plus } from "@phosphor-icons/react/dist/ssr";
 import { getTranslations } from "next-intl/server";
 import { HostShell } from "@/features/host/components";
-import { Card, CardContent } from "@/components/ui";
+import { EventsListClient } from "@/features/event/components";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("host.pages");
@@ -27,18 +27,7 @@ export default async function EventsPage() {
             <Plus size={17} aria-hidden="true" /> {t("createEvent")}
           </Link>
         </div>
-        <Card className="host-events__empty border-dashed">
-          <CardContent className="flex flex-col items-center p-0">
-            <span className="host-events__empty-icon">
-              <CalendarDots size={24} aria-hidden="true" />
-            </span>
-            <h2>{t("shelfWaiting")}</h2>
-            <p>{t("shelfDescription")}</p>
-            <Link className="text-button" href="/events/new">
-              {t("createFirstEvent")} <Plus size={16} aria-hidden="true" />
-            </Link>
-          </CardContent>
-        </Card>
+        <EventsListClient />
       </section>
     </HostShell>
   );

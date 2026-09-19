@@ -10,6 +10,7 @@ import {
   Key,
   EnvelopeSimple,
   ArrowsClockwise,
+  WarningCircle,
 } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { Brand } from "@/components/shared";
@@ -97,9 +98,7 @@ export function AccountRecovery({
       });
 
       if (result.error) {
-        setPasswordError(
-          getErrorMessage(result.error.code, undefined, tErrors),
-        );
+        setPasswordError(getErrorMessage(result.error, undefined, tErrors));
         setIsPending(false);
 
         return;
@@ -120,7 +119,7 @@ export function AccountRecovery({
       });
 
       if (result.error) {
-        setNotice(getErrorMessage(result.error.code, undefined, tErrors));
+        setNotice(getErrorMessage(result.error, undefined, tErrors));
         setIsPending(false);
 
         return;
@@ -210,9 +209,22 @@ export function AccountRecovery({
                   inputRef={confirmPasswordRef}
                 />
                 {passwordError && (
-                  <Alert variant="destructive" className="my-2">
-                    <AlertDescription>{passwordError}</AlertDescription>
-                  </Alert>
+                  <div
+                    id="password-error"
+                    className="recovery-form__error"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <WarningCircle
+                      size={14}
+                      weight="fill"
+                      className="recovery-form__error-icon"
+                      aria-hidden="true"
+                    />
+                    <span className="recovery-form__error-text">
+                      {passwordError}
+                    </span>
+                  </div>
                 )}
               </>
             )}
@@ -250,7 +262,7 @@ export function AccountRecovery({
           )}
 
           {notice && (
-            <Alert className="mt-4">
+            <Alert role="status" className="mt-4">
               <AlertDescription>{notice}</AlertDescription>
             </Alert>
           )}

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Plus } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
-import { useEvent } from "../hooks";
+import { useEvent, useMounted } from "../hooks";
 import { EventReadyCard } from "./event-ready-card";
 import { EventSetupChecklist } from "./event-setup-checklist";
 import { Spinner } from "@/components/ui";
@@ -15,9 +15,11 @@ type ReadyPageClientProps = {
 export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
   const t = useTranslations("event");
   const tCommon = useTranslations("common.errors");
+  const mounted = useMounted();
+
   const { data: event, isLoading } = useEvent(eventId);
 
-  if (isLoading) {
+  if (!mounted || isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 min-h-[50vh]">
         <Spinner size="lg" className="text-primary mb-3" />

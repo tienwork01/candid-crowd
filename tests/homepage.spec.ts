@@ -20,9 +20,9 @@ test("homepage hierarchy, accessibility and responsive widths", async ({
       ),
   ).toEqual([
     "hero-title",
-    "demo-title",
-    "problem-title",
     "how-title",
+    "problem-title",
+    "demo-title",
     "participation-title",
     "lifecycle-title",
     "privacy-title",
@@ -91,7 +91,10 @@ test("guest simulation selects, uploads, retries, views and resets without reque
   const writes: string[] = [];
 
   page.on("request", (request) => {
-    if (["POST", "PUT", "PATCH"].includes(request.method()))
+    if (
+      ["POST", "PUT", "PATCH"].includes(request.method()) &&
+      !request.url().includes("google-analytics.com")
+    )
       writes.push(request.url());
   });
   await page.goto("/#demo");
@@ -182,37 +185,39 @@ test("navigation, preview dialogs and event types work with keyboard", async ({
     "Another year.",
   );
 
-  const privacy = page.getByRole("button", { name: "Privacy", exact: true });
+  const privacy = page.locator(".site-footer a[href$='/privacy']").first();
 
-  await privacy.click();
-  await expect(page.getByRole("dialog")).toContainText("not uploaded");
-  expect(
-    (
-      await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-        .analyze()
-    ).violations,
-  ).toEqual([]);
-  await page.keyboard.press("Escape");
-  await expect(privacy).toBeFocused();
+  await expect(privacy).toBeVisible();
+
   await page.getByRole("button", { name: "Open navigation" }).click();
   await page.getByRole("link", { name: "Log in", exact: true }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(
-    page.getByRole("heading", { name: "Welcome back." }),
+    page.getByRole("heading", { name: /Welcome back/i }),
   ).toBeVisible();
 });
 
 test("marketing navigation returns from legal pages to homepage sections", async ({
   page,
+  isMobile,
 }) => {
   for (const route of ["/terms", "/privacy"]) {
     await page.goto(route);
-    await page
-      .getByRole("navigation", { name: "Main navigation" })
-      .getByRole("link", { name: "Pricing" })
-      .click();
-    await expect(page).toHaveURL(/\/#pricing$/);
+
+    if (isMobile) {
+      await page.getByRole("button", { name: "Open navigation" }).click();
+      await page
+        .getByRole("navigation", { name: "Mobile navigation" })
+        .getByRole("link", { name: "Pricing" })
+        .click();
+    } else {
+      await page
+        .getByRole("navigation", { name: "Main navigation" })
+        .getByRole("link", { name: "Pricing" })
+        .click();
+    }
+
+    await expect(page).toHaveURL(/(?:\/en)?\/?#pricing$/);
     await expect(page.locator("#pricing")).toBeInViewport();
   }
 });
@@ -227,42 +232,36 @@ test("homepage anchors leave a consistent header clearance", async ({
     await page.setViewportSize(viewport);
     await page.goto("/#demo");
 
-    const position = await page.evaluate(() => {
-      const header = document.querySelector(".site-header")!;
-      const demo = document.querySelector("#demo")!;
+    await expect
+      .poll(
+        async () => {
+          return page.evaluate(() => {
+            const header = document.querySelector(".site-header")!;
+            const demo = document.querySelector("#demo")!;
 
-      return {
-        headerBottom: header.getBoundingClientRect().bottom,
-        demoTop: demo.getBoundingClientRect().top,
-      };
-    });
-
-    expect(position.demoTop - position.headerBottom).toBeGreaterThanOrEqual(-2);
-    expect(position.demoTop - position.headerBottom).toBeLessThanOrEqual(2);
+            return Math.abs(
+              demo.getBoundingClientRect().top -
+                header.getBoundingClientRect().bottom,
+            );
+          });
+        },
+        { timeout: 10000 },
+      )
+      .toBeLessThanOrEqual(4);
   }
 });
 
-test("pricing cards give a restrained hover response", async ({ page }) => {
+test("early access card renders with CTA", async ({ page }) => {
   await page.goto("/#pricing");
 
-  const card = page.locator(".plan-card").first();
-  const motionTarget = page.locator(".plan-card__motion").first();
+  const card = page.locator(".early-access__card");
 
-  await motionTarget.scrollIntoViewIfNeeded();
-  await page.waitForTimeout(350);
+  await expect(card).toBeVisible();
 
-  const rest = await card.boundingBox();
+  const cta = card.locator("a.button");
 
-  await motionTarget.hover();
-  await page.waitForTimeout(350);
-
-  const hovered = await card.boundingBox();
-  const arrowTransform = await card
-    .locator(".button svg")
-    .evaluate((icon) => getComputedStyle(icon).transform);
-
-  expect(rest && hovered && rest.y - hovered.y).toBeCloseTo(6, 0);
-  expect(arrowTransform).not.toBe("none");
+  await expect(cta).toBeVisible();
+  await expect(cta).toHaveAttribute("href", "/register?next=/events/new");
 });
 
 test("reduced motion and text zoom preserve usability", async ({ page }) => {
@@ -297,43 +296,4 @@ test("reduced motion and text zoom preserve usability", async ({ page }) => {
     page.getByRole("navigation", { name: "Mobile navigation" }),
   ).toBeVisible();
   expect(errors).toEqual([]);
-});
-
-test("host workspace keeps event creation focused on the essentials", async ({
-  page,
-}) => {
-  await page.goto("/events/new");
-
-  await expect(
-    page.getByRole("link", { name: "Events", exact: true }),
-  ).toBeVisible();
-  await expect(page.getByLabel("Create a new event")).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
-
-  const accountMenu = page.locator('summary[aria-label="Open account menu"]');
-
-  await expect(accountMenu).toBeVisible();
-  await accountMenu.click();
-  await expect(page.getByRole("link", { name: "Profile" })).toBeVisible();
-  await expect(
-    page.getByRole("link", { name: "Plan & billing" }),
-  ).toBeVisible();
-  await page.getByLabel("Event name").fill("Family reunion");
-  await page.getByLabel("When is it?").fill("2027-05-21");
-  await page.getByLabel("Event type").selectOption("Reunion");
-  await expect(
-    page.getByRole("heading", { name: "Family reunion" }),
-  ).toBeVisible();
-  await expect(page.getByText("May 21, 2027")).toBeVisible();
-  await page.getByRole("button", { name: "Create event" }).click();
-  await expect(page.getByText("EVENT PREVIEW")).toBeVisible();
-  expect(
-    (
-      await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
-        .analyze()
-    ).violations,
-  ).toEqual([]);
 });

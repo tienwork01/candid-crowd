@@ -5,6 +5,7 @@ export const navigation = [
 ] as const;
 
 export type MarketingPhoto = { id: string; src: string; alt: string };
+
 export const photos = {
   countryside: {
     id: "countryside",
@@ -42,11 +43,15 @@ export const photos = {
     alt: "Flowers arranged along a wedding reception table",
   },
 } satisfies Record<string, MarketingPhoto>;
+
 export const sampleEvent = {
   name: "Emma & James",
   dateLabel: "September 21 · A day to remember",
   disclosure: "Fictional demo event",
+  slug: "8K2M",
+  fullUrl: "candidcrowd.life/e/8K2M",
 };
+
 export const guestDemo = {
   maxPhotos: 6,
   maxFileBytes: 10 * 1024 * 1024,
@@ -56,76 +61,25 @@ export const guestDemo = {
 };
 
 export const participation = {
-  guests: 157,
-  contributors: 93,
-  photos: 824,
-  videos: 72,
-  sources: [
-    { key: "qr", label: "Event QR code", contributors: 85 },
-    { key: "link", label: "Shared link", contributors: 8 },
+  guests: 120,
+  contributors: 54,
+  photos: 617,
+  videos: 0,
+  rate: 0.45,
+  funnel: [
+    { key: "scans", count: 154, percentage: 100 },
+    { key: "visits", count: 117, percentage: 76 },
+    { key: "opened", count: 73, percentage: 47 },
+    { key: "contributed", count: 54, percentage: 35 },
   ],
-};
+} as const;
 
-type PricingPlan = {
-  id: string;
-  name: string;
-  description: string;
-  priceLabel: string;
-  billing: string;
-  features: string[];
-  featured: boolean;
-  available: boolean;
-  cta: string;
-};
-
-// Placeholder configuration: no commercial prices, quotas, or paid offers have been approved.
-export const pricingPlans: PricingPlan[] = [
-  {
-    id: "free",
-    name: "Free",
-    description: "For trying CandidCrowd.",
-    priceLabel: "Free",
-    billing: "Explore the preview",
-    features: [
-      "Interactive guest experience",
-      "Try your own photos locally",
-      "Save an event draft",
-    ],
-    featured: false,
-    available: true,
-    cta: "Try it free",
-  },
-  {
-    id: "essential",
-    name: "Essential",
-    description: "One celebration. Every perspective.",
-    priceLabel: "Coming soon",
-    billing: "Pay once per event · Price to be announced",
-    features: [
-      "Your private event gallery",
-      "A guest link & printable QR",
-      "Original-quality photo downloads",
-    ],
-    featured: true,
-    available: false,
-    cta: "Explore the demo",
-  },
-  {
-    id: "plus",
-    name: "Plus",
-    description: "For the moments that need more room.",
-    priceLabel: "Coming soon",
-    billing: "Pay once per event · Price to be announced",
-    features: [
-      "Everything planned for Essential",
-      "More space for your memories",
-      "Video sharing & more event features",
-    ],
-    featured: false,
-    available: false,
-    cta: "Explore the demo",
-  },
-];
+export const earlyAccessFeatures = [
+  "oneQr",
+  "noGuestApp",
+  "realtimeGallery",
+  "originalQuality",
+] as const;
 
 export const eventTypes = [
   {
@@ -143,6 +97,13 @@ export const eventTypes = [
       "The candles, the surprises, and the people who make it your day.",
   },
   {
+    id: "anniversaries",
+    label: "Anniversaries",
+    line: "Celebrating love. Honoring the journey.",
+    description:
+      "Gather every generation, toast to the years passed, and collect every heartfelt toast.",
+  },
+  {
     id: "graduations",
     label: "Graduations",
     line: "One chapter closes. A new story begins.",
@@ -157,6 +118,13 @@ export const eventTypes = [
       "A home for every familiar smile, shared story, and long-overdue group photo.",
   },
   {
+    id: "parties",
+    label: "Parties & Celebrations",
+    line: "Good music. Great friends. Spontaneous shots.",
+    description:
+      "Capture the laughter, the dance moves, and all the moments in between.",
+  },
+  {
     id: "company-events",
     label: "Company events",
     line: "Good people. Shared moments.",
@@ -164,18 +132,3 @@ export const eventTypes = [
       "Collect the human side of team offsites, milestones, and company celebrations.",
   },
 ] as const;
-
-export const previewNotices = {
-  login: {
-    title: "Your host space is on its way.",
-    body: "Host accounts aren’t available in this preview yet. You can try the guest experience or create an event draft on this device. No credentials are collected.",
-  },
-  privacy: {
-    title: "Privacy · preview notice",
-    body: "Photos selected in this demo stay in this browser session and are not uploaded. An event draft is stored on this device if you save one. The full privacy policy will be published before live accounts and cloud uploads launch. This notice is a placeholder, not the final policy.",
-  },
-  terms: {
-    title: "Terms · preview notice",
-    body: "This is an interactive product preview, not a live event-sharing service. Paid plans, host accounts, and cloud uploads are not available. Full terms will be published before the service launches. This notice is a placeholder, not the final terms.",
-  },
-} as const;

@@ -7,3 +7,4 @@ export { ReadyPageClient } from "./ready-page-client";
 export { OverviewPageClient } from "./overview-page-client";
 export { GuestPageClient } from "./guest-page-client";
 export { EventDraftForm } from "./event-draft-form";
+export { EventsListClient } from "./events-list-client";

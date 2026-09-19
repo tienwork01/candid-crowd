@@ -2,14 +2,15 @@ import { MotionProvider } from "@/components/shared";
 import {
   Header,
   Hero,
-  GuestDemo,
-  ProblemSection,
+  TrustStrip,
   HowItWorks,
+  ProblemSection,
+  GuestDemo,
   ParticipationPreview,
   EventLifecycle,
   PrivacySection,
   EventTypes,
-  Pricing,
+  EarlyAccess,
   FinalCta,
   Footer,
 } from "@/features/marketing/components";
@@ -20,14 +21,15 @@ export default function HomePage() {
       <Header />
       <main id="main">
         <Hero />
-        <GuestDemo />
-        <ProblemSection />
+        <TrustStrip />
         <HowItWorks />
+        <ProblemSection />
+        <GuestDemo />
         <ParticipationPreview />
         <EventLifecycle />
         <PrivacySection />
         <EventTypes />
-        <Pricing />
+        <EarlyAccess />
         <FinalCta />
       </main>
       <Footer />
