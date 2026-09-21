@@ -41,14 +41,7 @@ export async function HostShell({ active, plan, children }: HostShellProps) {
             </span>
           </div>
           <div className="host-shell__account">
-            <HostAccountMenu
-              active={
-                active === "profile" || active === "billing" || active === "new"
-                  ? active
-                  : undefined
-              }
-              plan={plan}
-            />
+            <HostAccountMenu active={active} plan={plan} />
           </div>
         </div>
       </header>

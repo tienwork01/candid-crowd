@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { privateClient } from "@/lib/api-client";
+import { QUERY_KEYS } from "@/lib/cache-config";
 import type { CandidEvent } from "../types/event";
 import { updateStoredEvent } from "../lib/event-store";
 
@@ -54,12 +55,18 @@ export function useUpdateEvent() {
     },
     onSuccess: (data, variables) => {
       if (data) {
-        queryClient.setQueryData(["event", variables.id], data);
-        queryClient.setQueryData(["event", data.slug], data);
+        queryClient.setQueryData(QUERY_KEYS.event.detail(variables.id), data);
+
+        if (data.slug) {
+          queryClient.setQueryData(QUERY_KEYS.event.detail(data.slug), data);
+        }
       }
 
       void queryClient.invalidateQueries({
-        queryKey: ["event", variables.id],
+        queryKey: QUERY_KEYS.event.detail(variables.id),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.event.all,
       });
     },
   });

@@ -9,11 +9,14 @@ import {
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui";
 
+import { CACHE_TIMES } from "@/lib/cache-config";
+
 function makeQueryClient(): QueryClient {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000,
+        staleTime: CACHE_TIMES.STANDARD.staleTime,
+        gcTime: CACHE_TIMES.STANDARD.gcTime,
         retry: 1,
         refetchOnWindowFocus: false,
       },

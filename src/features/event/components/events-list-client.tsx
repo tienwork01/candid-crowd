@@ -137,16 +137,13 @@ export function EventsListClient() {
         onSortChange={setSort}
         selectedDirection={params.direction}
         onDirectionToggle={toggleDirection}
-        resultCount={pagination?.total ?? events.length}
-        hasActiveSearch={hasActiveSearch}
       />
 
-      {/* Loading overlay during page transitions */}
-      <div
-        className={`host-events__grid-wrapper${isFetching ? " host-events__grid-wrapper--loading" : ""}`}
-      >
-        {/* Empty Search Result */}
-        {events.length === 0 && hasActiveSearch ? (
+      {/* Grid or Skeleton or Empty State */}
+      <div className="host-events__grid-wrapper">
+        {isLoading && !data ? (
+          <EventCardSkeletonGrid count={6} />
+        ) : events.length === 0 && hasActiveSearch ? (
           <div className="host-events__search-empty">
             <MagnifyingGlass
               size={32}
@@ -166,7 +163,11 @@ export function EventsListClient() {
           </div>
         ) : (
           /* Events Grid */
-          <div className="host-events__grid grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div
+            className={`host-events__grid grid grid-cols-1 sm:grid-cols-2 gap-5 transition-opacity duration-200 ${
+              isFetching ? "opacity-75" : ""
+            }`}
+          >
             {events.map((ev) => {
               const dateString = ev.event_date
                 ? formatDate(ev.event_date, locale, {
@@ -266,6 +267,7 @@ export function EventsListClient() {
                     <Button
                       variant="ghost"
                       size="sm"
+                      nativeButton={false}
                       className="text-xs font-medium text-primary hover:text-primary gap-1"
                       render={
                         <Link href={`/events/${encodeURIComponent(ev.id)}`} />

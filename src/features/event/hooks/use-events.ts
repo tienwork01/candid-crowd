@@ -1,5 +1,6 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { privateClient } from "@/lib/api-client";
+import { CACHE_TIMES, QUERY_KEYS } from "@/lib/cache-config";
 import { siteConfig } from "@/lib/config";
 import type { CandidEvent } from "../types/event";
 import type { EventListParams, EventListResponse } from "../types/event-list";
@@ -89,10 +90,14 @@ export function useEvents(params: EventListParams = {}) {
       : "desc");
 
   return useQuery<EventListResponse>({
-    queryKey: [
-      "events",
-      { page, per_page, q, type, sort, direction: resolvedDirection },
-    ],
+    queryKey: QUERY_KEYS.event.list({
+      page,
+      per_page,
+      q,
+      type,
+      sort,
+      direction: resolvedDirection,
+    }),
     queryFn: async (): Promise<EventListResponse> => {
       try {
         const response = await privateClient.get<BackendEventsResponse>(
@@ -143,6 +148,8 @@ export function useEvents(params: EventListParams = {}) {
       });
     },
     placeholderData: keepPreviousData,
+    staleTime: CACHE_TIMES.STANDARD.staleTime,
+    gcTime: CACHE_TIMES.STANDARD.gcTime,
   });
 }
 

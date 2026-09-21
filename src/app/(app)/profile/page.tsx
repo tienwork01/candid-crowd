@@ -15,11 +15,22 @@ export default async function ProfilePage() {
   return (
     <HostShell active="profile">
       <section className="profile-page" aria-labelledby="profile-title">
-        <div className="profile-page__intro">
-          <p className="eyebrow">{t("accountEyebrow")}</p>
-          <h1 id="profile-title">{t("profileTitle")}</h1>
-          <p>{t("personalInfoDescription")}</p>
-        </div>
+        <header className="profile-page__intro">
+          <div className="profile-page__context-bar">
+            <span className="profile-page__status-badge">
+              <span className="profile-page__status-dot" aria-hidden="true" />
+              <span>{t("accountEyebrow")}</span>
+            </span>
+          </div>
+          <div className="profile-page__heading">
+            <div className="profile-page__title-group">
+              <h1 id="profile-title">{t("profileTitle")}</h1>
+              <p className="profile-page__description">
+                {t("personalInfoDescription")}
+              </p>
+            </div>
+          </div>
+        </header>
         <ProfileForm />
       </section>
     </HostShell>

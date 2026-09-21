@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Sparkle, X } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -30,6 +30,19 @@ function EventEditForm({
   onSave,
 }: Omit<EventEditDialogProps, "isOpen">) {
   const t = useTranslations("event");
+  const tCommon = useTranslations("common");
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   const [name, setName] = useState(event.name);
   const [eventType, setEventType] = useState<EventType>(event.event_type);
@@ -77,6 +90,7 @@ function EventEditForm({
     >
       <div
         className="w-full max-w-lg bg-surface border border-line rounded-2xl shadow-raised overflow-hidden"
+        style={{ backgroundColor: "var(--surface)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between p-5 border-b border-line">
@@ -95,7 +109,7 @@ function EventEditForm({
             type="button"
             onClick={onClose}
             className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-ink hover:bg-soft transition-colors"
-            aria-label="Close"
+            aria-label={tCommon("actions.close")}
           >
             <X size={16} />
           </button>
@@ -210,7 +224,7 @@ function EventEditForm({
               onClick={onClose}
               className="text-xs h-10 px-4"
             >
-              Cancel
+              {tCommon("actions.cancel")}
             </Button>
             <Button
               type="submit"
@@ -218,7 +232,7 @@ function EventEditForm({
               className="button button--primary text-xs h-10 px-5"
             >
               <Sparkle size={14} weight="fill" className="mr-1" />
-              <span>Save Changes</span>
+              <span>{tCommon("actions.save")}</span>
             </Button>
           </div>
         </form>

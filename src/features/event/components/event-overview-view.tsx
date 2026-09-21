@@ -1,29 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import {
-  CalendarCheck,
-  ChartBar,
-  ClockAfternoon,
-  Copy,
-  DownloadSimple,
-  Gear,
-  Images,
-  QrCode,
-  ShareNetwork,
-  Sparkle,
-  Users,
-} from "@phosphor-icons/react";
+import { useEffect, useState } from "react";
+import { ChartBar, Gear, Images, Megaphone, X } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import "./event.css";
-import type {
-  CandidEvent,
-  EventLifecyclePhase,
-  EventMediaItem,
-  EventMode,
-} from "../types/event";
+import type { CandidEvent, EventMediaItem, EventMode } from "../types/event";
+import { getEventLifecycleStatus, getEventPublicCode } from "../types/event";
 import {
   deleteStoredMediaItem,
   toggleStoredMediaStatus,
@@ -32,47 +15,88 @@ import {
 } from "../lib/event-store";
 import { EventAnalyticsView } from "./event-analytics-view";
 import { EventEditDialog } from "./event-edit-dialog";
+import { EventEngageView } from "./event-engage-view";
 import { EventGalleryView } from "./event-gallery-view";
 import { EventHubHeader } from "./event-hub-header";
 import { EventLiveWallModal } from "./event-live-wall-modal";
 import { EventMediaLightbox } from "./event-media-lightbox";
-import { EventModeSelector } from "./event-mode-selector";
-import { EventQrDialog } from "./event-qr-dialog";
+import { EventSharePopover } from "./event-share-popover";
+import { EventPrintModal } from "./print";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
-import { Button, Card, CardContent } from "@/components/ui";
+import { Button } from "@/components/ui";
 
 type EventOverviewViewProps = {
   event: CandidEvent;
 };
 
-type ActiveTab = "gallery" | "analytics" | "timeline" | "settings";
+type ActiveTab = "memories" | "participation" | "engage" | "settings";
 
 export function EventOverviewView({
   event: initialEvent,
 }: EventOverviewViewProps) {
   const t = useTranslations("event");
+  const tCommon = useTranslations("common");
   const locale = useLocale() as AppLocale;
 
   const [currentEvent, setCurrentEvent] = useState<CandidEvent>(initialEvent);
-  const [activeTab, setActiveTab] = useState<ActiveTab>("gallery");
-  const [activePhase, setActivePhase] = useState<EventLifecyclePhase>(
-    currentEvent.lifecycle_phase || "during",
-  );
+  const [activeTab, setActiveTab] = useState<ActiveTab>("memories");
 
   // Modals state
   const [lightboxItem, setLightboxItem] = useState<EventMediaItem | null>(null);
   const [isLiveWallOpen, setIsLiveWallOpen] = useState(false);
-  const [isQrDialogOpen, setIsQrDialogOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isRecoveryDismissed, setIsRecoveryDismissed] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
 
   const mediaItems = currentEvent.media_items || [];
   const activeMode = currentEvent.event_mode || "social";
+  const lifecycleStatus = getEventLifecycleStatus(currentEvent);
+  const publicCode = getEventPublicCode(currentEvent);
+
+  // Pre-generate QR code for instant modal & print responsiveness
+  useEffect(() => {
+    let active = true;
+    const publicGuestUrl = `https://candidcrowd.life/e/${publicCode}`;
+
+    void import("qrcode")
+      .then((qr) =>
+        qr.toDataURL(publicGuestUrl, {
+          width: 600,
+          margin: 1.5,
+          color: { dark: "#181e17", light: "#ffffff" },
+          errorCorrectionLevel: "H",
+        }),
+      )
+      .then((url) => {
+        if (active) setQrDataUrl(url);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [publicCode]);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const publicPath = currentEvent.public_url || `/e/${currentEvent.slug}`;
   const fullGuestUrl = currentEvent.guest_url || `${origin}${publicPath}`;
+  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
 
+  // --- Participation summary data ---
+  const expectedGuests = currentEvent.expected_guest_count || 100;
+  const contributors = currentEvent.metrics?.contributors_count || 0;
+  const memoriesCount =
+    (currentEvent.metrics?.photos_count || 0) +
+    (currentEvent.metrics?.videos_count || 0);
+  const participationRate =
+    expectedGuests > 0
+      ? Math.min(100, Math.round((contributors / expectedGuests) * 100))
+      : 0;
+
+  // --- Handlers ---
   const handleModeChange = (newMode: EventMode) => {
     const updated = updateStoredEventMode(currentEvent.id, newMode);
 
@@ -114,6 +138,23 @@ export function EventOverviewView({
     if (updated) setCurrentEvent(updated);
   };
 
+  const handleDownloadAll = () => {
+    if (mediaItems.length === 0) return;
+
+    toast.success(t("gallery.downloadAll", { count: mediaItems.length }));
+  };
+
+  const handleCopyReminder = async () => {
+    try {
+      const reminderText = `${t("overview.afterPromptHeading")} ${fullGuestUrl}`;
+
+      await navigator.clipboard.writeText(reminderText);
+      toast.success(t("overview.reminderCopied"));
+    } catch {
+      toast.error(t("overview.copyReminderLink"));
+    }
+  };
+
   // Lightbox navigation
   const visibleItems = mediaItems.filter((m) => m.status !== "hidden");
   const lightboxIndex = lightboxItem
@@ -130,26 +171,6 @@ export function EventOverviewView({
     if (hasNext) setLightboxItem(visibleItems[lightboxIndex + 1]);
   };
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(fullGuestUrl);
-      toast.success(t("ready.linkCopied"));
-    } catch {
-      toast.error(t("ready.copyLink"));
-    }
-  };
-
-  const handleCopyReminder = async () => {
-    try {
-      const reminderText = `${t("overview.afterPromptHeading")} ${fullGuestUrl}`;
-
-      await navigator.clipboard.writeText(reminderText);
-      toast.success(t("overview.reminderCopied"));
-    } catch {
-      toast.error(t("overview.copyReminderLink"));
-    }
-  };
-
   const formattedDate = currentEvent.event_date
     ? formatDate(currentEvent.event_date, locale, {
         month: "long",
@@ -158,85 +179,65 @@ export function EventOverviewView({
       })
     : t("ready.noDate");
 
-  let daysRemaining: number | null = null;
-
-  if (currentEvent.event_date) {
-    const target = new Date(currentEvent.event_date).getTime();
-    const now = new Date().getTime();
-
-    daysRemaining = Math.max(
-      0,
-      Math.ceil((target - now) / (1000 * 60 * 60 * 24)),
-    );
-  }
-
-  const expectedGuests = currentEvent.expected_guest_count || 100;
-  const mockContributors =
-    activePhase === "during" ? 38 : activePhase === "after" ? 76 : 0;
-  const mockMemories =
-    activePhase === "during" ? 142 : activePhase === "after" ? 318 : 0;
-  const mockScans =
-    activePhase === "during" ? 88 : activePhase === "after" ? 124 : 0;
-  const mockRate = Math.round((mockContributors / expectedGuests) * 100);
-
   return (
     <div className="event-hub">
-      {/* Top Editorial Header */}
+      {/* Compact Header */}
       <EventHubHeader
         event={currentEvent}
-        onOpenQr={() => setIsQrDialogOpen(true)}
+        onOpenShare={() => setIsShareOpen(true)}
         onOpenEdit={() => setIsEditDialogOpen(true)}
         onLaunchLiveWall={() => setIsLiveWallOpen(true)}
+        onDownloadAll={mediaItems.length > 0 ? handleDownloadAll : undefined}
       />
 
-      {/* 5 Event Modes Selector Bar */}
-      <EventModeSelector
-        activeMode={activeMode}
-        onModeChange={handleModeChange}
-      />
-
-      {/* Event Navigation Tabs */}
-      <div className="event-hub__tabs" role="tablist" aria-label="Event views">
+      {/* Tab Navigation — Memories | Participation | Engage | Settings */}
+      <div
+        className="event-hub__tabs"
+        role="tablist"
+        aria-label={t("hub.tabMemories")}
+      >
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === "gallery"}
-          onClick={() => setActiveTab("gallery")}
+          aria-selected={activeTab === "memories"}
+          onClick={() => setActiveTab("memories")}
           className={`event-hub__tab ${
-            activeTab === "gallery" ? "event-hub__tab--active" : ""
+            activeTab === "memories" ? "event-hub__tab--active" : ""
           }`}
         >
           <Images size={16} aria-hidden="true" />
-          <span>{t("hub.tabGallery")}</span>
-          <span className="ml-1 px-1.5 py-0.2 rounded-full text-[11px] bg-primary/10 text-primary font-semibold">
-            {mediaItems.length}
-          </span>
+          <span>{t("hub.tabMemories")}</span>
+          {mediaItems.length > 0 && (
+            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[11px] bg-primary/10 text-primary font-semibold">
+              {mediaItems.length}
+            </span>
+          )}
         </button>
 
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === "analytics"}
-          onClick={() => setActiveTab("analytics")}
+          aria-selected={activeTab === "participation"}
+          onClick={() => setActiveTab("participation")}
           className={`event-hub__tab ${
-            activeTab === "analytics" ? "event-hub__tab--active" : ""
+            activeTab === "participation" ? "event-hub__tab--active" : ""
           }`}
         >
           <ChartBar size={16} aria-hidden="true" />
-          <span>{t("hub.tabAnalytics")}</span>
+          <span>{t("hub.tabParticipation")}</span>
         </button>
 
         <button
           type="button"
           role="tab"
-          aria-selected={activeTab === "timeline"}
-          onClick={() => setActiveTab("timeline")}
+          aria-selected={activeTab === "engage"}
+          onClick={() => setActiveTab("engage")}
           className={`event-hub__tab ${
-            activeTab === "timeline" ? "event-hub__tab--active" : ""
+            activeTab === "engage" ? "event-hub__tab--active" : ""
           }`}
         >
-          <ClockAfternoon size={16} aria-hidden="true" />
-          <span>{t("hub.tabTimeline")}</span>
+          <Megaphone size={16} aria-hidden="true" />
+          <span>{t("hub.tabEngage")}</span>
         </button>
 
         <button
@@ -253,270 +254,96 @@ export function EventOverviewView({
         </button>
       </div>
 
-      {/* TAB CONTENT 1: GALLERY & MEDIA */}
-      {activeTab === "gallery" && (
-        <EventGalleryView
-          items={mediaItems}
-          onOpenLightbox={(item) => setLightboxItem(item)}
-          onToggleStatus={handleToggleMediaStatus}
-          onDeleteMedia={handleDeleteMedia}
+      {/* ═══ TAB: MEMORIES ═══ */}
+      {activeTab === "memories" && (
+        <>
+          {/* Compact participation summary (only when media exists) */}
+          {memoriesCount > 0 && (
+            <button
+              type="button"
+              className="event-hub__participation-summary"
+              onClick={() => setActiveTab("participation")}
+              title={t("hub.tabParticipation")}
+            >
+              <span>
+                {t("overview.participationSummary", {
+                  memories: memoriesCount,
+                  contributors,
+                  rate: participationRate,
+                })}
+              </span>
+            </button>
+          )}
+
+          {/* Lifecycle-aware banners */}
+          {lifecycleStatus === "upcoming" && mediaItems.length === 0 && (
+            <div className="event-hub__readiness-banner">
+              <span>{t("overview.readinessBanner")}</span>
+            </div>
+          )}
+
+          {lifecycleStatus === "ended" && !isRecoveryDismissed && (
+            <div className="event-hub__recovery-banner">
+              <div className="event-hub__recovery-banner-content">
+                <span>{t("overview.recoveryBanner")}</span>
+                <button
+                  type="button"
+                  className="event-hub__recovery-banner-action"
+                  onClick={handleCopyReminder}
+                >
+                  {t("overview.collectMore")}
+                </button>
+              </div>
+              <button
+                type="button"
+                className="event-hub__recovery-banner-close"
+                onClick={() => setIsRecoveryDismissed(true)}
+                aria-label={tCommon("actions.close")}
+              >
+                <X size={14} aria-hidden="true" />
+              </button>
+            </div>
+          )}
+
+          {/* Gallery View */}
+          <EventGalleryView
+            items={mediaItems}
+            eventName={currentEvent.name}
+            publicCode={publicCode}
+            onOpenLightbox={(item) => setLightboxItem(item)}
+            onToggleStatus={handleToggleMediaStatus}
+            onDeleteMedia={handleDeleteMedia}
+            guestUrl={testGuestUrl}
+            onOpenShare={() => setIsShareOpen(true)}
+            onOpenPrint={() => setIsPrintModalOpen(true)}
+          />
+        </>
+      )}
+
+      {/* ═══ TAB: PARTICIPATION ═══ */}
+      {activeTab === "participation" && (
+        <EventAnalyticsView event={currentEvent} />
+      )}
+
+      {/* ═══ TAB: ENGAGE ═══ */}
+      {activeTab === "engage" && (
+        <EventEngageView
+          activeMode={activeMode}
+          onModeChange={handleModeChange}
+          onLaunchLiveWall={() => setIsLiveWallOpen(true)}
         />
       )}
 
-      {/* TAB CONTENT 2: PARTICIPATION & QR ANALYTICS */}
-      {activeTab === "analytics" && <EventAnalyticsView event={currentEvent} />}
-
-      {/* TAB CONTENT 3: TIMELINE & PHASES */}
-      {activeTab === "timeline" && (
-        <div className="mt-8 space-y-6">
-          <div
-            role="tablist"
-            className="p-1.5 bg-surface border border-line rounded-xl inline-flex flex-wrap gap-1"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activePhase === "before"}
-              onClick={() => setActivePhase("before")}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
-                activePhase === "before"
-                  ? "bg-primary text-primary-foreground shadow-subtle"
-                  : "text-muted-foreground hover:text-ink"
-              }`}
-            >
-              {t("overview.lifecycleBefore")}
-            </button>
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activePhase === "during"}
-              onClick={() => setActivePhase("during")}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
-                activePhase === "during"
-                  ? "bg-primary text-primary-foreground shadow-subtle"
-                  : "text-muted-foreground hover:text-ink"
-              }`}
-            >
-              {t("overview.lifecycleDuring")}
-            </button>
-
-            <button
-              type="button"
-              role="tab"
-              aria-selected={activePhase === "after"}
-              onClick={() => setActivePhase("after")}
-              className={`px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-all ${
-                activePhase === "after"
-                  ? "bg-primary text-primary-foreground shadow-subtle"
-                  : "text-muted-foreground hover:text-ink"
-              }`}
-            >
-              {t("overview.lifecycleAfter")}
-            </button>
-          </div>
-          <p className="text-xs text-subtle ml-1">
-            {t("overview.lifecycleNote")}
-          </p>
-
-          {/* Phase: Before */}
-          {activePhase === "before" && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <Card className="bg-surface border-line shadow-card">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between text-muted-foreground mb-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider">
-                        {t("create.dateLabel")}
-                      </span>
-                      <CalendarCheck size={20} className="text-primary" />
-                    </div>
-                    <div className="text-2xl font-heading text-ink">
-                      {daysRemaining !== null
-                        ? t("overview.daysUntil", { count: daysRemaining })
-                        : t("ready.noDate")}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {formattedDate}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-surface border-line shadow-card">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between text-muted-foreground mb-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider">
-                        {t("guestCount.heading")}
-                      </span>
-                      <Users size={20} className="text-primary" />
-                    </div>
-                    <div className="text-2xl font-heading text-ink">
-                      {currentEvent.expected_guest_count
-                        ? `${currentEvent.expected_guest_count}`
-                        : "100"}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("guestCount.description")}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-surface border-line shadow-card">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between text-muted-foreground mb-2">
-                      <span className="text-xs font-semibold uppercase tracking-wider">
-                        {t("checklist.title")}
-                      </span>
-                      <Sparkle size={20} className="text-primary" />
-                    </div>
-                    <div className="text-2xl font-heading text-primary">
-                      {t("checklist.completed")}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {t("overview.eventReadyBanner")}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="p-6 bg-surface border border-line rounded-2xl shadow-card flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                    <QrCode size={26} aria-hidden="true" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading text-lg text-ink">
-                      {t("ready.qrCta")}
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      {t("ready.noAppNeeded")}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2.5 w-full sm:w-auto">
-                  <Link
-                    href={`/events/${encodeURIComponent(currentEvent.id)}/ready`}
-                    className="button button--secondary text-xs h-9 px-3.5 w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
-                  >
-                    <DownloadSimple size={16} />
-                    <span>{t("ready.downloadQr")}</span>
-                  </Link>
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={handleCopyLink}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5"
-                  >
-                    <ShareNetwork size={16} />
-                    <span>{t("ready.copyLink")}</span>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Phase: During */}
-          {activePhase === "during" && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="bg-surface border-line">
-                  <CardContent className="p-5">
-                    <span className="text-xs text-muted-foreground uppercase font-semibold">
-                      {t("overview.statMemories")}
-                    </span>
-                    <div className="text-3xl font-heading text-ink mt-1">
-                      {mockMemories}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-surface border-line">
-                  <CardContent className="p-5">
-                    <span className="text-xs text-muted-foreground uppercase font-semibold">
-                      {t("overview.statContributors")}
-                    </span>
-                    <div className="text-3xl font-heading text-ink mt-1">
-                      {mockContributors}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-surface border-line">
-                  <CardContent className="p-5">
-                    <span className="text-xs text-muted-foreground uppercase font-semibold">
-                      {t("overview.statParticipation")}
-                    </span>
-                    <div className="text-3xl font-heading text-primary mt-1">
-                      {mockRate}%
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-surface border-line">
-                  <CardContent className="p-5">
-                    <span className="text-xs text-muted-foreground uppercase font-semibold">
-                      {t("overview.statScans")}
-                    </span>
-                    <div className="text-3xl font-heading text-ink mt-1">
-                      {mockScans}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
-
-          {/* Phase: After */}
-          {activePhase === "after" && (
-            <div className="space-y-6">
-              <div className="p-6 sm:p-8 bg-surface border border-line rounded-2xl shadow-raised">
-                <div className="max-w-xl">
-                  <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                    {t("overview.lifecycleAfter")}
-                  </span>
-                  <h3 className="font-heading text-2xl text-ink mt-1">
-                    {t("overview.afterPromptHeading")}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {t("overview.afterPromptSub")}
-                  </p>
-
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <Button
-                      type="button"
-                      onClick={handleCopyReminder}
-                      className="inline-flex items-center gap-2"
-                    >
-                      <Copy size={16} />
-                      <span>{t("overview.copyReminderLink")}</span>
-                    </Button>
-
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleCopyLink}
-                    >
-                      <span>{t("ready.copyLink")}</span>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB CONTENT 4: SETTINGS */}
+      {/* ═══ TAB: SETTINGS ═══ */}
       {activeTab === "settings" && (
-        <div className="mt-8 max-w-xl bg-surface border border-line rounded-2xl p-6 sm:p-8 shadow-card">
+        <div className="event-hub__settings">
           <div className="flex items-center justify-between pb-4 border-b border-line">
             <div>
-              <h3 className="font-heading text-xl text-ink font-medium">
-                {t("settings.title")}
+              <h3 className="font-heading text-base text-ink">
+                {t("settings.heading")}
               </h3>
               <p className="text-xs text-muted-foreground mt-0.5">
-                {t("settings.sub")}
+                {t("settings.description")}
               </p>
             </div>
             <Button
@@ -526,12 +353,11 @@ export function EventOverviewView({
               onClick={() => setIsEditDialogOpen(true)}
               className="text-xs h-9"
             >
-              <Gear size={15} className="mr-1.5" />
-              <span>{t("hub.editEventBtn")}</span>
+              {t("hub.editEventBtn")}
             </Button>
           </div>
 
-          <div className="mt-6 space-y-4 text-xs">
+          <div className="mt-4 space-y-3 text-xs">
             <div className="flex items-center justify-between py-2 border-b border-line/60">
               <span className="text-muted-foreground">
                 {t("create.nameLabel")}
@@ -562,7 +388,7 @@ export function EventOverviewView({
                 {t("guestCount.heading")}
               </span>
               <span className="font-semibold text-ink">
-                {currentEvent.expected_guest_count || 100} guests
+                {currentEvent.expected_guest_count || 100}
               </span>
             </div>
 
@@ -572,8 +398,8 @@ export function EventOverviewView({
               </span>
               <span className="font-semibold text-primary">
                 {currentEvent.gallery_enabled !== false
-                  ? "Enabled"
-                  : "Upload-only"}
+                  ? t("checklist.completed")
+                  : t("checklist.optional")}
               </span>
             </div>
           </div>
@@ -599,11 +425,19 @@ export function EventOverviewView({
         onClose={() => setIsLiveWallOpen(false)}
       />
 
-      {/* Quick QR Code Dialog */}
-      <EventQrDialog
+      {/* Share Popover */}
+      <EventSharePopover
         event={currentEvent}
-        isOpen={isQrDialogOpen}
-        onClose={() => setIsQrDialogOpen(false)}
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+      />
+
+      {/* Print Sign Studio Modal */}
+      <EventPrintModal
+        event={currentEvent}
+        qrDataUrl={qrDataUrl}
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
       />
 
       {/* Edit Event Dialog */}

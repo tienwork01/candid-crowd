@@ -16,11 +16,22 @@ export default async function BillingPage() {
   return (
     <HostShell active="billing">
       <section className="profile-page" aria-labelledby="billing-title">
-        <div className="profile-page__intro">
-          <p className="eyebrow">{t("accountEyebrow")}</p>
-          <h1 id="billing-title">{t("billingTitle")}</h1>
-          <p>{t("billingCardDescription")}</p>
-        </div>
+        <header className="profile-page__intro">
+          <div className="profile-page__context-bar">
+            <span className="profile-page__status-badge">
+              <span className="profile-page__status-dot" aria-hidden="true" />
+              <span>{t("accountEyebrow")}</span>
+            </span>
+          </div>
+          <div className="profile-page__heading">
+            <div className="profile-page__title-group">
+              <h1 id="billing-title">{t("billingTitle")}</h1>
+              <p className="profile-page__description">
+                {t("billingCardDescription")}
+              </p>
+            </div>
+          </div>
+        </header>
 
         <div className="profile-page__grid">
           <div className="profile-page__main">

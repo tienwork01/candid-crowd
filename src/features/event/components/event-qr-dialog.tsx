@@ -23,6 +23,7 @@ type EventQrDialogProps = {
 
 export function EventQrDialog({ event, isOpen, onClose }: EventQrDialogProps) {
   const t = useTranslations("event");
+  const tCommon = useTranslations("common");
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [copied, setCopied] = useState(false);
 
@@ -93,6 +94,7 @@ export function EventQrDialog({ event, isOpen, onClose }: EventQrDialogProps) {
     >
       <div
         className="w-full max-w-sm bg-surface border border-line rounded-2xl shadow-raised overflow-hidden p-6 text-center"
+        style={{ backgroundColor: "var(--surface)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between pb-3 mb-3 border-b border-line">
@@ -106,7 +108,7 @@ export function EventQrDialog({ event, isOpen, onClose }: EventQrDialogProps) {
             type="button"
             onClick={onClose}
             className="w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-ink transition-colors"
-            aria-label="Close"
+            aria-label={tCommon("actions.close")}
           >
             <X size={16} />
           </button>

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { publicClient, APIError } from "@/lib/api-client";
+import { CACHE_TIMES, QUERY_KEYS } from "@/lib/cache-config";
 
 export type PublicEventData = {
   id: string;
@@ -14,7 +15,7 @@ export type PublicEventData = {
  */
 export function usePublicEvent(slug: string) {
   return useQuery<PublicEventData, APIError>({
-    queryKey: ["public-event", slug],
+    queryKey: QUERY_KEYS.event.public(slug),
     queryFn: async () => {
       const response = await publicClient.get<PublicEventData>(
         `/api/v1/public/events/${encodeURIComponent(slug)}`,
@@ -23,5 +24,7 @@ export function usePublicEvent(slug: string) {
       return response.data;
     },
     enabled: Boolean(slug),
+    staleTime: CACHE_TIMES.STATIC.staleTime,
+    gcTime: CACHE_TIMES.STATIC.gcTime,
   });
 }

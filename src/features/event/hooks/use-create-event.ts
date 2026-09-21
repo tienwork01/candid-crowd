@@ -1,5 +1,6 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { privateClient } from "@/lib/api-client";
+import { QUERY_KEYS } from "@/lib/cache-config";
 import type { CandidEvent, EventType } from "../types/event";
 import { createLocalEvent, saveStoredEvent } from "../lib/event-store";
 
@@ -18,6 +19,8 @@ export type CreateEventResponse = CandidEvent;
  * with seamless local persistence fallback for resilience.
  */
 export function useCreateEvent() {
+  const queryClient = useQueryClient();
+
   return useMutation<CreateEventResponse, Error, CreateEventInput>({
     mutationFn: async (input) => {
       try {
@@ -49,6 +52,19 @@ export function useCreateEvent() {
       });
 
       return localEvent;
+    },
+    onSuccess: (data) => {
+      if (data?.id) {
+        queryClient.setQueryData(QUERY_KEYS.event.detail(data.id), data);
+
+        if (data.slug) {
+          queryClient.setQueryData(QUERY_KEYS.event.detail(data.slug), data);
+        }
+      }
+
+      void queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.event.all,
+      });
     },
   });
 }

@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { privateClient } from "@/lib/api-client";
+import { CACHE_TIMES, QUERY_KEYS } from "@/lib/cache-config";
 import type { CandidEvent } from "../types/event";
 import { getStoredEvent, saveStoredEvent } from "../lib/event-store";
 
@@ -8,7 +9,7 @@ import { getStoredEvent, saveStoredEvent } from "../lib/event-store";
  */
 export function useEvent(idOrSlug: string) {
   return useQuery<CandidEvent | null>({
-    queryKey: ["event", idOrSlug],
+    queryKey: QUERY_KEYS.event.detail(idOrSlug),
     queryFn: async () => {
       if (!idOrSlug) return null;
 
@@ -33,5 +34,7 @@ export function useEvent(idOrSlug: string) {
     },
     enabled: Boolean(idOrSlug),
     initialData: () => getStoredEvent(idOrSlug),
+    staleTime: CACHE_TIMES.STANDARD.staleTime,
+    gcTime: CACHE_TIMES.STANDARD.gcTime,
   });
 }

@@ -31,8 +31,6 @@ type EventsToolbarProps = {
   onSortChange: (sort: EventSortOption) => void;
   selectedDirection?: SortDirection;
   onDirectionToggle?: () => void;
-  resultCount: number;
-  hasActiveSearch: boolean;
 };
 
 const sortLabelKeys: Record<EventSortOption, string> = {
@@ -52,8 +50,6 @@ export function EventsToolbar({
   onSortChange,
   selectedDirection = "desc",
   onDirectionToggle,
-  resultCount,
-  hasActiveSearch,
 }: EventsToolbarProps) {
   const t = useTranslations("host.pages");
   const tEvent = useTranslations("event");
@@ -80,7 +76,7 @@ export function EventsToolbar({
             type="button"
             onClick={onSearchClear}
             className="host-events__search-clear"
-            aria-label={t("searchClear")}
+            aria-label={t("clearSearch")}
           >
             <X size={14} aria-hidden="true" />
           </button>
@@ -179,17 +175,6 @@ export function EventsToolbar({
           </button>
         )}
       </div>
-
-      {/* Results count */}
-      {hasActiveSearch && (
-        <div className="host-events__toolbar-meta">
-          <span className="host-events__results-count">
-            {resultCount === 1
-              ? t("searchResultSingle")
-              : t("searchResultsMultiple", { count: resultCount })}
-          </span>
-        </div>
-      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-// shadcn/ui Base UI button, adapted to CandidCrowd's colors and 44px targets.
+import * as React from "react";
 import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
@@ -32,12 +32,21 @@ export function Button({
   className,
   variant,
   size,
+  nativeButton,
   ...props
 }: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+  const isNativeButton =
+    nativeButton !== undefined
+      ? nativeButton
+      : React.isValidElement(props.render)
+        ? props.render.type === "button"
+        : undefined;
+
   return (
     <ButtonPrimitive
       data-slot="button"
       className={cn(buttonVariants({ variant, size }), className)}
+      nativeButton={isNativeButton}
       {...props}
     />
   );

@@ -72,7 +72,7 @@ function sortEvents(
   const copy = [...events];
   const isDesc =
     direction === "desc" ||
-    (!direction && (sort === "newest" as EventSortOption));
+    (!direction && sort === ("newest" as EventSortOption));
 
   switch (sort) {
     case "newest":

@@ -8,7 +8,8 @@ import {
   CircleNotch,
   CreditCard,
   Globe,
-  Plus,
+  Images,
+  Question,
   SignOut,
   User,
 } from "@phosphor-icons/react";
@@ -31,7 +32,9 @@ import {
 import { localeLabels, locales } from "@/i18n/locales";
 import { useLocaleSwitcher } from "@/i18n/use-locale-switcher";
 import { authClient } from "@/lib/auth-client";
+import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
+import { useHostProfile } from "../hooks";
 
 export type UserPlan = "free" | "essential" | "plus";
 
@@ -57,13 +60,12 @@ function initials(value: string) {
     .toUpperCase();
 }
 
-export function HostAccountMenu({
-  active,
-  plan,
-}: {
-  active?: "profile" | "billing" | "new";
+export type HostAccountMenuProps = {
+  active?: "events" | "profile" | "billing" | "new";
   plan?: UserPlan;
-}) {
+};
+
+export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
   const {
     currentLocale,
     switchLocale,
@@ -71,12 +73,12 @@ export function HostAccountMenu({
     pendingLocale,
   } = useLocaleSwitcher();
   const t = useTranslations("host.accountMenu");
-  const { data: session, isPending } = authClient.useSession();
+  const { user, isPending, clear: clearHostCache } = useHostProfile();
   const router = useRouter();
 
   const userPlan = (
     plan ||
-    (session?.user as { plan?: string } | undefined)?.plan ||
+    (user as { plan?: string } | undefined)?.plan ||
     "free"
   ).toLowerCase();
 
@@ -91,7 +93,7 @@ export function HostAccountMenu({
   if (isPending) {
     return (
       <div
-        className="inline-flex items-center gap-2.5 bg-transparent p-1 select-none animate-pulse"
+        className="inline-flex min-h-[44px] items-center gap-2.5 rounded-xl px-2.5 py-1.5 select-none animate-pulse"
         aria-hidden="true"
       >
         <div className="size-8 rounded-full bg-muted/20 shrink-0" />
@@ -104,20 +106,18 @@ export function HostAccountMenu({
     );
   }
 
-  const name = session?.user.name || t("yourAccount");
-  const email = session?.user.email || t("signInToManage");
+  const name = user?.name || t("yourAccount");
+  const email = user?.email || t("signInToManage");
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t("openMenuAria")}
-        className="group inline-flex items-center gap-2.5 bg-transparent p-1 text-foreground transition-opacity duration-150 hover:opacity-85 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none rounded-lg cursor-pointer select-none"
+        className="group inline-flex min-h-[44px] items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-foreground transition-colors duration-150 hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none cursor-pointer select-none"
       >
         {/* Column 1: Avatar */}
         <Avatar size="default" className="size-8 text-xs font-bold shrink-0">
-          {session?.user.image ? (
-            <AvatarImage src={session.user.image} alt={name} />
-          ) : null}
+          {user?.image ? <AvatarImage src={user.image} alt={name} /> : null}
           <AvatarFallback className="bg-sage text-primary font-bold">
             {initials(name) || "CC"}
           </AvatarFallback>
@@ -125,13 +125,13 @@ export function HostAccountMenu({
 
         {/* Column 2: User Name (top) and Plan Badge (bottom) */}
         <div className="flex min-w-0 flex-col items-start leading-tight text-left">
-          <span className="max-w-[120px] truncate text-xs font-semibold text-foreground">
+          <span className="max-w-[140px] truncate text-xs font-semibold text-foreground">
             {name}
           </span>
           <Badge
             variant="secondary"
             className={cn(
-              "mt-0.5 h-3.5 px-1.5 text-[9px] font-bold uppercase tracking-wider shrink-0 rounded-full border-0",
+              "mt-0.5 h-4 px-1.5 text-[9px] font-bold uppercase tracking-wider shrink-0 rounded-full border-0",
               getPlanBadgeStyle(userPlan),
             )}
           >
@@ -152,139 +152,157 @@ export function HostAccountMenu({
         align="end"
         sideOffset={8}
         aria-label={t("menuAria")}
-        className="w-70 p-1.5 bg-card border border-border shadow-xl rounded-xl"
+        className="w-72 p-1.5 bg-card border border-border shadow-xl rounded-2xl ring-1 ring-foreground/5"
       >
-        <div className="flex items-center gap-2.5 px-2.5 py-2">
-          <Avatar size="default" className="size-9 text-xs font-bold shrink-0">
-            {session?.user.image ? (
-              <AvatarImage src={session.user.image} alt={name} />
-            ) : null}
-            <AvatarFallback className="bg-sage text-primary font-bold">
+        {/* User Identity Header */}
+        <div className="flex items-center gap-3 px-3 py-2.5">
+          <Avatar size="default" className="size-10 text-xs font-bold shrink-0">
+            {user?.image ? <AvatarImage src={user.image} alt={name} /> : null}
+            <AvatarFallback className="bg-sage text-primary font-bold text-sm">
               {initials(name) || "CC"}
             </AvatarFallback>
           </Avatar>
           <div className="flex min-w-0 flex-1 flex-col leading-tight">
-            <strong className="truncate text-xs font-semibold text-foreground">
-              {name}
-            </strong>
-            <span className="truncate text-[11px] text-muted-foreground mt-0.5">
+            <div className="flex items-center gap-1.5">
+              <strong className="truncate text-sm font-semibold text-foreground">
+                {name}
+              </strong>
+              <Badge
+                variant="secondary"
+                className={cn(
+                  "h-4.5 px-1.5 text-[9px] font-bold uppercase tracking-wider shrink-0 rounded-full border-0",
+                  getPlanBadgeStyle(userPlan),
+                )}
+              >
+                {planLabel}
+              </Badge>
+            </div>
+            <span className="truncate text-xs text-muted-foreground mt-0.5">
               {email}
             </span>
           </div>
         </div>
 
-        <div className="my-1 mx-1 flex items-center justify-between rounded-lg bg-muted/40 px-2.5 py-2 text-xs">
-          <span className="text-[11px] font-medium text-muted-foreground">
-            {t("currentPlan")}
-          </span>
-          <Badge
-            variant="secondary"
-            className={cn(
-              "h-5 rounded-full px-2 py-0 text-[10px] font-bold uppercase tracking-wider border-0",
-              getPlanBadgeStyle(userPlan),
-            )}
-          >
-            {planLabel}
-          </Badge>
-        </div>
+        <DropdownMenuSeparator className="my-1 mx-1" />
 
-        <DropdownMenuSeparator />
-
+        {/* Primary Destinations Group */}
         <DropdownMenuGroup>
           <DropdownMenuItem
-            render={<Link href="/events/new" />}
+            render={<Link href="/events" />}
             nativeButton={false}
-            className={
-              active === "new"
-                ? "bg-accent text-accent-foreground font-medium"
-                : ""
-            }
+            className={cn(
+              "min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg",
+              active === "events" &&
+                "bg-accent text-accent-foreground font-semibold",
+            )}
           >
-            <Plus size={16} />
-            <span>{t("newEvent")}</span>
+            <Images size={16} className="text-muted-foreground shrink-0" />
+            <span>{t("events")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             render={<Link href="/profile" />}
             nativeButton={false}
-            className={
-              active === "profile"
-                ? "bg-accent text-accent-foreground font-medium"
-                : ""
-            }
+            className={cn(
+              "min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg",
+              active === "profile" &&
+                "bg-accent text-accent-foreground font-semibold",
+            )}
           >
-            <User size={16} />
+            <User size={16} className="text-muted-foreground shrink-0" />
             <span>{t("profile")}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             render={<Link href="/billing" />}
             nativeButton={false}
-            className={
-              active === "billing"
-                ? "bg-accent text-accent-foreground font-medium"
-                : ""
-            }
+            className={cn(
+              "min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg",
+              active === "billing" &&
+                "bg-accent text-accent-foreground font-semibold",
+            )}
           >
-            <CreditCard size={16} />
+            <CreditCard size={16} className="text-muted-foreground shrink-0" />
             <span>{t("planAndBilling")}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
 
-        <DropdownMenuSeparator />
+        <DropdownMenuSeparator className="my-1 mx-1" />
 
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger disabled={isLocalePending}>
-            {isLocalePending ? (
-              <CircleNotch size={16} className="animate-spin text-primary" />
-            ) : (
-              <Globe size={16} />
-            )}
-            <span>{t("language")}</span>
-            <span className="ml-auto text-xs text-muted-foreground">
-              {localeLabels[currentLocale]}
-            </span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="min-w-36">
-            {locales.map((loc) => {
-              const isSelected = loc === currentLocale;
-              const isTargetPending = isLocalePending && pendingLocale === loc;
+        {/* Preferences & Support */}
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger
+              disabled={isLocalePending}
+              className="min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg"
+            >
+              {isLocalePending ? (
+                <CircleNotch
+                  size={16}
+                  className="animate-spin text-primary shrink-0"
+                />
+              ) : (
+                <Globe size={16} className="text-muted-foreground shrink-0" />
+              )}
+              <span>{t("language")}</span>
+              <span className="ml-auto text-xs text-muted-foreground">
+                {localeLabels[currentLocale]}
+              </span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="min-w-38 rounded-xl p-1 shadow-lg border border-border">
+              {locales.map((loc) => {
+                const isSelected = loc === currentLocale;
+                const isTargetPending =
+                  isLocalePending && pendingLocale === loc;
 
-              return (
-                <DropdownMenuItem
-                  key={loc}
-                  disabled={isLocalePending}
-                  onClick={() => switchLocale(loc)}
-                  className="flex items-center justify-between cursor-pointer"
-                >
-                  <span
-                    className={isSelected ? "font-semibold text-primary" : ""}
+                return (
+                  <DropdownMenuItem
+                    key={loc}
+                    disabled={isLocalePending}
+                    onClick={() => switchLocale(loc)}
+                    className="flex min-h-[34px] items-center justify-between px-2.5 py-1.5 text-xs cursor-pointer rounded-md"
                   >
-                    {localeLabels[loc]}
-                  </span>
-                  {isTargetPending ? (
-                    <CircleNotch
-                      size={13}
-                      className="animate-spin text-primary"
-                    />
-                  ) : isSelected ? (
-                    <Check size={13} weight="bold" className="text-primary" />
-                  ) : null}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+                    <span
+                      className={isSelected ? "font-semibold text-primary" : ""}
+                    >
+                      {localeLabels[loc]}
+                    </span>
+                    {isTargetPending ? (
+                      <CircleNotch
+                        size={13}
+                        className="animate-spin text-primary"
+                      />
+                    ) : isSelected ? (
+                      <Check size={13} weight="bold" className="text-primary" />
+                    ) : null}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
 
-        <DropdownMenuSeparator />
+          <DropdownMenuItem
+            render={<a href={`mailto:${siteConfig.supportEmail}`} />}
+            nativeButton={false}
+            className="min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg"
+          >
+            <Question size={16} className="text-muted-foreground shrink-0" />
+            <span>{t("helpSupport")}</span>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
 
+        <DropdownMenuSeparator className="my-1 mx-1" />
+
+        {/* Sign Out */}
         <DropdownMenuItem
           variant="destructive"
           onClick={async () => {
+            clearHostCache();
             await authClient.signOut();
             router.replace("/login");
             router.refresh();
           }}
+          className="min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg"
         >
-          <SignOut size={16} />
+          <SignOut size={16} className="shrink-0" />
           <span>{t("logOut")}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

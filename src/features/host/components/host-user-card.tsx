@@ -11,8 +11,8 @@ import {
 } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
 import { Avatar, AvatarFallback, AvatarImage, Badge } from "@/components/ui";
-import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
+import { useHostProfile } from "../hooks";
 
 function initials(value: string) {
   return value
@@ -65,9 +65,8 @@ export function HostUserCard({
   const tMenu = useTranslations("host.accountMenu");
   const locale = useLocale();
   const pathname = usePathname();
-  const { data: session, isPending: sessionLoading } = authClient.useSession();
+  const { user, isPending: sessionLoading } = useHostProfile();
 
-  const user = session?.user;
   const userPlan = (
     (user as { plan?: string } | undefined)?.plan || "free"
   ).toLowerCase();

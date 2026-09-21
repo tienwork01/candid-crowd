@@ -107,6 +107,8 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
   --color-card: var(--surface);
   --color-popover: var(--surface);
   --color-popover-foreground: var(--ink);
@@ -114,16 +116,25 @@
   --color-ink: var(--ink);
   --color-muted: var(--soft);
   --color-muted-foreground: var(--muted);
+  --color-subtle: var(--subtle);
   --color-accent: var(--soft);
   --color-accent-foreground: var(--ink);
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--on-primary);
   --color-secondary: var(--sage);
+  --color-soft: var(--soft);
+  --color-sage: var(--sage);
   --color-border: var(--line);
+  --color-line: var(--line);
+  --color-line-hover: var(--line-hover);
   --color-input: var(--line);
   --color-ring: var(--primary);
   --color-destructive: var(--error);
+  --shadow-subtle: var(--primitive-shadow-subtle);
+  --shadow-card: var(--primitive-shadow-card);
+  --shadow-raised: var(--primitive-shadow-raised);
+  --shadow-floating: var(--primitive-shadow-floating);
   --radius-sm: var(--radius-sm);
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
@@ -2293,7 +2304,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(1240px, calc(100% - 48px));
+  width: min(1160px, calc(100% - 48px));
   height: 64px;
   margin-inline: auto;
 }
@@ -2354,9 +2365,10 @@
 .host-shell__content {
   width: min(1160px, calc(100% - 48px));
   margin-inline: auto;
+  padding: 36px 0 80px;
 }
 .host-shell__content--event-setup {
-  padding: 72px 0 100px;
+  padding: 48px 0 80px;
 }
 .host-shell__footer {
   border-top: 1px solid var(--line);
@@ -2365,7 +2377,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: min(1240px, calc(100% - 48px));
+  width: min(1160px, calc(100% - 48px));
   min-height: 72px;
   margin-inline: auto;
   color: var(--muted);
@@ -2618,15 +2630,6 @@
   color: var(--ink);
   background: var(--line);
 }
-.host-events__toolbar-meta {
-  display: flex;
-  align-items: center;
-}
-.host-events__results-count {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--muted);
-}
 .host-events__search-empty {
   display: flex;
   flex-direction: column;
@@ -2767,14 +2770,9 @@
   outline-offset: 2px;
 }
 
-/* ── Grid loading overlay ── */
+/* ── Grid wrapper ── */
 .host-events__grid-wrapper {
   position: relative;
-  transition: opacity 0.15s ease;
-}
-.host-events__grid-wrapper--loading {
-  opacity: 0.55;
-  pointer-events: none;
 }
 
 /* ── Pagination ── */
@@ -3004,22 +3002,70 @@
 
 /* ── Profile Page ────────────────────────────────────────────────── */
 .profile-page {
-  width: min(1100px, calc(100% - 48px));
+  width: min(1160px, calc(100% - 48px));
   margin: 0 auto;
-  padding: 72px 0 100px;
+  padding: 36px 0 80px;
 }
 .profile-page h1 {
-  margin: 8px 0 0;
-  font-size: clamp(36px, 4vw, 52px);
+  margin: 0 0 8px;
+  font-size: clamp(32px, 3.5vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -0.5px;
 }
 .profile-page__intro {
+  margin-bottom: 28px;
+}
+.profile-page__context-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.profile-page__status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: var(--sand);
+  border: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+.profile-page__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2e6945;
+  box-shadow: 0 0 0 2px rgba(46, 105, 69, 0.2);
+}
+.profile-page__heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+.profile-page__title-group h1 {
+  margin: 0 0 8px;
+  font-size: clamp(32px, 3.5vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+.profile-page__description {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
   max-width: 520px;
+  line-height: 1.5;
 }
 .profile-page__intro > p:last-child {
   margin-top: 10px;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--muted);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .profile-page__loading {
   display: flex;
@@ -3032,9 +3078,9 @@
 .profile-page__grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 48px;
+  gap: 40px;
   align-items: start;
-  margin-top: 40px;
+  margin-top: 0;
 }
 .profile-page__main {
   min-width: 0;
@@ -3043,7 +3089,7 @@
 /* Sticky sidebar */
 .profile-page__sidebar {
   position: sticky;
-  top: 32px;
+  top: 88px;
 }
 .profile-page__sidebar-card {
   padding: 28px;
@@ -3548,7 +3594,7 @@
   text-decoration: underline;
   text-underline-offset: 4px;
 }
-@media (max-width: 760px) {
+@media (max-width: 768px) {
   .host-shell__header-inner {
     height: 64px;
     width: calc(100% - 32px);
@@ -3568,22 +3614,24 @@
     margin-left: 12px;
   }
   .host-shell__content {
-    width: min(100% - 32px, 560px);
+    width: calc(100% - 32px);
+    padding: 24px 0 60px;
   }
   .host-shell__content--event-setup {
-    padding-top: 48px;
+    padding-top: 36px;
   }
   .host-shell__footer-inner {
     width: calc(100% - 32px);
     min-height: 64px;
   }
   .host-events {
-    width: min(100% - 32px, 560px);
-    padding-top: 48px;
+    width: calc(100% - 32px);
+    padding: 24px 0 60px;
   }
   .host-events__heading {
     align-items: flex-start;
     flex-direction: column;
+    gap: 16px;
   }
   .host-events__heading .button {
     width: 100%;
@@ -3593,28 +3641,32 @@
     margin-top: 48px;
   }
   .host-account-page {
-    width: min(100% - 32px, 560px);
-    padding-top: 48px;
+    width: calc(100% - 32px);
+    padding: 24px 0 60px;
   }
   .profile-page {
-    width: min(100% - 32px, 560px);
-    padding-top: 48px;
-    padding-bottom: 60px;
+    width: calc(100% - 32px);
+    padding: 24px 0 60px;
   }
   .profile-page h1 {
     font-size: clamp(28px, 7vw, 36px);
+  }
+  .profile-page__heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
   }
   .profile-page__intro > p:last-child {
     font-size: 14px;
   }
   .profile-page__grid {
     grid-template-columns: 1fr;
-    gap: 28px;
-    margin-top: 28px;
+    gap: 32px;
+    margin-top: 0;
   }
   .profile-page__sidebar {
     position: static;
-    order: -1;
+    order: 2;
   }
   .profile-page__sidebar-card {
     padding: 24px;
@@ -4735,7 +4787,7 @@
 .host-shell__content--event-create,
 .host-shell__content--event-ready,
 .host-shell__content--event-overview {
-  padding: 40px 0 80px;
+  padding: 36px 0 80px;
 }
 
 .create-event-card {

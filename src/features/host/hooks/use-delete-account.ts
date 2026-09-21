@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
@@ -18,6 +18,7 @@ export type DeleteAccountResponse = {
  */
 export function useDeleteAccount() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const tPages = useTranslations("host.pages");
   const tErrors = useTranslations("common.errors");
 
@@ -28,6 +29,7 @@ export function useDeleteAccount() {
       });
     },
     onSuccess: async () => {
+      queryClient.clear();
       await authClient.signOut();
       toast.success(tPages("deleteAccount"));
       router.replace("/");

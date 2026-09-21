@@ -1,161 +1,135 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
   CalendarDots,
-  Check,
-  Copy,
+  DotsThree,
+  DownloadSimple,
   Eye,
   Gear,
   Presentation,
-  QrCode,
+  ShareNetwork,
   Sparkle,
-  Users,
 } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
-import { toast } from "sonner";
-import type { CandidEvent } from "../types/event";
+import type { CandidEvent, EventLifecycleStatus } from "../types/event";
+import { getEventLifecycleStatus } from "../types/event";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
-import { Button } from "@/components/ui";
+import {
+  Button,
+  buttonVariants,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui";
 
 type EventHubHeaderProps = {
   event: CandidEvent;
-  onOpenQr: () => void;
+  onOpenShare: () => void;
   onOpenEdit: () => void;
   onLaunchLiveWall: () => void;
+  onDownloadAll?: () => void;
+};
+
+const lifecycleColors: Record<EventLifecycleStatus, string> = {
+  upcoming: "event-hub__lifecycle-badge--upcoming",
+  live: "event-hub__lifecycle-badge--live",
+  ended: "event-hub__lifecycle-badge--ended",
 };
 
 export function EventHubHeader({
   event,
-  onOpenQr,
+  onOpenShare,
   onOpenEdit,
   onLaunchLiveWall,
+  onDownloadAll,
 }: EventHubHeaderProps) {
   const t = useTranslations("event");
   const locale = useLocale() as AppLocale;
-  const [copiedLink, setCopiedLink] = useState(false);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const publicPath = event.public_url || `/e/${event.slug}`;
   const fullGuestUrl = event.guest_url || `${origin}${publicPath}`;
   const testGuestUrl = `${fullGuestUrl}?is_test=true`;
 
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(fullGuestUrl);
-      setCopiedLink(true);
-      toast.success(t("ready.linkCopied"));
-      setTimeout(() => setCopiedLink(false), 2200);
-    } catch {
-      toast.error(t("ready.copyLink"));
-    }
-  };
+  const status = getEventLifecycleStatus(event);
 
   const formattedDate = event.event_date
     ? formatDate(event.event_date, locale, {
-        month: "long",
+        month: "short",
         day: "numeric",
         year: "numeric",
       })
     : t("ready.noDate");
 
-  let daysRemaining: number | null = null;
-
-  if (event.event_date) {
-    const target = new Date(event.event_date).getTime();
-    const now = new Date().getTime();
-
-    daysRemaining = Math.max(
-      0,
-      Math.ceil((target - now) / (1000 * 60 * 60 * 24)),
-    );
-  }
+  const lifecycleLabel = t(
+    `overview.lifecycle${status.charAt(0).toUpperCase()}${status.slice(1)}` as
+      | "overview.lifecycleUpcoming"
+      | "overview.lifecycleLive"
+      | "overview.lifecycleEnded",
+  );
 
   return (
     <header className="event-hub__header">
       <div className="event-hub__headline">
-        {/* Top Breadcrumb */}
-        <nav aria-label={t("overview.breadcrumb")} className="mb-3">
-          <Link
-            href="/events"
-            className="text-xs text-muted-foreground hover:text-ink inline-flex items-center gap-1.5 transition-colors"
-          >
-            <ArrowLeft size={13} aria-hidden="true" />
-            <span>{t("overview.breadcrumb")}</span>
-          </Link>
-        </nav>
+        {/* Context Bar: Back + Metadata */}
+        <div className="event-hub__context-bar">
+          <nav aria-label={t("overview.breadcrumb")}>
+            <Link href="/events" className="event-hub__breadcrumb">
+              <ArrowLeft size={13} aria-hidden="true" />
+              <span>{t("overview.breadcrumb")}</span>
+            </Link>
+          </nav>
 
-        {/* Metadata Badges */}
-        <div className="event-hub__meta-row">
-          <span className="event-hub__type-badge">
-            <Sparkle size={12} weight="fill" className="text-primary" />
-            <span>{t(`types.${event.event_type}`)}</span>
+          <span className="event-hub__badge-sep" aria-hidden="true">
+            •
           </span>
 
-          <span className="event-hub__date">
-            <CalendarDots size={14} aria-hidden="true" />
-            <span>{formattedDate}</span>
-          </span>
-
-          {daysRemaining !== null && (
-            <span className="event-hub__days-badge">
-              {t("overview.daysUntil", { count: daysRemaining })}
+          <div className="event-hub__meta-row">
+            <span className="event-hub__type-badge">
+              <Sparkle size={12} weight="fill" className="text-primary" />
+              <span>{t(`types.${event.event_type}`)}</span>
             </span>
-          )}
 
-          {Boolean(event.expected_guest_count) && (
-            <span className="text-xs text-muted-foreground inline-flex items-center gap-1 font-medium">
-              <Users size={14} aria-hidden="true" />
-              <span>
-                {event.expected_guest_count}{" "}
-                {t("checklist.itemGuestCount").toLowerCase()}
-              </span>
+            <span className="event-hub__date">
+              <CalendarDots size={14} aria-hidden="true" />
+              <span>{formattedDate}</span>
             </span>
-          )}
+
+            <span
+              className={`event-hub__lifecycle-badge ${lifecycleColors[status]}`}
+            >
+              {status === "live" && (
+                <span className="event-hub__lifecycle-dot" aria-hidden="true" />
+              )}
+              <span>{lifecycleLabel}</span>
+            </span>
+          </div>
         </div>
 
-        {/* Big Editorial Title */}
+        {/* Compact Title */}
         <h1 className="event-hub__title">{event.name}</h1>
       </div>
 
-      {/* Header Quick Actions */}
+      {/* Header Actions — Compact */}
       <div className="event-hub__actions">
-        {/* Copy Guest Link */}
+        {/* Share (opens share popover) */}
         <Button
           type="button"
           variant="outline"
           size="sm"
-          onClick={handleCopyLink}
+          onClick={onOpenShare}
           className="text-xs h-9"
-          title={t("ready.copyLink")}
+          title={t("hub.shareBtn")}
         >
-          {copiedLink ? (
-            <Check size={14} className="text-primary" aria-hidden="true" />
-          ) : (
-            <Copy size={14} aria-hidden="true" />
-          )}
-          <span>
-            {copiedLink ? t("ready.linkCopied") : t("ready.copyLink")}
-          </span>
+          <ShareNetwork size={15} aria-hidden="true" />
+          <span>{t("hub.shareBtn")}</span>
         </Button>
 
-        {/* View / Download QR */}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={onOpenQr}
-          className="text-xs h-9"
-          title={t("ready.downloadQr")}
-        >
-          <QrCode size={16} aria-hidden="true" />
-          <span>{t("hub.qrCodeBtn")}</span>
-        </Button>
-
-        {/* Live Wall Presenter */}
+        {/* Live Wall */}
         <Button
           type="button"
           variant="outline"
@@ -165,33 +139,47 @@ export function EventHubHeader({
           title={t("hub.liveWallBtn")}
         >
           <Presentation size={16} aria-hidden="true" />
-          <span>{t("hub.liveWallBtn")}</span>
+          <span className="hidden sm:inline">{t("hub.liveWallBtn")}</span>
         </Button>
 
-        {/* Preview as Guest */}
+        {/* View as Guest */}
         <a
           href={testGuestUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="button button--secondary text-xs h-9 inline-flex items-center gap-1.5 px-3 rounded-md cursor-pointer"
+          className={buttonVariants({ variant: "outline", size: "sm" })}
           title={t("ready.previewAsGuest")}
         >
           <Eye size={15} weight="bold" aria-hidden="true" />
-          <span>{t("ready.previewAsGuest")}</span>
+          <span className="hidden sm:inline">{t("ready.previewAsGuest")}</span>
         </a>
 
-        {/* Edit Event Settings */}
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          onClick={onOpenEdit}
-          className="h-9 w-9 text-muted-foreground hover:text-ink"
-          aria-label={t("hub.editEventBtn")}
-          title={t("hub.editEventBtn")}
-        >
-          <Gear size={17} aria-hidden="true" />
-        </Button>
+        {/* More Menu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            className="h-9 w-9 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-ink hover:bg-accent transition-colors"
+            aria-label={t("hub.moreBtn")}
+            title={t("hub.moreBtn")}
+          >
+            <DotsThree size={20} weight="bold" aria-hidden="true" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onOpenEdit}>
+              <Gear size={15} aria-hidden="true" />
+              <span>{t("hub.editEventBtn")}</span>
+            </DropdownMenuItem>
+            {onDownloadAll && (
+              <DropdownMenuItem onClick={onDownloadAll}>
+                <DownloadSimple size={15} aria-hidden="true" />
+                <span>
+                  {t("gallery.downloadAll", {
+                    count: event.media_items?.length || 0,
+                  })}
+                </span>
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

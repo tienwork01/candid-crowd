@@ -108,3 +108,83 @@ export type EventDraft = {
   expectedGuests: number;
   createdAt: string;
 };
+
+export type EventLifecycleStatus = "upcoming" | "live" | "ended";
+
+/**
+ * Derive the lifecycle status from the event date.
+ * - "upcoming" if the event date is in the future (more than 0 days away)
+ * - "live" if the event date is today
+ * - "ended" if the event date is in the past
+ * - Falls back to lifecycle_phase if no date is set
+ */
+export function getEventLifecycleStatus(
+  event: CandidEvent,
+): EventLifecycleStatus {
+  if (!event.event_date) {
+    // No date — infer from lifecycle_phase if set
+    if (event.lifecycle_phase === "before") return "upcoming";
+    if (event.lifecycle_phase === "after") return "ended";
+
+    return "live";
+  }
+
+  const eventDate = new Date(event.event_date);
+  const now = new Date();
+
+  // Normalise to date-only comparisons
+  const eventDay = new Date(
+    eventDate.getFullYear(),
+    eventDate.getMonth(),
+    eventDate.getDate(),
+  );
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  if (eventDay.getTime() > today.getTime()) return "upcoming";
+  if (eventDay.getTime() === today.getTime()) return "live";
+
+  return "ended";
+}
+
+/**
+ * Derives a clean, stable public event code (e.g. "CB0449")
+ * ensuring internal database IDs (like "evt_...") are never exposed.
+ */
+export function getEventPublicCode(event: {
+  id?: string;
+  slug?: string;
+  name?: string;
+}): string {
+  // If the event already has an explicit short code (<= 8 chars alphanumeric)
+  if (
+    event.slug &&
+    !event.slug.startsWith("evt_") &&
+    event.slug.length <= 8 &&
+    /^[A-Za-z0-9]+$/.test(event.slug)
+  ) {
+    return event.slug.toUpperCase();
+  }
+
+  // Derive a deterministic, stable 6-character uppercase code (like "CB0449")
+  const seed = (event.id || event.slug || event.name || "candid").replace(
+    /^evt_/,
+    "",
+  );
+  let hash = 5381;
+
+  for (let i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) + hash) ^ seed.charCodeAt(i);
+  }
+
+  const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  let val = Math.abs(hash);
+
+  for (let i = 0; i < 6; i++) {
+    code += charset[val % charset.length];
+    val =
+      Math.floor(val / charset.length) + seed.charCodeAt(i % seed.length) * 31;
+  }
+
+  return code;
+}

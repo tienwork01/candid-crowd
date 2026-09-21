@@ -5,7 +5,7 @@ import { Plus } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { useEvent, useMounted } from "../hooks";
 import { EventOverviewView } from "./event-overview-view";
-import { Spinner } from "@/components/ui";
+import { EventHubSkeleton } from "./event-hub-skeleton";
 
 type OverviewPageClientProps = {
   eventId: string;
@@ -19,12 +19,7 @@ export function OverviewPageClient({ eventId }: OverviewPageClientProps) {
   const { data: event, isLoading } = useEvent(eventId);
 
   if (!mounted || isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 min-h-[50vh]">
-        <Spinner size="lg" className="text-primary mb-3" />
-        <p className="text-sm text-muted-foreground">{t("create.creating")}</p>
-      </div>
-    );
+    return <EventHubSkeleton />;
   }
 
   if (!event) {
@@ -47,9 +42,5 @@ export function OverviewPageClient({ eventId }: OverviewPageClientProps) {
     );
   }
 
-  return (
-    <div className="event-overview-page max-w-5xl mx-auto py-6 sm:py-10">
-      <EventOverviewView event={event} />
-    </div>
-  );
+  return <EventOverviewView event={event} />;
 }
