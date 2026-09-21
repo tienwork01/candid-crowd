@@ -30,6 +30,38 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
   }
 
   // If event not found, provide a fallback guest mock event so previewing is always seamless
+  const typeParam = searchParams?.get("type");
+  const fallbackType: CandidEvent["event_type"] =
+    typeParam &&
+    [
+      "Wedding",
+      "Birthday",
+      "Anniversary",
+      "Graduation",
+      "Baby Shower",
+      "Reunion",
+      "Party",
+      "Corporate",
+      "Conference",
+      "Other",
+    ].includes(typeParam)
+      ? (typeParam as CandidEvent["event_type"])
+      : slug.toLowerCase().includes("birthday")
+        ? "Birthday"
+        : slug.toLowerCase().includes("anniversary")
+          ? "Anniversary"
+          : slug.toLowerCase().includes("corporate")
+            ? "Corporate"
+            : slug.toLowerCase().includes("conference")
+              ? "Conference"
+              : slug.toLowerCase().includes("party")
+                ? "Party"
+                : slug.toLowerCase().includes("graduation")
+                  ? "Graduation"
+                  : slug.toLowerCase().includes("baby")
+                    ? "Baby Shower"
+                    : "Wedding";
+
   const displayEvent: CandidEvent = event || {
     id: `evt_demo_${slug}`,
     name:
@@ -38,7 +70,7 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
         .slice(0, -1)
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(" ") || "Celebration",
-    event_type: "Wedding",
+    event_type: fallbackType,
     event_date: null,
     date_unknown: true,
     expected_guest_count: 100,

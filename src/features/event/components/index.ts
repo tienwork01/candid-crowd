@@ -26,3 +26,4 @@ export {
 } from "./event-card-skeleton";
 export { EventHubSkeleton } from "./event-hub-skeleton";
 export { EventPrintModal } from "./print";
+export { CandidCameraModal } from "./candid-camera-modal";

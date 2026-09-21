@@ -40,7 +40,9 @@ export default function RootLayout({
     <html data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className={`${sans.variable} ${serif.variable}`}>
         <QueryProvider>{children}</QueryProvider>
-        <GoogleAnalytics gaId="G-REK9J5QXX2" />
+        {process.env.NODE_ENV === "production" && (
+          <GoogleAnalytics gaId="G-REK9J5QXX2" />
+        )}
       </body>
     </html>
   );

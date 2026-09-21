@@ -205,7 +205,9 @@ test.describe("CandidCrowd Event Creation and Ready Flow", () => {
       "Chloe & Liam's Wedding",
     );
     await expect(
-      page.getByRole("button", { name: "Select from camera roll" }),
+      page.getByRole("button", {
+        name: /Choose photos & videos|Select from camera roll/i,
+      }),
     ).toBeVisible();
 
     // 8. Test "Remove test uploads" button

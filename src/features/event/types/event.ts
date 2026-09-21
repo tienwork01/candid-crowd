@@ -86,6 +86,7 @@ export type CandidEvent = {
   lifecycle_phase?: EventLifecyclePhase;
   event_mode?: EventMode;
   gallery_enabled?: boolean;
+  candid_camera_enabled?: boolean;
   setup_checklist?: EventSetupChecklist;
   media_items?: EventMediaItem[];
   qr_sources?: QRSourceMetric[];

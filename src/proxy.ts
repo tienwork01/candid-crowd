@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
-import { auth } from "@/lib/auth";
 import {
   isAppLocale,
   localeCookieName,
@@ -71,6 +70,7 @@ function isProtectedPath(pathname: string): boolean {
 
 async function hasValidSession(request: NextRequest): Promise<boolean> {
   try {
+    const { auth } = await import("@/lib/auth");
     const session = await auth.api.getSession({
       headers: request.headers,
       query: { disableCookieCache: true, disableRefresh: true },

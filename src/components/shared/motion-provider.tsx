@@ -1,13 +1,10 @@
 "use client";
 
-import { LazyMotion, MotionConfig } from "motion/react";
-
-const loadFeatures = () =>
-  import("./motion-features").then((module) => module.default);
+import { domAnimation, LazyMotion, MotionConfig } from "motion/react";
 
 export function MotionProvider({ children }: { children: React.ReactNode }) {
   return (
-    <LazyMotion features={loadFeatures} strict>
+    <LazyMotion features={domAnimation} strict>
       <MotionConfig
         reducedMotion={process.env.NODE_ENV === "production" ? "user" : "never"}
         transition={{ duration: 0.3 }}

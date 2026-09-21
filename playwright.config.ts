@@ -9,7 +9,11 @@ if (existsSync(resolve(process.cwd(), ".env"))) {
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: true,
-  use: { baseURL: "http://localhost:3000", trace: "retain-on-failure" },
+  use: {
+    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || "https://localhost:3000",
+    ignoreHTTPSErrors: true,
+    trace: "retain-on-failure",
+  },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     {
@@ -19,7 +23,8 @@ export default defineConfig({
   ],
   webServer: {
     command: "pnpm dev",
-    url: "http://localhost:3000",
+    url: process.env.PLAYWRIGHT_TEST_BASE_URL || "https://localhost:3000",
     reuseExistingServer: !process.env.CI,
+    ignoreHTTPSErrors: true,
   },
 });

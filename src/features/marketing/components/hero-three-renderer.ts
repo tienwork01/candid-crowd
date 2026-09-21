@@ -37,8 +37,7 @@ export async function createHeroRenderer(
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
   renderer.shadowMap.enabled = true;
-  // PCFSoft keeps the physical depth cue without VSM's extra blur pass.
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   host.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
