@@ -145,6 +145,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const libraryInputRef = useRef<HTMLInputElement>(null);
+  const stagedFilesRef = useRef<StagedFile[]>([]);
 
   const [activeTab, setActiveTab] = useState<"upload" | "gallery">("upload");
   const [galleryMedia, setGalleryMedia] = useState<EventMediaItem[]>(
@@ -203,14 +204,20 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [uploadPhase]);
 
+  // Keep object URLs alive while a staged item is rendered; revoke only when the
+  // guest removes an item or the page actually unmounts.
+  useEffect(() => {
+    stagedFilesRef.current = stagedFiles;
+  }, [stagedFiles]);
+
   // Cleanup object URLs on unmount
   useEffect(() => {
     return () => {
-      stagedFiles.forEach((item) => {
+      stagedFilesRef.current.forEach((item) => {
         URL.revokeObjectURL(item.previewUrl);
       });
     };
-  }, [stagedFiles]);
+  }, []);
 
   const formattedDate = event.event_date
     ? formatDate(event.event_date, locale, {
@@ -1135,9 +1142,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
           onShareCaptures={handleCameraShare}
           onFallbackToLibrary={() => libraryInputRef.current?.click()}
           onFallbackToNativeCamera={() => cameraInputRef.current?.click()}
-          eventName={event.name}
-          eventDate={formattedDate !== t("ready.noDate") ? formattedDate : null}
-          eventType={event.event_type}
+          eventMode={mode}
         />
       )}
     </div>

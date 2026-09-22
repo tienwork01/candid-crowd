@@ -19,6 +19,8 @@ export type GuestAnalyticsEvent =
   | "guest_camera_frame_selected"
   | "guest_camera_flipped"
   | "guest_camera_shutter_pressed"
+  | "guest_camera_timer_started"
+  | "guest_camera_sound_toggled"
   | "guest_camera_photo_captured"
   | "guest_camera_retake"
   | "guest_camera_photo_retaken"

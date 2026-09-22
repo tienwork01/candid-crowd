@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   ArrowCounterClockwise,
@@ -8,19 +8,19 @@ import {
   CameraRotate,
   CameraSlash,
   Check,
+  FastForward,
   Images,
   Plus,
+  SpeakerHigh,
+  SpeakerSlash,
   Sparkle,
+  Timer,
   X,
 } from "@phosphor-icons/react";
 import { trackEvent } from "@/lib/analytics";
-import {
-  cameraEffectList,
-  cameraEffects,
-  type CameraEffectId,
-} from "../lib/camera-effects";
 import { applyEventFrameToCanvas } from "../lib/camera-frames";
-import { useCameraStream } from "../hooks/use-camera-stream";
+import { useCameraShutterSound, useCameraStream } from "../hooks";
+import type { EventMode } from "../types/event";
 import "./candid-camera.css";
 
 export interface CandidCameraModalProps {
@@ -29,9 +29,7 @@ export interface CandidCameraModalProps {
   onShareCaptures: (files: File[]) => void;
   onFallbackToLibrary?: () => void;
   onFallbackToNativeCamera?: () => void;
-  eventName: string;
-  eventDate?: string | null;
-  eventType?: string;
+  eventMode?: EventMode;
 }
 
 export function CandidCameraModal({
@@ -40,21 +38,23 @@ export function CandidCameraModal({
   onShareCaptures,
   onFallbackToLibrary,
   onFallbackToNativeCamera,
-  eventName,
-  eventDate,
-  eventType,
+  eventMode,
 }: CandidCameraModalProps) {
   const t = useTranslations("event.camera");
 
   const [screen, setScreen] = useState<"viewfinder" | "review">("viewfinder");
-  const [activeEffectId, setActiveEffectId] =
-    useState<CameraEffectId>("original");
   const [isFrameEnabled, setIsFrameEnabled] = useState(true);
   const [isFlashing, setIsFlashing] = useState(false);
   const [capturedFiles, setCapturedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [selectedCaptureIndex, setSelectedCaptureIndex] = useState(0);
+  const [isTimerMenuOpen, setIsTimerMenuOpen] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [isQuickCaptureEnabled, setIsQuickCaptureEnabled] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   const {
     stream,
     permissionState,
@@ -63,12 +63,8 @@ export function CandidCameraModal({
     stopTracks,
     flipFacingMode,
   } = useCameraStream(isOpen);
-
-  // Active effect configuration
-  const currentEffect = useMemo(
-    () => cameraEffects[activeEffectId] || cameraEffects.original,
-    [activeEffectId],
-  );
+  const { isSoundEnabled, playCountdownTick, playShutterSound, toggleSound } =
+    useCameraShutterSound(eventMode === "silent");
 
   // Clean up object URLs on unmount
   const cleanupPreviewUrls = useCallback(() => {
@@ -89,6 +85,9 @@ export function CandidCameraModal({
     cleanupPreviewUrls();
     setCapturedFiles([]);
     setPreviewUrls([]);
+    setSelectedCaptureIndex(0);
+    setCountdown(null);
+    setIsTimerMenuOpen(false);
     setScreen("viewfinder");
     stopTracks();
     onClose();
@@ -103,12 +102,41 @@ export function CandidCameraModal({
     });
 
     const prevOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
 
     document.body.style.overflow = "hidden";
+
+    window.setTimeout(() => {
+      modalRef.current
+        ?.querySelector<HTMLButtonElement>("button:not([disabled])")
+        ?.focus();
+    }, 0);
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         handleClose();
+
+        return;
+      }
+
+      if (e.key === "Tab" && modalRef.current) {
+        const focusable = Array.from(
+          modalRef.current.querySelectorAll<HTMLButtonElement>(
+            "button:not([disabled])",
+          ),
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (!first || !last) return;
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
@@ -117,6 +145,7 @@ export function CandidCameraModal({
     return () => {
       document.body.style.overflow = prevOverflow;
       window.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
     };
   }, [isOpen, handleClose, facingMode]);
 
@@ -130,14 +159,6 @@ export function CandidCameraModal({
     }
   }, [stream, screen]);
 
-  // Effect change handler
-  const handleEffectChange = (effectId: CameraEffectId) => {
-    setActiveEffectId(effectId);
-    trackEvent("guest_camera_effect_changed", {
-      effect: effectId,
-    });
-  };
-
   // Frame toggle handler
   const handleFrameToggle = () => {
     const nextState = !isFrameEnabled;
@@ -150,17 +171,22 @@ export function CandidCameraModal({
 
   // Camera flip handler
   const handleFlip = () => {
+    const nextFacingMode =
+      facingMode === "environment" ? "user" : "environment";
+
     flipFacingMode();
     trackEvent("guest_camera_flipped", {
-      target_facing: facingMode === "environment" ? "user" : "environment",
+      target_facing: nextFacingMode,
     });
   };
 
   // Shutter action
-  const handleShutter = () => {
+  const handleShutter = useCallback(async () => {
     const video = videoRef.current;
 
-    if (!video || video.videoWidth === 0) return;
+    if (!video || !isVideoReady || video.videoWidth === 0) return;
+
+    playShutterSound();
 
     // Trigger visual flash
     setIsFlashing(true);
@@ -207,11 +233,6 @@ export function CandidCameraModal({
 
       if (!ctx) return;
 
-      // Apply effect filter
-      if (currentEffect.canvasFilter && currentEffect.canvasFilter !== "none") {
-        ctx.filter = currentEffect.canvasFilter;
-      }
-
       // Mirror front camera
       if (facingMode === "user") {
         ctx.translate(canvas.width, 0);
@@ -236,12 +257,8 @@ export function CandidCameraModal({
       ctx.filter = "none";
 
       // Apply event frame overlay if enabled
-      if (isFrameEnabled && eventName) {
-        applyEventFrameToCanvas(ctx, canvas.width, canvas.height, {
-          eventName,
-          eventDate,
-          eventType,
-        });
+      if (isFrameEnabled) {
+        applyEventFrameToCanvas(ctx, canvas.width, canvas.height);
       }
 
       // Export JPEG file
@@ -255,10 +272,10 @@ export function CandidCameraModal({
 
           setCapturedFiles((prev) => [...prev, file]);
           setPreviewUrls((prev) => [...prev, previewUrl]);
-          setScreen("review");
+          setSelectedCaptureIndex(capturedFiles.length);
+          setScreen(isQuickCaptureEnabled ? "viewfinder" : "review");
 
           trackEvent("guest_camera_shutter_pressed", {
-            effect: activeEffectId,
             frame: isFrameEnabled ? "event" : "none",
             facing_mode: facingMode,
           });
@@ -269,6 +286,47 @@ export function CandidCameraModal({
     } catch {
       // Fallback if canvas rendering fails
     }
+  }, [
+    capturedFiles.length,
+    facingMode,
+    isFrameEnabled,
+    isQuickCaptureEnabled,
+    isVideoReady,
+    playShutterSound,
+  ]);
+
+  useEffect(() => {
+    if (countdown === null) return;
+
+    const timeoutId = window.setTimeout(() => {
+      if (countdown === 1) {
+        setCountdown(null);
+
+        handleShutter();
+
+        return;
+      }
+
+      playCountdownTick();
+      setCountdown((current) => (current ? current - 1 : null));
+    }, 1000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [countdown, handleShutter, playCountdownTick]);
+
+  const handleTimerSelection = (seconds: number) => {
+    setIsTimerMenuOpen(false);
+    playCountdownTick();
+    setCountdown(seconds);
+    trackEvent("guest_camera_timer_started", { seconds });
+  };
+
+  const handleSoundToggle = () => {
+    toggleSound();
+    trackEvent("guest_camera_sound_toggled", {
+      sound_enabled: !isSoundEnabled,
+      event_mode: eventMode ?? "social",
+    });
   };
 
   // Review: Retake latest photo
@@ -278,14 +336,22 @@ export function CandidCameraModal({
     });
 
     if (previewUrls.length > 0) {
-      const lastUrl = previewUrls[previewUrls.length - 1];
+      const selectedUrl = previewUrls[selectedCaptureIndex];
 
-      URL.revokeObjectURL(lastUrl);
-      setPreviewUrls((prev) => prev.slice(0, -1));
-      setCapturedFiles((prev) => prev.slice(0, -1));
+      URL.revokeObjectURL(selectedUrl);
+      setPreviewUrls((prev) =>
+        prev.filter((_, index) => index !== selectedCaptureIndex),
+      );
+      setCapturedFiles((prev) =>
+        prev.filter((_, index) => index !== selectedCaptureIndex),
+      );
+
+      if (previewUrls.length === 1) {
+        setScreen("viewfinder");
+      } else {
+        setSelectedCaptureIndex((index) => Math.max(0, index - 1));
+      }
     }
-
-    setScreen("viewfinder");
   };
 
   // Review: Keep photo and take another
@@ -315,14 +381,14 @@ export function CandidCameraModal({
     permissionState === "unavailable" ||
     permissionState === "error";
 
-  const latestPreviewUrl =
-    previewUrls.length > 0 ? previewUrls[previewUrls.length - 1] : null;
+  const selectedPreviewUrl = previewUrls[selectedCaptureIndex] ?? null;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
       aria-label={t("cameraTitle")}
+      ref={modalRef}
       className="candid-camera"
     >
       {/* ─── CASE A: PERMISSION BLOCKED / ERROR ─── */}
@@ -384,7 +450,7 @@ export function CandidCameraModal({
             </button>
           </div>
         </div>
-      ) : screen === "review" && latestPreviewUrl ? (
+      ) : screen === "review" && selectedPreviewUrl ? (
         /* ─── CASE B: REVIEW SCREEN ─── */
         <div className="candid-camera__review">
           {/* Top Bar with Close */}
@@ -398,24 +464,48 @@ export function CandidCameraModal({
               <X size={20} weight="bold" />
             </button>
 
-            {capturedFiles.length > 1 && (
-              <span className="candid-camera__batch-badge">
-                {t("capturesCount", { count: capturedFiles.length })}
-              </span>
-            )}
+            <span className="candid-camera__batch-badge" role="status">
+              {t("capturesCount", { count: capturedFiles.length })}
+            </span>
 
-            <div style={{ width: 44 }} />
+            <div className="candid-camera__top-spacer" aria-hidden="true" />
           </div>
 
           {/* Captured Preview */}
           <div className="candid-camera__preview-wrap">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={latestPreviewUrl}
+              src={selectedPreviewUrl}
               alt={t("reviewTitle")}
               className="candid-camera__preview-img"
             />
           </div>
+
+          {previewUrls.length > 1 && (
+            <div
+              role="group"
+              className="candid-camera__capture-tray"
+              aria-label={t("capturesCount", { count: capturedFiles.length })}
+            >
+              {previewUrls.map((url, index) => (
+                <button
+                  key={url}
+                  type="button"
+                  onClick={() => setSelectedCaptureIndex(index)}
+                  aria-label={t("reviewTitle")}
+                  aria-pressed={selectedCaptureIndex === index}
+                  className={`candid-camera__capture-thumb ${
+                    selectedCaptureIndex === index
+                      ? "candid-camera__capture-thumb--active"
+                      : ""
+                  }`}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="" />
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Review Actions */}
           <div className="candid-camera__review-actions">
@@ -470,6 +560,7 @@ export function CandidCameraModal({
             <button
               type="button"
               onClick={handleFrameToggle}
+              aria-pressed={isFrameEnabled}
               className={`candid-camera__frame-toggle ${
                 isFrameEnabled ? "candid-camera__frame-toggle--active" : ""
               }`}
@@ -478,15 +569,30 @@ export function CandidCameraModal({
               <span>{isFrameEnabled ? t("frameEvent") : t("frameNone")}</span>
             </button>
 
-            {/* Flip Camera Button */}
-            <button
-              type="button"
-              onClick={handleFlip}
-              aria-label={t("flipCamera")}
-              className="candid-camera__icon-btn"
-            >
-              <CameraRotate size={22} weight="bold" />
-            </button>
+            <div className="candid-camera__top-actions">
+              <button
+                type="button"
+                onClick={handleSoundToggle}
+                aria-label={isSoundEnabled ? t("soundOn") : t("soundOff")}
+                aria-pressed={isSoundEnabled}
+                className="candid-camera__icon-btn candid-camera__sound-toggle"
+              >
+                {isSoundEnabled ? (
+                  <SpeakerHigh size={21} weight="bold" />
+                ) : (
+                  <SpeakerSlash size={21} weight="bold" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleFlip}
+                aria-label={t("flipCamera")}
+                className="candid-camera__icon-btn"
+              >
+                <CameraRotate size={22} weight="bold" />
+              </button>
+            </div>
           </div>
 
           {/* Viewfinder Video Area */}
@@ -496,78 +602,125 @@ export function CandidCameraModal({
               playsInline
               autoPlay
               muted
+              onLoadStart={() => setIsVideoReady(false)}
+              onCanPlay={() => setIsVideoReady(true)}
               className={`candid-camera__video ${
                 facingMode === "user" ? "candid-camera__video--mirrored" : ""
               }`}
-              style={{ filter: currentEffect.cssFilter }}
             />
 
             {/* Live Frame Preview Overlay */}
-            {isFrameEnabled && eventName && (
+            {isFrameEnabled && (
               <div className="candid-camera__frame" aria-hidden="true">
-                {/* Bottom Frosted-Glass Plaque */}
-                <div className="candid-camera__frame-plaque">
-                  <span className="candid-camera__frame-title">
-                    {eventName}
-                  </span>
-                  {eventDate && (
-                    <span className="candid-camera__frame-date">
-                      {eventDate}
-                    </span>
-                  )}
-                </div>
+                <span className="candid-camera__frame-ornament">
+                  <span className="candid-camera__frame-ornament-line candid-camera__frame-ornament-line--left" />
+                  <span className="candid-camera__frame-ornament-line candid-camera__frame-ornament-line--right" />
+                  <span className="candid-camera__frame-sparkle candid-camera__frame-sparkle--large" />
+                  <span className="candid-camera__frame-sparkle candid-camera__frame-sparkle--left" />
+                  <span className="candid-camera__frame-sparkle candid-camera__frame-sparkle--right" />
+                  <span className="candid-camera__frame-ornament-dot candid-camera__frame-ornament-dot--left" />
+                  <span className="candid-camera__frame-ornament-dot candid-camera__frame-ornament-dot--right" />
+                </span>
+                <span className="candid-camera__frame-corner candid-camera__frame-corner--top-left" />
+                <span className="candid-camera__frame-corner candid-camera__frame-corner--top-right" />
+                <span className="candid-camera__frame-corner candid-camera__frame-corner--bottom-left" />
+                <span className="candid-camera__frame-corner candid-camera__frame-corner--bottom-right" />
               </div>
             )}
 
             {/* Flash Effect on Capture */}
             {isFlashing && <div className="candid-camera__flash" />}
+
+            {countdown !== null && (
+              <div
+                className="candid-camera__countdown"
+                role="status"
+                aria-live="assertive"
+              >
+                {countdown}
+              </div>
+            )}
+
+            {previewUrls.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCaptureIndex(previewUrls.length - 1);
+                  setScreen("review");
+                }}
+                aria-label={t("capturesCount", { count: capturedFiles.length })}
+                className="candid-camera__capture-summary"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={previewUrls[previewUrls.length - 1]} alt="" />
+                <span>{capturedFiles.length}</span>
+              </button>
+            )}
           </div>
 
           {/* Bottom Controls Area */}
           <div className="candid-camera__bottom-bar">
-            {/* Curated Effects Carousel */}
-            <div
-              role="radiogroup"
-              aria-label="Photo looks"
-              className="candid-camera__effects-carousel"
-            >
-              {cameraEffectList.map((effect) => {
-                const isActive = effect.id === activeEffectId;
-                // leaf translation key lookup
-                const effectNameKey = effect.labelKey.replace("camera.", "") as
-                  | "effectOriginal"
-                  | "effectFilm"
-                  | "effectBlackAndWhite"
-                  | "effectWarm"
-                  | "effectVintage"
-                  | "effectDisposable";
-
-                return (
-                  <button
-                    key={effect.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={isActive}
-                    onClick={() => handleEffectChange(effect.id)}
-                    className={`candid-camera__effect-pill ${
-                      isActive ? "candid-camera__effect-pill--active" : ""
-                    }`}
-                  >
-                    {t(effectNameKey)}
-                  </button>
-                );
-              })}
-            </div>
-
             {/* Circular Shutter Button */}
             <div className="candid-camera__shutter-row">
+              <div className="candid-camera__timer-control">
+                <button
+                  type="button"
+                  onClick={() => setIsTimerMenuOpen((isOpen) => !isOpen)}
+                  aria-label={t("takePhoto")}
+                  aria-expanded={isTimerMenuOpen}
+                  aria-controls="camera-timer-options"
+                  className={`candid-camera__timer-btn ${
+                    isTimerMenuOpen ? "candid-camera__timer-btn--active" : ""
+                  }`}
+                >
+                  <Timer size={21} weight="bold" aria-hidden="true" />
+                </button>
+
+                {isTimerMenuOpen && (
+                  <div
+                    id="camera-timer-options"
+                    role="group"
+                    aria-label={t("takePhoto")}
+                    className="candid-camera__timer-menu"
+                  >
+                    {[3, 5, 10].map((seconds) => (
+                      <button
+                        key={seconds}
+                        type="button"
+                        onClick={() => handleTimerSelection(seconds)}
+                        className="candid-camera__timer-option"
+                      >
+                        {seconds}s
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <button
                 type="button"
                 onClick={handleShutter}
                 aria-label={t("takePhoto")}
+                disabled={countdown !== null || !isVideoReady}
                 className="candid-camera__shutter-btn"
               >
                 <div className="candid-camera__shutter-inner" />
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  setIsQuickCaptureEnabled((isEnabled) => !isEnabled)
+                }
+                aria-label={t("quickCapture")}
+                aria-pressed={isQuickCaptureEnabled}
+                className={`candid-camera__quick-capture-btn ${
+                  isQuickCaptureEnabled
+                    ? "candid-camera__quick-capture-btn--active"
+                    : ""
+                }`}
+              >
+                <FastForward size={20} weight="bold" aria-hidden="true" />
+                <span>{t("quickCapture")}</span>
               </button>
             </div>
           </div>

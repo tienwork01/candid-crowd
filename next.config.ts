@@ -9,6 +9,8 @@ const nextConfig: NextConfig = {
     "127.0.0.1:3000",
     "192.168.88.218:3000",
     "192.168.88.218",
+    "10.0.0.101",
+    "10.0.0.101:3000",
   ],
   poweredByHeader: false,
   devIndicators: false,

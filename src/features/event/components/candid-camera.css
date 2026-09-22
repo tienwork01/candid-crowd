@@ -75,6 +75,35 @@
   background: rgba(255, 255, 255, 0.25);
 }
 
+.candid-camera__top-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.candid-camera__icon-btn:focus-visible,
+.candid-camera__frame-toggle:focus-visible,
+.candid-camera__effect-pill:focus-visible,
+.candid-camera__shutter-btn:focus-visible,
+.candid-camera__btn:focus-visible,
+.candid-camera__capture-summary:focus-visible,
+.candid-camera__capture-thumb:focus-visible {
+  outline: 3px solid #fef08a;
+  outline-offset: 3px;
+}
+
+.candid-camera__timer-btn:focus-visible,
+.candid-camera__timer-option:focus-visible,
+.candid-camera__quick-capture-btn:focus-visible {
+  outline: 3px solid #fef08a;
+  outline-offset: 3px;
+}
+
+.candid-camera__top-spacer {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+}
+
 .candid-camera__frame-toggle {
   display: inline-flex;
   align-items: center;
@@ -138,16 +167,125 @@
 /* ─── LIVE EVENT FRAME OVERLAY (MINIMAL FROSTED-GLASS KEEPSAKE) ────────── */
 .candid-camera__frame {
   position: absolute;
-  inset: 14px;
+  inset: 12px;
   pointer-events: none;
   z-index: 10;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 14px;
+  border: 2px solid rgba(250, 246, 235, 0.9);
+  border-radius: 18px;
+  box-shadow:
+    inset 0 0 0 4px rgba(250, 246, 235, 0.14),
+    0 4px 18px rgba(0, 0, 0, 0.16);
   animation: candidCameraFrameIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.candid-camera__frame-corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: #c7a96a;
+  border-style: solid;
+  border-width: 0;
+}
+
+.candid-camera__frame-ornament {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  width: 78px;
+  height: 28px;
+  transform: translateX(-50%);
+}
+
+.candid-camera__frame-ornament-line {
+  position: absolute;
+  top: 13px;
+  width: 17px;
+  border-top: 1px solid rgba(199, 169, 106, 0.9);
+}
+
+.candid-camera__frame-ornament-line--left {
+  left: 9px;
+}
+
+.candid-camera__frame-ornament-line--right {
+  right: 9px;
+}
+
+.candid-camera__frame-sparkle {
+  position: absolute;
+  border: 1px solid rgba(199, 169, 106, 0.94);
+  transform: rotate(45deg);
+}
+
+.candid-camera__frame-sparkle--large {
+  top: 8px;
+  left: 34px;
+  width: 10px;
+  height: 10px;
+}
+
+.candid-camera__frame-sparkle--left,
+.candid-camera__frame-sparkle--right {
+  top: 11px;
+  width: 5px;
+  height: 5px;
+}
+
+.candid-camera__frame-sparkle--left {
+  left: 26px;
+}
+
+.candid-camera__frame-sparkle--right {
+  right: 26px;
+}
+
+.candid-camera__frame-ornament-dot {
+  position: absolute;
+  top: 12px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #c7a96a;
+}
+
+.candid-camera__frame-ornament-dot--left {
+  left: 1px;
+}
+
+.candid-camera__frame-ornament-dot--right {
+  right: 1px;
+}
+
+.candid-camera__frame-corner--top-left {
+  top: 14px;
+  left: 14px;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+
+.candid-camera__frame-corner--top-right {
+  top: 14px;
+  right: 14px;
+  border-top-width: 2px;
+  border-right-width: 2px;
+}
+
+.candid-camera__frame-corner--bottom-left {
+  bottom: 16px;
+  left: 14px;
+  border-bottom-width: 2px;
+  border-left-width: 2px;
+}
+
+.candid-camera__frame-corner--bottom-right {
+  right: 14px;
+  bottom: 16px;
+  border-right-width: 2px;
+  border-bottom-width: 2px;
 }
 
 @keyframes candidCameraFrameIn {
@@ -161,47 +299,6 @@
   }
 }
 
-/* Bottom Frosted-Glass Plaque */
-.candid-camera__frame-plaque {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  margin-bottom: 14px;
-  padding: 10px 22px;
-  border-radius: 14px;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  max-width: calc(100% - 32px);
-}
-
-.candid-camera__frame-title {
-  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
-  font-size: clamp(15px, 4.2vw, 19px);
-  font-weight: 600;
-  color: #ffffff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
-  letter-spacing: -0.01em;
-  line-height: 1.3;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-align: center;
-}
-
-.candid-camera__frame-date {
-  font-size: 11px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.75);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
 /* Shutter Visual Flash Feedback */
 .candid-camera__flash {
   position: absolute;
@@ -210,6 +307,27 @@
   pointer-events: none;
   z-index: 30;
   animation: candidCameraFlashAnim 180ms ease-out forwards;
+}
+
+.candid-camera__countdown {
+  position: absolute;
+  z-index: 31;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  width: 96px;
+  height: 96px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.46);
+  color: #ffffff;
+  font-family: var(--font-heading, "Playfair Display", Georgia, serif);
+  font-size: 56px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  line-height: 1;
+  transform: translate(-50%, -50%);
 }
 
 @keyframes candidCameraFlashAnim {
@@ -255,7 +373,7 @@
 
 .candid-camera__effect-pill {
   flex-shrink: 0;
-  height: 32px;
+  min-height: 44px;
   padding: 0 14px;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.12);
@@ -267,6 +385,45 @@
   touch-action: manipulation;
   transition: all 150ms ease;
   white-space: nowrap;
+}
+
+.candid-camera__capture-summary {
+  position: absolute;
+  z-index: 12;
+  left: 16px;
+  bottom: 16px;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.88);
+  border-radius: 12px;
+  background: #18181b;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+}
+
+.candid-camera__capture-summary img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.candid-camera__capture-summary span {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 2px solid #09090b;
+  border-radius: 50%;
+  background: #fff;
+  color: #18181b;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .candid-camera__effect-pill:active {
@@ -282,11 +439,95 @@
 
 /* ─── SHUTTER BUTTON ─────────────────────────────────────────────────── */
 .candid-camera__shutter-row {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 100%;
   padding-bottom: 6px;
+}
+
+.candid-camera__timer-control {
+  position: absolute;
+  bottom: 20px;
+  width: 48px;
+  height: 48px;
+}
+
+.candid-camera__timer-control {
+  left: 24px;
+}
+
+.candid-camera__quick-capture-btn {
+  position: absolute;
+  right: 16px;
+  bottom: 20px;
+  display: inline-flex;
+  min-width: 48px;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.candid-camera__quick-capture-btn--active {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #18181b;
+}
+
+.candid-camera__timer-btn {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.candid-camera__timer-btn--active {
+  background: #ffffff;
+  color: #18181b;
+}
+
+.candid-camera__timer-menu {
+  position: absolute;
+  bottom: 58px;
+  left: 0;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  background: rgba(24, 24, 27, 0.88);
+}
+
+.candid-camera__timer-option {
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.candid-camera__timer-option:active {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .candid-camera__shutter-btn {
@@ -320,6 +561,11 @@
 .candid-camera__shutter-btn:active .candid-camera__shutter-inner {
   transform: scale(0.88);
   background-color: #e2e8f0;
+}
+
+.candid-camera__shutter-btn:disabled {
+  cursor: wait;
+  opacity: 0.62;
 }
 
 /* ─── PERMISSION / ERROR RECOVERY CARD ───────────────────────────────── */
@@ -445,10 +691,62 @@
   border-radius: 20px;
 }
 
+.candid-camera__capture-tray {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  overflow-x: auto;
+  padding: 12px 2px 2px;
+  scrollbar-width: none;
+}
+
+.candid-camera__capture-tray::-webkit-scrollbar {
+  display: none;
+}
+
+.candid-camera__capture-thumb {
+  flex: 0 0 52px;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: #18181b;
+  cursor: pointer;
+}
+
+.candid-camera__capture-thumb--active {
+  border-color: #fff;
+}
+
+.candid-camera__capture-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .candid-camera,
+  .candid-camera__frame,
+  .candid-camera__flash,
+  .candid-camera__video,
+  .candid-camera__icon-btn,
+  .candid-camera__frame-toggle,
+  .candid-camera__effect-pill,
+  .candid-camera__shutter-btn,
+  .candid-camera__shutter-inner,
+  .candid-camera__btn {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 .candid-camera__batch-badge {
-  position: absolute;
-  top: 14px;
-  left: 14px;
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  justify-content: center;
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8px);
   color: #ffffff;

@@ -16,12 +16,6 @@ export const cameraFrames: Record<CameraFrameId, CameraFrame> = {
   },
 };
 
-export type EventFrameOptions = {
-  eventName: string;
-  eventDate?: string | null;
-  eventType?: string;
-};
-
 /**
  * Helper to draw a rounded rectangle path on Canvas 2D.
  */
@@ -51,111 +45,126 @@ function drawRoundedRect(
   }
 }
 
+function drawSparkle(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  radius: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x, y - radius);
+  ctx.lineTo(x + radius * 0.42, y - radius * 0.42);
+  ctx.lineTo(x + radius, y);
+  ctx.lineTo(x + radius * 0.42, y + radius * 0.42);
+  ctx.lineTo(x, y + radius);
+  ctx.lineTo(x - radius * 0.42, y + radius * 0.42);
+  ctx.lineTo(x - radius, y);
+  ctx.lineTo(x - radius * 0.42, y - radius * 0.42);
+  ctx.closePath();
+  ctx.stroke();
+}
+
 /**
  * Composites the Editorial Photobooth Event Frame onto a Canvas 2D context.
  * Creates an elegant keepsake with an inset rounded border, photobooth L-bracket
- * corner accents, top commemorative badge, and bottom keepsake plaque.
+ * corner accents, and a small top ornament without placing text over the memory.
  */
 export function applyEventFrameToCanvas(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
-  options: EventFrameOptions,
 ) {
-  const { eventName, eventDate } = options;
-
-  if (!eventName) return;
-
   const minDim = Math.min(width, height);
-  const margin = Math.round(minDim * 0.038);
-  const frameW = width - 2 * margin;
-  const frameH = height - 2 * margin;
-  const cornerRadius = Math.round(minDim * 0.025);
+  const paper = "rgba(250, 246, 235, 0.96)";
+  const gold = "#c7a96a";
+  const outerInset = Math.round(minDim * 0.024);
+  const innerInset = Math.round(minDim * 0.052);
+  const borderRadius = Math.round(minDim * 0.018);
+  const lowerMarkY = height - innerInset - Math.round(minDim * 0.015);
 
-  // 1. Subtle Inset Rounded Border
-  ctx.save();
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
-  ctx.lineWidth = Math.max(1, Math.round(minDim * 0.002));
-  drawRoundedRect(ctx, margin, margin, frameW, frameH, cornerRadius);
-  ctx.stroke();
-  ctx.restore();
-
-  // 2. Bottom Frosted-Glass Plaque
   ctx.save();
 
-  const titleFontSize = Math.max(16, Math.round(minDim * 0.038));
-  const dateFontSize = Math.max(11, Math.round(minDim * 0.018));
-  const padX = Math.round(titleFontSize * 1.4);
-  const padY = Math.round(titleFontSize * 0.6);
-  const plaqueRadius = Math.round(minDim * 0.025);
-  const plaqueGap = Math.round(dateFontSize * 0.4);
-
-  // Measure text widths to size the plaque dynamically
-  ctx.font = `600 ${titleFontSize}px "Playfair Display", Georgia, "Times New Roman", serif`;
-
-  const titleMetrics = ctx.measureText(eventName);
-  let textBlockWidth = titleMetrics.width;
-  let textBlockHeight = titleFontSize;
-
-  if (eventDate) {
-    ctx.font = `500 ${dateFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-
-    const dateMetrics = ctx.measureText(eventDate.toUpperCase());
-
-    textBlockWidth = Math.max(textBlockWidth, dateMetrics.width);
-    textBlockHeight += plaqueGap + dateFontSize;
-  }
-
-  const plaqueW = Math.min(
-    textBlockWidth + padX * 2,
-    frameW - Math.round(minDim * 0.06),
+  // A warm paper border makes the mark readable on both bright and dark photos.
+  ctx.strokeStyle = paper;
+  ctx.lineWidth = Math.max(2, Math.round(minDim * 0.006));
+  drawRoundedRect(
+    ctx,
+    outerInset,
+    outerInset,
+    width - outerInset * 2,
+    height - outerInset * 2,
+    borderRadius,
   );
-  const plaqueH = textBlockHeight + padY * 2;
-  const plaqueX = Math.round((width - plaqueW) / 2);
-  const plaqueY = margin + frameH - Math.round(minDim * 0.04) - plaqueH;
-
-  // Frosted-glass background
-  ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
-  drawRoundedRect(ctx, plaqueX, plaqueY, plaqueW, plaqueH, plaqueRadius);
-  ctx.fill();
-
-  // Plaque border
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-  ctx.lineWidth = 1;
   ctx.stroke();
 
-  // Event Name
-  ctx.fillStyle = "#ffffff";
-  ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
-  ctx.shadowBlur = 4;
-  ctx.shadowOffsetY = 1;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "alphabetic";
+  // A fine inner rule gives the frame the feel of an editorial print.
+  ctx.strokeStyle = "rgba(45, 53, 43, 0.72)";
+  ctx.lineWidth = Math.max(1, Math.round(minDim * 0.0025));
+  drawRoundedRect(
+    ctx,
+    innerInset,
+    innerInset,
+    width - innerInset * 2,
+    height - innerInset * 2,
+    Math.round(borderRadius * 0.7),
+  );
+  ctx.stroke();
 
-  const textCenterX = plaqueX + plaqueW / 2;
+  const centerX = width / 2;
+  // Four restrained gold corner marks make the frame recognizable at a glance.
+  const markLength = Math.round(minDim * 0.035);
+  const markInset = innerInset + Math.round(minDim * 0.015);
 
-  if (eventDate) {
-    const titleY = plaqueY + padY + titleFontSize;
+  ctx.strokeStyle = gold;
+  ctx.lineWidth = Math.max(2, Math.round(minDim * 0.004));
 
-    ctx.font = `600 ${titleFontSize}px "Playfair Display", Georgia, "Times New Roman", serif`;
-    ctx.fillText(eventName, textCenterX, titleY, plaqueW - padX * 2);
+  const corners = [
+    [markInset, markInset, 1, 1],
+    [width - markInset, markInset, -1, 1],
+    [markInset, lowerMarkY, 1, -1],
+    [width - markInset, lowerMarkY, -1, -1],
+  ] as const;
 
-    // Event Date
-    ctx.font = `500 ${dateFontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
-    ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-    ctx.shadowBlur = 3;
-    ctx.fillText(
-      eventDate.toUpperCase(),
-      textCenterX,
-      titleY + plaqueGap + dateFontSize,
-      plaqueW - padX * 2,
-    );
-  } else {
-    const titleY = plaqueY + plaqueH / 2 + titleFontSize * 0.35;
+  corners.forEach(([x, y, horizontal, vertical]) => {
+    ctx.beginPath();
+    ctx.moveTo(x, y + markLength * vertical);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x + markLength * horizontal, y);
+    ctx.stroke();
+  });
 
-    ctx.font = `600 ${titleFontSize}px "Playfair Display", Georgia, "Times New Roman", serif`;
-    ctx.fillText(eventName, textCenterX, titleY, plaqueW - padX * 2);
-  }
+  const ornamentY = innerInset + Math.round(minDim * 0.028);
+  const sparkleRadius = Math.max(4, Math.round(minDim * 0.014));
+  const ornamentGap = Math.round(minDim * 0.038);
+
+  ctx.strokeStyle = "rgba(199, 169, 106, 0.9)";
+  ctx.lineWidth = Math.max(1, Math.round(minDim * 0.0022));
+  ctx.beginPath();
+  ctx.moveTo(centerX - ornamentGap * 1.75, ornamentY);
+  ctx.lineTo(centerX - ornamentGap * 0.75, ornamentY);
+  ctx.moveTo(centerX + ornamentGap * 0.75, ornamentY);
+  ctx.lineTo(centerX + ornamentGap * 1.75, ornamentY);
+  ctx.stroke();
+  drawSparkle(ctx, centerX, ornamentY, sparkleRadius);
+  drawSparkle(
+    ctx,
+    centerX - ornamentGap * 0.52,
+    ornamentY,
+    sparkleRadius * 0.48,
+  );
+  drawSparkle(
+    ctx,
+    centerX + ornamentGap * 0.52,
+    ornamentY,
+    sparkleRadius * 0.48,
+  );
+
+  ctx.fillStyle = gold;
+  [centerX - ornamentGap * 2.05, centerX + ornamentGap * 2.05].forEach((x) => {
+    ctx.beginPath();
+    ctx.arc(x, ornamentY, Math.max(1.5, minDim * 0.003), 0, Math.PI * 2);
+    ctx.fill();
+  });
 
   ctx.restore();
 }

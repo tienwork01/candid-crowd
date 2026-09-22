@@ -5,3 +5,5 @@ export * from "./use-public-event";
 export * from "./use-events";
 export * from "./use-event-list-params";
 export * from "./use-mounted";
+export * from "./use-camera-stream";
+export * from "./use-camera-shutter-sound";

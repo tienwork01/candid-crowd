@@ -11,7 +11,8 @@ export type CameraFacingMode = "user" | "environment";
 export function useCameraStream(isActive: boolean) {
   const [permissionState, setPermissionState] =
     useState<CameraPermissionState>("idle");
-  const [facingMode, setFacingMode] = useState<CameraFacingMode>("environment");
+  // Candid Camera is optimized for group selfies; guests can switch to rear camera.
+  const [facingMode, setFacingMode] = useState<CameraFacingMode>("user");
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 

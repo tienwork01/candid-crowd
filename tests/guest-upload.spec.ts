@@ -141,29 +141,18 @@ test.describe("Guest Upload UI & Mobile Ergonomics", () => {
 
     await expect(modal).toBeVisible();
 
-    // Viewfinder and effects carousel should be visible
+    // Viewfinder should stay focused on taking an unedited photo.
     await expect(modal.locator(".candid-camera__viewfinder")).toBeVisible();
-    await expect(
-      modal.locator(".candid-camera__effects-carousel"),
-    ).toBeVisible();
-
-    // Verify effects pills (at least 6 looks)
-    const effectPills = modal.locator(".candid-camera__effect-pill");
-
-    await expect(effectPills).toHaveCount(6);
-
-    // Switch to Film effect
-    await effectPills.nth(1).click();
-    await expect(effectPills.nth(1)).toHaveClass(
-      /candid-camera__effect-pill--active/,
+    await expect(modal.locator(".candid-camera__effects-carousel")).toHaveCount(
+      0,
     );
 
-    // Verify event frame is visible by default with photobooth styling
+    // Verify event frame is visible by default as a text-free visual signature.
     const frameOverlay = modal.locator(".candid-camera__frame");
 
     await expect(frameOverlay).toBeVisible();
-    await expect(modal.locator(".candid-camera__frame-badge")).toBeVisible();
-    await expect(modal.locator(".candid-camera__frame-title")).toBeVisible();
+    await expect(modal.locator(".candid-camera__frame-ornament")).toBeVisible();
+    await expect(modal.locator(".candid-camera__frame-title")).toHaveCount(0);
 
     // Verify event frame toggle works (toggle off and on)
     const frameToggle = modal.locator(".candid-camera__frame-toggle");
@@ -173,6 +162,13 @@ test.describe("Guest Upload UI & Mobile Ergonomics", () => {
     await expect(frameOverlay).toHaveCount(0);
     await frameToggle.click();
     await expect(frameOverlay).toBeVisible();
+
+    // Shutter feedback can be muted without leaving the viewfinder.
+    const soundToggle = modal.locator(".candid-camera__sound-toggle");
+
+    await expect(soundToggle).toHaveAttribute("aria-pressed", "true");
+    await soundToggle.click();
+    await expect(soundToggle).toHaveAttribute("aria-pressed", "false");
 
     // Press shutter button
     const shutterBtn = modal.locator(".candid-camera__shutter-btn");
