@@ -6,8 +6,9 @@ export type PublicEventData = {
   id: string;
   name: string;
   slug: string;
-  event_date: string;
+  event_date: string | null;
   event_type: string;
+  gallery_enabled: boolean;
 };
 
 /**

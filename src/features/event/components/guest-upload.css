@@ -912,11 +912,25 @@
 .guest-gallery__item {
   position: relative;
   aspect-ratio: 1 / 1;
-  border-radius: 14px;
+  border-radius: 8px;
   overflow: hidden;
   background-color: var(--soft);
   border: 1px solid var(--line);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.guest-gallery__item:nth-child(5n + 1) {
+  aspect-ratio: 4 / 5;
+}
+
+.guest-gallery__media-button {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
   touch-action: manipulation;
 }
@@ -928,7 +942,7 @@
   transition: transform 250ms ease;
 }
 
-.guest-gallery__item:hover .guest-gallery__img {
+.guest-gallery__media-button:hover .guest-gallery__img {
   transform: scale(1.03);
 }
 
@@ -960,10 +974,14 @@
 }
 
 .guest-gallery__like-btn {
-  width: 32px;
-  height: 32px;
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 1;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(24, 30, 23, 0.54);
   backdrop-filter: blur(4px);
   border: none;
   display: inline-flex;
@@ -984,6 +1002,15 @@
 .guest-gallery__like-btn--active {
   background: rgba(225, 29, 72, 0.85);
   color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guest-gallery__img,
+  .guest-gallery__like-btn,
+  .event-lightbox__close,
+  .event-lightbox__nav {
+    transition: none;
+  }
 }
 
 /* ─── FLOATING ACTION BUTTON (Mobile in Gallery) ─────────────────────── */

@@ -1245,14 +1245,14 @@
   justify-content: center;
   background: rgba(24, 30, 23, 0.92);
   backdrop-filter: blur(8px);
-  padding: 20px;
+  padding: 24px;
 }
 
 .event-lightbox__inner {
   position: relative;
   max-width: 900px;
   width: 100%;
-  max-height: 90vh;
+  max-height: min(90dvh, 900px);
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -1264,8 +1264,8 @@
 .event-lightbox__image-box {
   position: relative;
   width: 100%;
-  max-height: 65vh;
-  min-height: 320px;
+  height: min(65dvh, 620px);
+  min-height: 280px;
   background: #111;
   display: flex;
   align-items: center;
@@ -1279,6 +1279,124 @@
   align-items: center;
   justify-content: space-between;
   border-top: 1px solid var(--line);
+  gap: 16px;
+}
+
+.event-lightbox__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.event-lightbox__context {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-lightbox__counter {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+}
+
+.event-lightbox__close,
+.event-lightbox__nav {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.event-lightbox__close {
+  flex: 0 0 auto;
+  border-radius: 50%;
+  color: var(--muted);
+  background: transparent;
+}
+
+.event-lightbox__close:hover {
+  color: var(--ink);
+  background: var(--soft);
+}
+
+.event-lightbox__nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.58);
+  transform: translateY(-50%);
+}
+
+.event-lightbox__nav:hover {
+  background: rgba(0, 0, 0, 0.82);
+}
+
+.event-lightbox__nav:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.event-lightbox__nav--previous {
+  left: 12px;
+}
+
+.event-lightbox__nav--next {
+  right: 12px;
+}
+
+.event-lightbox__details {
+  min-width: 0;
+}
+
+.event-lightbox button:focus-visible,
+.guest-gallery button:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .event-lightbox {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .event-lightbox__inner {
+    max-height: 94dvh;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .event-lightbox__image-box {
+    height: min(56dvh, 520px);
+    min-height: 240px;
+  }
+
+  .event-lightbox__footer {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 14px 16px max(14px, env(safe-area-inset-bottom));
+  }
+
+  .event-lightbox__footer > .flex {
+    width: 100%;
+  }
+
+  .event-lightbox__footer > .flex > button {
+    flex: 1;
+  }
 }
 
 /* ─── LIVE WALL PRESENTER ────────────────────────────────────────────── */

@@ -3,7 +3,9 @@ import { authClient } from "@/lib/auth-client";
 import { getCurrentRelativePath, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
 
-const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL;
+// Keep browser requests same-origin. Next rewrites /api/v1 to API_UPSTREAM_URL
+// server-side, so HTTPS guest pages never make insecure HTTP API requests.
+const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL || undefined;
 
 function redirectToLogin(): void {
   if (typeof window !== "undefined") {

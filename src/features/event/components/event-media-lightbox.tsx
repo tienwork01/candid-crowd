@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useId, useRef } from "react";
 import Image from "next/image";
 import {
   CaretLeft,
@@ -27,6 +27,8 @@ type EventMediaLightboxProps = {
   hasPrev?: boolean;
   hasNext?: boolean;
   onToggleStatus?: (id: string) => void;
+  currentIndex?: number;
+  totalItems?: number;
 };
 
 export function EventMediaLightbox({
@@ -38,9 +40,15 @@ export function EventMediaLightbox({
   hasPrev = false,
   hasNext = false,
   onToggleStatus,
+  currentIndex,
+  totalItems,
 }: EventMediaLightboxProps) {
   const t = useTranslations("event");
   const locale = useLocale() as AppLocale;
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+  const descriptionId = useId();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -52,6 +60,24 @@ export function EventMediaLightbox({
         onPrev();
       } else if (e.key === "ArrowRight" && hasNext && onNext) {
         onNext();
+      } else if (e.key === "Tab") {
+        const focusableElements =
+          dialogRef.current?.querySelectorAll<HTMLElement>(
+            "button:not([disabled]), a[href], video[controls]",
+          );
+
+        if (!focusableElements?.length) return;
+
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
@@ -61,6 +87,25 @@ export function EventMediaLightbox({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, hasPrev, hasNext, onPrev, onNext, onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    previouslyFocusedElement.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    const originalOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    closeButtonRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      previouslyFocusedElement.current?.focus();
+    };
+  }, [isOpen]);
 
   if (!isOpen || !item) return null;
 
@@ -84,19 +129,28 @@ export function EventMediaLightbox({
       role="dialog"
       aria-modal="true"
       aria-label={item.caption || "Event photo lightbox"}
+      aria-describedby={descriptionId}
       className="event-lightbox"
       onClick={onClose}
     >
       <div
+        ref={dialogRef}
         className="event-lightbox__inner"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top bar with close button */}
-        <div className="flex items-center justify-between p-3.5 bg-surface border-b border-line">
-          <div className="flex items-center gap-2">
+        <div className="event-lightbox__topbar">
+          <div className="event-lightbox__context">
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {item.is_video ? "Video" : "Photo"}
             </span>
+            {typeof currentIndex === "number" && totalItems && (
+              <span
+                className="event-lightbox__counter"
+                aria-label={t("guest.tabMemoriesCount", { count: totalItems })}
+              >
+                {currentIndex + 1} / {totalItems}
+              </span>
+            )}
             {item.status === "hidden" && (
               <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-destructive/15 text-destructive">
                 {t("gallery.statusHidden")}
@@ -110,44 +164,53 @@ export function EventMediaLightbox({
           </div>
 
           <button
+            ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-ink hover:bg-soft transition-colors"
+            className="event-lightbox__close"
             aria-label="Close lightbox"
           >
             <X size={18} aria-hidden="true" />
           </button>
         </div>
 
-        {/* Media display area */}
-        <div className="event-lightbox__image-box relative">
-          <Image
-            src={item.url}
-            alt={item.caption || "Event memory"}
-            fill
-            className="object-contain"
-            sizes="(max-width: 900px) 100vw, 900px"
-            priority
-          />
+        <div className="event-lightbox__image-box">
+          {item.is_video ? (
+            <video
+              src={item.url}
+              controls
+              playsInline
+              className="h-full w-full object-contain"
+              preload="metadata"
+            />
+          ) : (
+            <Image
+              src={item.url}
+              alt={item.caption || "Event memory"}
+              fill
+              unoptimized
+              className="object-contain"
+              sizes="(max-width: 900px) 100vw, 900px"
+              priority
+            />
+          )}
 
-          {/* Prev button */}
           {hasPrev && onPrev && (
             <button
               type="button"
               onClick={onPrev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white hover:bg-black/75 flex items-center justify-center transition-colors"
+              className="event-lightbox__nav event-lightbox__nav--previous"
               aria-label="Previous photo"
             >
               <CaretLeft size={22} weight="bold" aria-hidden="true" />
             </button>
           )}
 
-          {/* Next button */}
           {hasNext && onNext && (
             <button
               type="button"
               onClick={onNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white hover:bg-black/75 flex items-center justify-center transition-colors"
+              className="event-lightbox__nav event-lightbox__nav--next"
               aria-label="Next photo"
             >
               <CaretRight size={22} weight="bold" aria-hidden="true" />
@@ -155,9 +218,8 @@ export function EventMediaLightbox({
           )}
         </div>
 
-        {/* Footer with caption, author, source, and actions */}
-        <div className="event-lightbox__footer">
-          <div>
+        <div className="event-lightbox__footer" id={descriptionId}>
+          <div className="event-lightbox__details">
             {item.caption && (
               <p className="font-heading text-base font-semibold text-ink">
                 {item.caption}

@@ -31,13 +31,14 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type { CandidEvent, EventMediaItem } from "../types/event";
-import { addStoredMediaItem } from "../lib/event-store";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
 import { Spinner } from "@/components/ui";
 import { EventMediaLightbox } from "./event-media-lightbox";
 import { CandidCameraModal } from "./candid-camera-modal";
 import { trackEvent } from "@/lib/analytics";
+import { useGuestUpload } from "@/features/upload/hooks";
+import { usePublicMedia } from "../hooks/use-public-media";
 import "./guest-upload.css";
 
 type GuestEventViewProps = {
@@ -148,9 +149,21 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   const stagedFilesRef = useRef<StagedFile[]>([]);
 
   const [activeTab, setActiveTab] = useState<"upload" | "gallery">("upload");
-  const [galleryMedia, setGalleryMedia] = useState<EventMediaItem[]>(
-    () => event.media_items?.filter((m) => m.status !== "hidden") || [],
+  const [localGalleryMedia, setLocalGalleryMedia] = useState<EventMediaItem[]>(
+    [],
   );
+  const { data: remoteMedia = [] } = usePublicMedia(event.slug);
+  const galleryMedia = useMemo(() => {
+    const baseMedia =
+      remoteMedia.length > 0
+        ? remoteMedia
+        : event.media_items?.filter((item) => item.status !== "hidden") || [];
+    const combined = new Map(baseMedia.map((item) => [item.id, item]));
+
+    localGalleryMedia.forEach((item) => combined.set(item.id, item));
+
+    return Array.from(combined.values());
+  }, [event.media_items, localGalleryMedia, remoteMedia]);
 
   const [stagedFiles, setStagedFiles] = useState<StagedFile[]>([]);
   const [guestName, setGuestName] = useState(() => {
@@ -178,6 +191,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
   const mode = event.event_mode || "social";
   const galleryAllowed = event.gallery_enabled !== false;
+  const { uploadFile } = useGuestUpload(event.slug);
 
   // Track event view on mount
   useEffect(() => {
@@ -242,10 +256,27 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
       if (!fileList || fileList.length === 0) return;
 
       const newFiles: StagedFile[] = [];
-      const maxFileBytes = 50 * 1024 * 1024; // 50MB
+      const supportedTypes = new Set([
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "video/mp4",
+        "video/quicktime",
+      ]);
       let hasOversized = false;
+      let hasUnsupported = false;
 
       Array.from(fileList).forEach((file, index) => {
+        const maxFileBytes = file.type.startsWith("video/")
+          ? 500 * 1024 * 1024
+          : 25 * 1024 * 1024;
+
+        if (!supportedTypes.has(file.type)) {
+          hasUnsupported = true;
+
+          return;
+        }
+
         if (file.size > maxFileBytes) {
           hasOversized = true;
 
@@ -267,6 +298,10 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
       if (hasOversized) {
         toast.error(t("guest.dropzoneSub"));
+      }
+
+      if (hasUnsupported) {
+        toast.error("Please choose a JPEG, PNG, WebP, MP4, or MOV file.");
       }
 
       if (newFiles.length > 0) {
@@ -367,40 +402,51 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
       setUploadProgress(currentPercent);
 
-      // Emulate network upload latency
-      await new Promise((resolve) => setTimeout(resolve, 320));
+      try {
+        const uploaded = await uploadFile(currentTarget.file, {
+          onProgress: (percent) => {
+            const overall = Math.round(15 + ((i + percent / 100) / total) * 80);
 
-      // Successfully processed item
-      const mediaItem: EventMediaItem = {
-        id: currentTarget.id.replace("stage_", "guest_up_"),
-        url: currentTarget.previewUrl,
-        caption:
-          guestNote.trim() || currentTarget.file.name.replace(/\.[^/.]+$/, ""),
-        guest_name: guestName.trim() || "Guest",
-        created_at: new Date().toISOString(),
-        status: "ready",
-        is_video: currentTarget.isVideo,
-        likes_count: 0,
-      };
+            setUploadProgress(overall);
+          },
+        });
+        const mediaItem: EventMediaItem = {
+          id: uploaded.id,
+          url: uploaded.url,
+          caption:
+            guestNote.trim() ||
+            currentTarget.file.name.replace(/\.[^/.]+$/, ""),
+          guest_name: guestName.trim() || "Guest",
+          created_at: new Date().toISOString(),
+          status: "ready",
+          is_video: currentTarget.isVideo,
+          likes_count: 0,
+        };
 
-      successfulUploadedItems.push(mediaItem);
-      addStoredMediaItem(event.id, mediaItem);
-
-      // Mark current file as done
-      setStagedFiles((prev) =>
-        prev.map((f) =>
-          f.id === currentTarget.id ? { ...f, status: "success" } : f,
-        ),
-      );
+        successfulUploadedItems.push(mediaItem);
+        setStagedFiles((prev) =>
+          prev.map((f) =>
+            f.id === currentTarget.id ? { ...f, status: "success" } : f,
+          ),
+        );
+      } catch {
+        failedIds.push(currentTarget.id);
+        setStagedFiles((prev) =>
+          prev.map((f) =>
+            f.id === currentTarget.id ? { ...f, status: "error" } : f,
+          ),
+        );
+      }
     }
 
     setUploadProgress(100);
 
     if (failedIds.length === 0) {
       // Complete success!
-      setGalleryMedia((prev) => [...successfulUploadedItems, ...prev]);
+      setLocalGalleryMedia((prev) => [...successfulUploadedItems, ...prev]);
       setLastUploadedCount(successfulUploadedItems.length);
       setUploadPhase("success");
+      sourceFiles.forEach((item) => URL.revokeObjectURL(item.previewUrl));
       setStagedFiles([]);
       setGuestNote("");
 
@@ -415,7 +461,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
       toast.success(t("guest.uploadSuccess"));
     } else {
       // Partial success
-      setGalleryMedia((prev) => [...successfulUploadedItems, ...prev]);
+      setLocalGalleryMedia((prev) => [...successfulUploadedItems, ...prev]);
       setUploadPhase("error");
 
       trackEvent("guest_upload_failed", {
@@ -475,26 +521,25 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
   const toggleLike = (id: string) => {
     setGuestLikes((prev) => ({ ...prev, [id]: !prev[id] }));
-    setGalleryMedia((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          const isLiked = guestLikes[id];
+    setLocalGalleryMedia((prev) => {
+      const isLiked = guestLikes[id];
+      const source =
+        prev.find((item) => item.id === id) ||
+        galleryMedia.find((item) => item.id === id);
 
-          return {
-            ...item,
-            likes_count: (item.likes_count || 0) + (isLiked ? -1 : 1),
-          };
-        }
+      if (!source) return prev;
 
-        return item;
-      }),
-    );
+      const updatedItem = {
+        ...source,
+        likes_count: (source.likes_count || 0) + (isLiked ? -1 : 1),
+      };
+
+      return [updatedItem, ...prev.filter((item) => item.id !== id)];
+    });
   };
 
   const handleRemoveTestUploads = () => {
-    setGalleryMedia(
-      event.media_items?.filter((m) => m.status !== "hidden") || [],
-    );
+    setLocalGalleryMedia([]);
     toast.success(t("guest.testRemovedToast"));
   };
 
@@ -1049,50 +1094,58 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
             ) : (
               <div className="guest-gallery__grid">
                 {galleryMedia.map((item, index) => (
-                  <div
-                    key={item.id}
-                    onClick={() => setLightboxIndex(index)}
-                    className="guest-gallery__item group"
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        setLightboxIndex(index);
+                  <div key={item.id} className="guest-gallery__item">
+                    <button
+                      type="button"
+                      onClick={() => setLightboxIndex(index)}
+                      className="guest-gallery__media-button"
+                      aria-label={
+                        item.caption ||
+                        t("guest.tabMemoriesCount", { count: index + 1 })
                       }
-                    }}
-                  >
-                    <Image
-                      src={item.url}
-                      alt={item.caption || "Event memory"}
-                      fill
-                      className="guest-gallery__img"
-                      sizes="(max-width: 640px) 50vw, 33vw"
-                    />
+                    >
+                      {item.is_video ? (
+                        <video
+                          src={item.url}
+                          className="guest-gallery__img"
+                          muted
+                          playsInline
+                          preload="metadata"
+                        />
+                      ) : (
+                        <Image
+                          src={item.url}
+                          alt=""
+                          fill
+                          unoptimized
+                          className="guest-gallery__img"
+                          sizes="(max-width: 640px) 50vw, 33vw"
+                        />
+                      )}
+                    </button>
 
-                    <div className="guest-gallery__overlay">
+                    <div className="guest-gallery__overlay" aria-hidden="true">
                       <span className="guest-gallery__uploader-name">
                         {item.guest_name || "Guest"}
                       </span>
-
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleLike(item.id);
-                        }}
-                        aria-label="Like memory"
-                        className={`guest-gallery__like-btn ${
-                          guestLikes[item.id]
-                            ? "guest-gallery__like-btn--active"
-                            : ""
-                        }`}
-                      >
-                        <Heart
-                          size={15}
-                          weight={guestLikes[item.id] ? "fill" : "regular"}
-                        />
-                      </button>
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={() => toggleLike(item.id)}
+                      aria-label="Like memory"
+                      aria-pressed={Boolean(guestLikes[item.id])}
+                      className={`guest-gallery__like-btn ${
+                        guestLikes[item.id]
+                          ? "guest-gallery__like-btn--active"
+                          : ""
+                      }`}
+                    >
+                      <Heart
+                        size={15}
+                        weight={guestLikes[item.id] ? "fill" : "regular"}
+                      />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -1131,6 +1184,8 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
           }
           hasNext={lightboxIndex < galleryMedia.length - 1}
           hasPrev={lightboxIndex > 0}
+          currentIndex={lightboxIndex}
+          totalItems={galleryMedia.length}
         />
       )}
 

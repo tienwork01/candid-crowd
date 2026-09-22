@@ -591,6 +591,8 @@
       "socialProofContributors": "{count} khách đã cùng đóng góp",
       "emptyMemoriesTitle": "Chưa có kỷ niệm nào",
       "emptyMemoriesDesc": "Hãy là người đầu tiên chia sẻ khoảnh khắc trong sự kiện này!",
+      "eventUnavailableTitle": "Không thể tải sự kiện này",
+      "eventUnavailableDesc": "Kiểm tra kết nối rồi thử lại nhé.",
       "silentModeNotice": "Chương trình đang diễn ra trang trọng. Hãy cùng tận hưởng khoảnh khắc và chia sẻ ảnh sau nhé.",
       "silentModeNotice_Wedding": "Lễ cưới đang diễn ra trang trọng. Hãy cùng tận hưởng khoảnh khắc và chia sẻ ảnh sau nhé.",
       "afterModeNotice": "Bạn còn ảnh chưa kịp gửi? Hãy cùng chia sẻ vào album nhé!"

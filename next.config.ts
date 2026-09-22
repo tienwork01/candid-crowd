@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const apiUpstreamURL = process.env.API_UPSTREAM_URL;
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: [
@@ -31,6 +32,18 @@ const nextConfig: NextConfig = {
         source: "/signup",
         destination: "/register",
         permanent: true,
+      },
+    ];
+  },
+  async rewrites() {
+    if (!apiUpstreamURL) {
+      throw new Error("API_UPSTREAM_URL is required to proxy /api/v1 requests");
+    }
+
+    return [
+      {
+        source: "/api/v1/:path*",
+        destination: `${apiUpstreamURL}/api/v1/:path*`,
       },
     ];
   },

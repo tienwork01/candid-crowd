@@ -591,6 +591,8 @@
       "socialProofContributors": "{count, plural, one {# guest has contributed} other {# guests have contributed}}",
       "emptyMemoriesTitle": "No memories yet",
       "emptyMemoriesDesc": "Be the first to share a moment from this celebration!",
+      "eventUnavailableTitle": "Unable to load this event",
+      "eventUnavailableDesc": "Check your connection and try again.",
       "silentModeNotice": "Event in progress. Enjoy the moment with us. Feel free to contribute afterwards.",
       "silentModeNotice_Wedding": "Ceremony in progress. Enjoy the moment with us. Feel free to contribute afterwards.",
       "afterModeNotice": "Got photos in your camera roll? Share memories from the celebration!"

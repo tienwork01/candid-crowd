@@ -591,6 +591,8 @@
       "socialProofContributors": "{count, plural, one {# invité a contribué} other {# invités ont contribué}}",
       "emptyMemoriesTitle": "Aucun souvenir pour l'instant",
       "emptyMemoriesDesc": "Soyez le premier à partager un instant de cette célébration !",
+      "eventUnavailableTitle": "Impossible de charger cet événement",
+      "eventUnavailableDesc": "Vérifiez votre connexion et réessayez.",
       "silentModeNotice": "Célébration en cours. Profitez de l'instant présent. Vous pourrez partager vos photos plus tard.",
       "silentModeNotice_Wedding": "La cérémonie a commencé. Profitez de l'instant avec nous. Partagez vos photos ensuite.",
       "afterModeNotice": "Des photos dans votre pellicule ? Partagez vos souvenirs de la fête !"
