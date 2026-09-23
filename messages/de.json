@@ -7,7 +7,8 @@
       "save": "Speichern",
       "cancel": "Abbrechen",
       "close": "Schließen",
-      "back": "Zurück"
+      "back": "Zurück",
+      "edit": "Bearbeiten"
     },
     "errors": {
       "USER_ALREADY_EXISTS": "Ein Konto mit dieser E-Mail existiert bereits. Bitte melden Sie sich an.",
@@ -491,7 +492,6 @@
       "linkCopied": "Gästelink in die Zwischenablage kopiert!",
       "openGuestPage": "Gästeseite öffnen",
       "previewAsGuest": "Als Gast ansehen",
-      "previewNotice": "Öffnet im Vorschaumodus, damit Test-Uploads Ihre Statistiken nicht beeinflussen",
       "goToOverview": "Zum Event"
     },
     "checklist": {
@@ -504,8 +504,7 @@
       "itemCustomizeQr": "QR-Karte anpassen",
       "itemCustomizePage": "Gästeseite anpassen",
       "completed": "Abgeschlossen",
-      "optional": "Optional",
-      "comingSoon": "Demnächst"
+      "optional": "Optional"
     },
     "guestCount": {
       "heading": "Wie viele Gäste erwarten Sie?",
@@ -513,7 +512,8 @@
       "placeholder": "z. B. 120",
       "save": "Schätzung speichern",
       "skip": "Vorerst überspringen",
-      "savedToast": "Gästeanzahl gespeichert"
+      "savedToast": "Gästeanzahl gespeichert",
+      "countLabel": "Gäste"
     },
     "overview": {
       "breadcrumb": "Alle Events",
@@ -755,6 +755,57 @@
       "reassurance": "Keine App nötig · Keine Registrierung",
       "poweredBy": "Powered by CandidCrowd",
       "preview": "Vorschau"
+    },
+    "qrCustomize": {
+      "title": "QR-Karte anpassen",
+      "subtitle": "Farben, Formen und Branding für Ihr Event personalisieren",
+      "previewLabel": "Live-Vorschau",
+      "resetDefaults": "Auf Standard zurücksetzen",
+      "resetSuccess": "Auf Standardstil zurückgesetzt",
+      "apply": "Anwenden & Speichern",
+      "applied": "QR-Karte erfolgreich angepasst!",
+      "noLogoWarning": "Laden Sie ein Logo hoch für optimale Wiedererkennung",
+      "colorScheme": "Farbschema",
+      "custom": "Benutzerdefiniert",
+      "colorClassic": "Klassisch",
+      "colorMoss": "Moos",
+      "colorNavy": "Navy",
+      "colorForest": "Wald",
+      "colorWine": "Weinrot",
+      "colorMidnight": "Mitternacht",
+      "colorOcean": "Ozean",
+      "colorSunset": "Sonnenuntergang",
+      "dotStyle": "Punkt-Stil",
+      "dotRounded": "Abgerundet",
+      "dotSquare": "Quadratisch",
+      "dotDots": "Punkte",
+      "dotClassy": "Elegant",
+      "cornerStyle": "Ecken-Stil",
+      "cornerRounded": "Abgerundet",
+      "cornerSquare": "Quadratisch",
+      "cornerDot": "Punkt",
+      "logo": "Zentrales Logo",
+      "requiredBadge": "Empfohlen",
+      "logoAdded": "Logo hinzugefügt",
+      "logoRequiredPrompt": "Logo hinzufügen",
+      "uploadLogoFormats": "PNG, JPG, SVG, WebP (max. 5MB)",
+      "logoUploaded": "Logo erfolgreich hochgeladen",
+      "uploadLogo": "Logo-Upload fehlgeschlagen",
+      "logoCustom": "Individuelles Event-Logo",
+      "clickToReplace": "Klicken zum Ersetzen oder neues Bild ablegen",
+      "removeLogo": "Logo entfernen",
+      "processingLogo": "Logo wird verarbeitet...",
+      "uploadLogoDrag": "Event-Logo oder Monogramm hochladen",
+      "logoSize": "Logo-Größe",
+      "logoSizeSmall": "Kompakt",
+      "logoSizeBalanced": "Ausgewogen",
+      "logoSizeProminent": "Hervorgehoben",
+      "destinationLabel": "QR-Code-Ziel",
+      "destinationHint": "Dieser QR-Code öffnet immer direkt die Gäste-Upload-Seite.",
+      "customFg": "QR & Text",
+      "customBg": "Hintergrund",
+      "vectorBadge": "Vektorqualität",
+      "logoAlt": "Event-Logo"
     }
   },
   "guest": {

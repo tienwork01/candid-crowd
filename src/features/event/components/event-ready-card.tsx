@@ -1,49 +1,84 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
   ArrowSquareOut,
   Check,
   Copy,
   DownloadSimple,
-  Eye,
+  Printer,
   QrCode,
-  Sparkle,
+  ShareNetwork,
 } from "@phosphor-icons/react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type { CandidEvent } from "../types/event";
-import { formatDate } from "@/i18n/format";
-import type { AppLocale } from "@/i18n/locales";
 import { Button } from "@/components/ui";
+import { QRStyledPreview, type QRCustomizeState } from "./qr-customize";
+import { loadQRConfig } from "../lib/qr-customize-storage";
 
 type EventReadyCardProps = {
   event: CandidEvent;
-  onPreviewOpened?: () => void;
+  qrDataUrl?: string;
+  config?: QRCustomizeState | null;
+  onOpenPrintModal?: () => void;
+  configVersion?: number;
+  onDownloadReady?: (fn: (ext: "png" | "svg") => Promise<void>) => void;
 };
 
 export function EventReadyCard({
   event,
-  onPreviewOpened,
+  qrDataUrl: initialQrDataUrl,
+  config: propConfig,
+  onOpenPrintModal,
+  configVersion,
+  onDownloadReady,
 }: EventReadyCardProps) {
   const t = useTranslations("event");
-  const locale = useLocale() as AppLocale;
 
-  const [qrDataUrl, setQrDataUrl] = useState<string>("");
+  const [localQrDataUrl, setLocalQrDataUrl] = useState<string>(
+    initialQrDataUrl || "",
+  );
   const [copied, setCopied] = useState(false);
+  const [customConfig, setCustomConfig] = useState<QRCustomizeState | null>(
+    () => propConfig || loadQRConfig(event.id),
+  );
+  const [prevEventKey, setPrevEventKey] = useState(
+    () => `${event.id}-${configVersion ?? 0}`,
+  );
+  const styledDownloadFnRef = useRef<
+    ((ext: "png" | "svg") => Promise<void>) | null
+  >(null);
+
+  const currentEventKey = `${event.id}-${configVersion ?? 0}`;
+
+  if (propConfig) {
+    if (customConfig !== propConfig) {
+      setCustomConfig(propConfig);
+    }
+  } else if (currentEventKey !== prevEventKey) {
+    setPrevEventKey(currentEventKey);
+    setCustomConfig(loadQRConfig(event.id));
+  }
+
+  const canShare =
+    typeof navigator !== "undefined" && typeof navigator.share === "function";
 
   // Compute guest URLs
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const publicPath = event.public_url || `/e/${event.slug}`;
   const fullGuestUrl = event.guest_url || `${origin}${publicPath}`;
-  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
 
   // Display-friendly short URL
   const displayUrl = fullGuestUrl.replace(/^https?:\/\//, "");
 
+  // Generate QR if not passed from parent
   useEffect(() => {
+    if (initialQrDataUrl) {
+      return;
+    }
+
     let active = true;
 
     void import("qrcode")
@@ -59,7 +94,7 @@ export function EventReadyCard({
         }),
       )
       .then((dataUrl) => {
-        if (active) setQrDataUrl(dataUrl);
+        if (active) setLocalQrDataUrl(dataUrl);
       })
       .catch(() => {
         // Handled via fallback icon
@@ -68,7 +103,9 @@ export function EventReadyCard({
     return () => {
       active = false;
     };
-  }, [fullGuestUrl]);
+  }, [fullGuestUrl, initialQrDataUrl]);
+
+  const qrDataUrl = initialQrDataUrl || localQrDataUrl;
 
   const handleCopyLink = async () => {
     try {
@@ -81,7 +118,35 @@ export function EventReadyCard({
     }
   };
 
+  const handleNativeShare = async () => {
+    if (
+      typeof navigator !== "undefined" &&
+      typeof navigator.share === "function"
+    ) {
+      try {
+        await navigator.share({
+          title: event.name,
+          text: `${event.name} - ${t("ready.heroSubtitle")}`,
+          url: fullGuestUrl,
+        });
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name !== "AbortError") {
+          void handleCopyLink();
+        }
+      }
+    } else {
+      void handleCopyLink();
+    }
+  };
+
   const handleDownloadQr = () => {
+    if (customConfig && styledDownloadFnRef.current) {
+      void styledDownloadFnRef.current("png");
+      toast.success(t("ready.downloadQr"));
+
+      return;
+    }
+
     if (!qrDataUrl) return;
 
     const link = document.createElement("a");
@@ -96,116 +161,156 @@ export function EventReadyCard({
     toast.success(t("ready.downloadQr"));
   };
 
-  const handlePreview = () => {
-    onPreviewOpened?.();
-    window.open(testGuestUrl, "_blank", "noopener,noreferrer");
-  };
-
-  const formattedDate = event.event_date
-    ? formatDate(event.event_date, locale, {
-        month: "long",
-        day: "numeric",
-        year: "numeric",
-      })
-    : t("ready.noDate");
-
   return (
-    <section className="event-ready-card" aria-labelledby="ready-title">
-      {/* Hero / Success Header */}
-      <div className="event-ready-card__hero text-center">
-        <div className="event-ready-card__badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary mb-3">
-          <Sparkle size={13} weight="fill" aria-hidden="true" />
-          <span>{t("ready.heroBadge")}</span>
+    <section
+      className="event-ready-card bg-surface border border-line rounded-2xl p-5 sm:p-6 shadow-card"
+      aria-labelledby="ready-qr-heading"
+    >
+      {/* Card Header */}
+      <div className="event-ready-card__header flex items-center justify-between pb-3.5 mb-4 border-b border-line/60">
+        <div className="flex items-center gap-2">
+          <QrCode
+            size={18}
+            className="text-primary"
+            weight="bold"
+            aria-hidden="true"
+          />
+          <h2
+            id="ready-qr-heading"
+            className="text-xs font-semibold uppercase tracking-wider text-muted-foreground"
+          >
+            {t("checklist.itemQrReady")}
+          </h2>
         </div>
-        <h1 id="ready-title" className="event-ready-card__title">
-          {t("ready.heroTitle")}
-        </h1>
-        <p className="event-ready-card__subtitle text-muted-foreground mt-2 max-w-lg mx-auto">
-          {t("ready.heroSubtitle")}
-        </p>
-
-        {/* Event Meta Pills */}
-        <div className="event-ready-card__meta mt-4 flex flex-wrap items-center justify-center gap-2">
-          <span className="event-ready-card__meta-item px-3 py-1 bg-surface border border-line rounded-md text-sm font-medium text-ink">
-            {event.name}
-          </span>
-          <span className="event-ready-card__meta-item px-3 py-1 bg-surface border border-line rounded-md text-sm text-muted-foreground">
-            {t(`types.${event.event_type}`)}
-          </span>
-          <span className="event-ready-card__meta-item px-3 py-1 bg-surface border border-line rounded-md text-sm text-muted-foreground">
-            {formattedDate}
+        <div className="flex items-center gap-2">
+          <span className="text-xs px-2.5 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+            {t("ready.heroBadge")}
           </span>
         </div>
       </div>
 
-      {/* Main QR Card */}
-      <div className="event-ready-card__qr-box mt-8 mx-auto max-w-md bg-surface border border-line rounded-2xl p-6 sm:p-8 shadow-card text-center">
-        <div className="event-ready-card__qr event-ready-card__qr-image mx-auto w-64 h-64 sm:w-72 sm:h-72 p-3 bg-white rounded-xl border border-line flex items-center justify-center shadow-subtle">
-          {qrDataUrl ? (
-            <Image
-              src={qrDataUrl}
-              alt={event.name}
-              width={260}
-              height={260}
-              className="w-full h-full object-contain rounded-lg"
-              unoptimized
-            />
-          ) : (
-            <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
-              <QrCode size={64} aria-hidden="true" />
-              <span className="text-xs">{t("checklist.itemQrReady")}</span>
-            </div>
-          )}
+      {/* Main QR Code Visual Frame */}
+      {customConfig ? (
+        <div className="mx-auto flex justify-center">
+          <QRStyledPreview
+            url={fullGuestUrl}
+            config={customConfig}
+            eventName={event.name}
+            size={200}
+            className="w-full max-w-[280px]"
+            onDownloadReady={(fn) => {
+              styledDownloadFnRef.current = fn;
+              onDownloadReady?.(fn);
+            }}
+          />
         </div>
+      ) : (
+        <>
+          <div className="event-ready-card__qr-frame mx-auto w-52 h-52 sm:w-60 sm:h-60 p-3 bg-white rounded-xl border border-line shadow-subtle flex items-center justify-center">
+            {qrDataUrl ? (
+              <Image
+                src={qrDataUrl}
+                alt={event.name}
+                width={240}
+                height={240}
+                className="w-full h-full object-contain rounded-lg"
+                unoptimized
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-2 text-muted-foreground">
+                <QrCode size={48} aria-hidden="true" />
+                <span className="text-xs">{t("checklist.itemQrReady")}</span>
+              </div>
+            )}
+          </div>
 
-        <h2 className="event-ready-card__name event-ready-card__qr-event-name font-heading text-xl text-ink mt-5">
-          {event.name}
-        </h2>
+          {/* CTA & Trust note */}
+          <div className="event-ready-card__labels text-center mt-3.5">
+            <p className="text-sm font-semibold text-ink">{t("ready.qrCta")}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {t("ready.noAppNeeded")}
+            </p>
+          </div>
+        </>
+      )}
 
-        <p className="event-ready-card__qr-cta text-sm font-medium text-primary mt-1">
-          {t("ready.qrCta")}
-        </p>
-
-        <p className="event-ready-card__qr-trust text-xs text-subtle mt-1">
-          {t("ready.noAppNeeded")}
-        </p>
-
-        {/* Short guest URL */}
-        <div className="event-ready-card__guest-link mt-4 h-12 px-3 bg-background border border-line rounded-lg flex items-center justify-between gap-2">
-          <span className="text-xs font-mono text-muted-foreground truncate select-all">
-            {displayUrl}
-          </span>
-          <button
-            type="button"
-            onClick={handleCopyLink}
-            className="text-xs text-primary hover:text-primary-hover font-medium flex items-center gap-1 shrink-0 p-1"
-            aria-label={t("ready.copyLink")}
-          >
+      {/* Short Guest URL Bar - Full container click-to-copy */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleCopyLink}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            void handleCopyLink();
+          }
+        }}
+        className={`event-ready-card__guest-link mt-4 h-11 px-3 bg-background border rounded-lg flex items-center justify-between gap-2 cursor-pointer transition-all duration-200 select-none group ${
+          copied
+            ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+            : "border-line hover:border-line-hover hover:bg-surface-raised"
+        }`}
+        title={t("ready.copyLink")}
+        aria-label={t("ready.copyLink")}
+      >
+        <span className="text-xs font-mono text-muted-foreground group-hover:text-ink truncate transition-colors">
+          {displayUrl}
+        </span>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <span className="text-xs text-primary font-medium flex items-center gap-1 p-1">
             {copied ? (
-              <Check size={14} className="text-primary" />
+              <Check size={14} className="text-primary" weight="bold" />
             ) : (
               <Copy size={14} />
             )}
-          </button>
-        </div>
+            <span>{copied ? t("share.copied") : t("ready.copyLink")}</span>
+          </span>
 
-        {/* Action Buttons */}
-        <div className="event-ready-card__qr-actions mt-5 grid grid-cols-2 gap-2.5">
+          {canShare && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                void handleNativeShare();
+              }}
+              className="text-xs text-muted-foreground hover:text-ink font-medium flex items-center gap-1 p-1 rounded hover:bg-surface border border-line/60 transition-colors"
+              title={t("share.title")}
+              aria-label={t("share.title")}
+            >
+              <ShareNetwork size={14} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Quick Action Buttons (Download QR + Print Sign) */}
+      <div className="event-ready-card__actions mt-3 grid grid-cols-2 gap-2.5">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleDownloadQr}
+          className="w-full text-xs sm:text-sm h-10 flex items-center justify-center gap-1.5"
+        >
+          <DownloadSimple size={16} aria-hidden="true" />
+          <span>{t("ready.downloadQr")}</span>
+        </Button>
+
+        {onOpenPrintModal ? (
           <Button
             type="button"
             variant="outline"
-            onClick={handleDownloadQr}
-            className="w-full text-xs sm:text-sm h-12 flex items-center justify-center gap-1.5"
+            onClick={onOpenPrintModal}
+            className="w-full text-xs sm:text-sm h-10 flex items-center justify-center gap-1.5"
           >
-            <DownloadSimple size={16} aria-hidden="true" />
-            <span>{t("ready.downloadQr")}</span>
+            <Printer size={16} aria-hidden="true" />
+            <span>{t("share.downloadPrintTemplate")}</span>
           </Button>
-
+        ) : (
           <Button
             type="button"
             variant="outline"
             onClick={handleCopyLink}
-            className="w-full text-xs sm:text-sm h-12 flex items-center justify-center gap-1.5"
+            className="w-full text-xs sm:text-sm h-10 flex items-center justify-center gap-1.5"
           >
             {copied ? (
               <Check size={16} aria-hidden="true" className="text-primary" />
@@ -214,46 +319,20 @@ export function EventReadyCard({
             )}
             <span>{t("ready.copyLink")}</span>
           </Button>
-        </div>
-
-        {/* Open guest page link */}
-        <div className="mt-3">
-          <a
-            href={fullGuestUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-muted-foreground hover:text-ink inline-flex items-center gap-1 underline underline-offset-4"
-          >
-            <span>{t("ready.openGuestPage")}</span>
-            <ArrowSquareOut size={13} aria-hidden="true" />
-          </a>
-        </div>
+        )}
       </div>
 
-      {/* Primary Action: Preview as guest */}
-      <div className="event-ready-card__preview-section mt-6 mx-auto max-w-md text-center">
+      {/* Direct guest page link */}
+      <div className="event-ready-card__direct-link mt-4 pt-3.5 border-t border-line/60 text-center">
         <a
-          href={testGuestUrl}
+          href={fullGuestUrl}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={handlePreview}
-          className="button button--primary w-full h-12 text-base font-semibold shadow-raised flex items-center justify-center gap-2"
+          className="text-xs text-muted-foreground hover:text-ink inline-flex items-center gap-1 underline underline-offset-4 transition-colors"
         >
-          <Eye size={20} weight="bold" aria-hidden="true" />
-          <span>{t("ready.previewAsGuest")}</span>
+          <span>{t("ready.openGuestPage")}</span>
+          <ArrowSquareOut size={13} aria-hidden="true" />
         </a>
-        <p className="text-xs text-subtle mt-2">{t("ready.previewNotice")}</p>
-      </div>
-
-      {/* Overview Shortcut */}
-      <div className="event-ready-card__overview-link mt-4 text-center">
-        <Link
-          href={`/events/${encodeURIComponent(event.id)}`}
-          className="text-button text-sm font-medium text-ink hover:text-primary inline-flex items-center gap-1"
-        >
-          <span>{t("ready.goToOverview")}</span>
-          <span aria-hidden="true">→</span>
-        </Link>
       </div>
     </section>
   );

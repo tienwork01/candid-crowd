@@ -76,3 +76,9 @@ export { Alert, AlertTitle, AlertDescription } from "./alert";
 export { Checkbox } from "./checkbox";
 export { Spinner } from "./spinner";
 export { Toaster } from "./sonner";
+export {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionPanel,
+} from "./accordion";

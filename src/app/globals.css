@@ -4785,9 +4785,12 @@
    Event Creation Flow & Ready Experience
    ========================================================================== */
 .host-shell__content--event-create,
-.host-shell__content--event-ready,
 .host-shell__content--event-overview {
   padding: 36px 0 80px;
+}
+
+.host-shell__content--event-ready {
+  padding: 16px 0 48px;
 }
 
 .create-event-card {

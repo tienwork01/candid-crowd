@@ -1,11 +1,18 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus } from "@phosphor-icons/react";
-import { useTranslations } from "next-intl";
-import { useEvent, useMounted } from "../hooks";
+import { ArrowLeft, Plus, Sparkle } from "@phosphor-icons/react";
+import { useLocale, useTranslations } from "next-intl";
+import { useEvent, useMounted, useUpdateEvent } from "../hooks";
+import "./event.css";
 import { EventReadyCard } from "./event-ready-card";
 import { EventSetupChecklist } from "./event-setup-checklist";
+import { EventPrintModal } from "./print";
+import { QRCustomizeModal } from "./qr-customize";
+import { EventEditDialog } from "./event-edit-dialog";
+import { formatDate } from "@/i18n/format";
+import type { AppLocale } from "@/i18n/locales";
 import { Spinner } from "@/components/ui";
 
 type ReadyPageClientProps = {
@@ -15,9 +22,63 @@ type ReadyPageClientProps = {
 export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
   const t = useTranslations("event");
   const tCommon = useTranslations("common.errors");
+  const locale = useLocale() as AppLocale;
   const mounted = useMounted();
 
   const { data: event, isLoading } = useEvent(eventId);
+  const { mutateAsync: updateEvent } = useUpdateEvent();
+
+  const [qrDataUrl, setQrDataUrl] = useState<string>("");
+  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [isCustomizeQrOpen, setIsCustomizeQrOpen] = useState(false);
+  const [isEditEventOpen, setIsEditEventOpen] = useState(false);
+  const [qrConfigVersion, setQrConfigVersion] = useState(0);
+
+  // Compute guest URL for QR pre-generation
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const publicPath =
+    event?.public_url || (event?.slug ? `/e/${event.slug}` : "");
+  const fullGuestUrl = event?.guest_url || `${origin}${publicPath}`;
+
+  useEffect(() => {
+    if (!fullGuestUrl) return;
+
+    let active = true;
+
+    void import("qrcode")
+      .then((qr) =>
+        qr.toDataURL(fullGuestUrl, {
+          width: 512,
+          margin: 1.5,
+          color: {
+            dark: "#181e17",
+            light: "#ffffff",
+          },
+          errorCorrectionLevel: "H",
+        }),
+      )
+      .then((dataUrl) => {
+        if (active) setQrDataUrl(dataUrl);
+      })
+      .catch(() => {
+        // Fallback handled gracefully in card
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [fullGuestUrl]);
+
+  const handlePreviewOpened = () => {
+    if (event && !event.setup_checklist?.testedGuestExperience) {
+      void updateEvent({
+        id: event.id,
+        setup_checklist: {
+          testedGuestExperience: true,
+        },
+      });
+    }
+  };
 
   if (!mounted || isLoading) {
     return (
@@ -48,10 +109,134 @@ export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
     );
   }
 
+  const formattedDate = event.event_date
+    ? formatDate(event.event_date, locale, {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : t("ready.noDate");
+
   return (
-    <div className="event-ready-page max-w-3xl mx-auto py-6 sm:py-10">
-      <EventReadyCard event={event} />
-      <EventSetupChecklist event={event} />
+    <div className="event-ready-page max-w-6xl mx-auto px-4 sm:px-6">
+      {/* Unified Compact Header */}
+      <div className="event-ready-page__header pb-3 mb-6 sm:mb-8 border-b border-line">
+        {/* Breadcrumb Hierarchy & Status Tag */}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mb-1.5">
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-1 hover:text-ink transition-colors font-medium"
+          >
+            <ArrowLeft size={13} aria-hidden="true" />
+            <span>{t("overview.breadcrumb")}</span>
+          </Link>
+          <span className="text-line-hover" aria-hidden="true">
+            /
+          </span>
+          <Link
+            href={`/events/${encodeURIComponent(event.id)}`}
+            className="font-medium text-muted-foreground hover:text-ink hover:underline underline-offset-4 transition-colors truncate max-w-[200px] sm:max-w-xs"
+            title={t("ready.goToOverview")}
+          >
+            {event.name}
+          </Link>
+          <span className="text-line-hover" aria-hidden="true">
+            /
+          </span>
+          <span className="inline-flex items-center gap-1 font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full text-[11px]">
+            <Sparkle size={11} weight="fill" aria-hidden="true" />
+            <span>{t("ready.heroBadge")}</span>
+          </span>
+        </div>
+
+        {/* Heading & Meta Subtitle */}
+        <div>
+          <h1 className="font-heading text-lg sm:text-xl lg:text-2xl text-ink font-semibold tracking-tight">
+            {t("ready.heroTitle")}
+          </h1>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {t(`types.${event.event_type}`)}
+            {event.event_date ? ` · ${formattedDate}` : ""}
+          </p>
+        </div>
+      </div>
+
+      {/* Main 2-Column Bento Grid */}
+      <div className="event-ready-page__grid grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        {/* Left Column: QR Code & Guest Launchpad Card (Purely focuses on QR & Logo preview) */}
+        <div className="lg:col-span-5 w-full">
+          <EventReadyCard
+            event={event}
+            qrDataUrl={qrDataUrl}
+            onOpenPrintModal={() => setIsPrintModalOpen(true)}
+            configVersion={qrConfigVersion}
+          />
+        </div>
+
+        {/* Right Column: Setup Checklist & Next Steps Card (With Prominent Customize QR CTA) */}
+        <div className="lg:col-span-7 w-full">
+          <EventSetupChecklist
+            event={event}
+            onOpenPrintModal={() => setIsPrintModalOpen(true)}
+            onOpenCustomizeQr={() => setIsCustomizeQrOpen(true)}
+            onOpenEditPage={() => setIsEditEventOpen(true)}
+            onPreviewClick={handlePreviewOpened}
+          />
+        </div>
+      </div>
+
+      {/* Printable Signage Modal */}
+      <EventPrintModal
+        event={event}
+        qrDataUrl={qrDataUrl}
+        configVersion={qrConfigVersion}
+        isOpen={isPrintModalOpen}
+        onClose={() => setIsPrintModalOpen(false)}
+      />
+
+      {/* QR Card Customizer Modal */}
+      <QRCustomizeModal
+        event={event}
+        guestUrl={fullGuestUrl}
+        formattedDate={event.event_date ? formattedDate : null}
+        isOpen={isCustomizeQrOpen}
+        onClose={() => setIsCustomizeQrOpen(false)}
+        onApplied={() => {
+          setQrConfigVersion((v) => v + 1);
+
+          if (event && !event.setup_checklist?.customizedQr) {
+            void updateEvent({
+              id: event.id,
+              setup_checklist: {
+                customizedQr: true,
+              },
+            });
+          }
+        }}
+      />
+
+      {/* Edit Event Details Dialog */}
+      <EventEditDialog
+        event={event}
+        isOpen={isEditEventOpen}
+        onClose={() => setIsEditEventOpen(false)}
+        onSave={async (updated) => {
+          try {
+            await updateEvent({
+              id: event.id,
+              ...updated,
+              setup_checklist: {
+                customizedPage: true,
+                ...(updated.expected_guest_count
+                  ? { addedGuestCount: true }
+                  : {}),
+              },
+            });
+          } catch {
+            // Handled gracefully
+          }
+        }}
+      />
     </div>
   );
 }

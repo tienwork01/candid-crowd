@@ -32,6 +32,7 @@ import {
 import { localeLabels, locales } from "@/i18n/locales";
 import { useLocaleSwitcher } from "@/i18n/use-locale-switcher";
 import { authClient } from "@/lib/auth-client";
+import { clearAuthTokenCache } from "@/lib/api-client";
 import { siteConfig } from "@/lib/config";
 import { cn } from "@/lib/utils";
 import { useHostProfile } from "../hooks";
@@ -296,6 +297,7 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
           variant="destructive"
           onClick={async () => {
             clearHostCache();
+            clearAuthTokenCache();
             await authClient.signOut();
             router.replace("/login");
             router.refresh();

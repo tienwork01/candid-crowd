@@ -1,18 +1,17 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { authClient } from "@/lib/auth-client";
-import { getCurrentRelativePath, withAuthRedirect } from "@/lib/auth-redirect";
 import { getErrorMessage } from "@/lib/errors";
 
 // Keep browser requests same-origin. Next rewrites /api/v1 to API_UPSTREAM_URL
 // server-side, so HTTPS guest pages never make insecure HTTP API requests.
 const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL || undefined;
 
-function redirectToLogin(): void {
-  if (typeof window !== "undefined") {
-    window.location.assign(
-      withAuthRedirect("/login", getCurrentRelativePath()),
-    );
-  }
+let cachedToken: string | null = null;
+let tokenExpiresAt = 0;
+
+export function clearAuthTokenCache(): void {
+  cachedToken = null;
+  tokenExpiresAt = 0;
 }
 
 export class APIError extends Error {
@@ -61,19 +60,37 @@ function normalizeAxiosError(
 /**
  * Retrieves the current session's JWT token via Better Auth.
  * Returns null if not authenticated.
+ * Caches token in-memory for up to 5 minutes to avoid repeated roundtrips.
  */
-export async function getAuthToken(): Promise<string | null> {
+export async function getAuthToken(
+  forceRefresh = false,
+): Promise<string | null> {
+  const now = Date.now();
+
+  if (!forceRefresh && cachedToken && now < tokenExpiresAt) {
+    return cachedToken;
+  }
+
   try {
     const { data, error } = await authClient.token({
       fetchOptions: { cache: "no-store" },
     });
 
     if (error || !data?.token) {
+      cachedToken = null;
+      tokenExpiresAt = 0;
+
       return null;
     }
 
-    return data.token;
+    cachedToken = data.token;
+    tokenExpiresAt = now + 5 * 60 * 1000;
+
+    return cachedToken;
   } catch {
+    cachedToken = null;
+    tokenExpiresAt = 0;
+
     return null;
   }
 }
@@ -127,7 +144,6 @@ privateClient.interceptors.request.use(
       const token = await getAuthToken();
 
       if (!token) {
-        redirectToLogin();
         throw new APIError(
           401,
           "unauthenticated",
@@ -162,8 +178,9 @@ privateClient.interceptors.response.use(
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
+      clearAuthTokenCache();
 
-      const freshToken = await getAuthToken();
+      const freshToken = await getAuthToken(true);
 
       if (freshToken) {
         originalRequest.headers.Authorization = `Bearer ${freshToken}`;
@@ -173,8 +190,6 @@ privateClient.interceptors.response.use(
     }
 
     const normalizedError = normalizeAxiosError(error);
-
-    if (normalizedError.status === 401) redirectToLogin();
 
     return Promise.reject(normalizedError);
   },
@@ -205,7 +220,6 @@ export async function apiFetch(
   const token = await getAuthToken();
 
   if (!token) {
-    redirectToLogin();
     throw new APIError(
       401,
       "unauthenticated",
@@ -216,7 +230,9 @@ export async function apiFetch(
   let response = await authorizedFetch(url, init, token);
 
   if (response.status === 401) {
-    const refreshedToken = await getAuthToken();
+    clearAuthTokenCache();
+
+    const refreshedToken = await getAuthToken(true);
 
     if (refreshedToken) {
       response = await authorizedFetch(url, init, refreshedToken);
@@ -234,11 +250,7 @@ export async function apiFetch(
 
     const code = body?.error?.code || body?.code || "request_failed";
 
-    const apiError = new APIError(response.status, code, getErrorMessage(code));
-
-    if (apiError.status === 401) redirectToLogin();
-
-    throw apiError;
+    throw new APIError(response.status, code, getErrorMessage(code));
   }
 
   return response;

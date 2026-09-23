@@ -35,11 +35,64 @@ export function createInitialChecklist(
   return {
     eventCreated: true,
     qrReady: true,
-    testedGuestExperience: true,
+    testedGuestExperience: false,
     addedGuestCount: hasGuestCount,
     customizedQr: false,
     customizedPage: false,
   };
+}
+
+export function createInitialQrSources(): QRSourceMetric[] {
+  return [
+    {
+      id: "src_entrance",
+      source: "entrance",
+      label: "Welcome Entrance",
+      scans_count: 0,
+      contributors_count: 0,
+      media_count: 0,
+    },
+    {
+      id: "src_table",
+      source: "table",
+      label: "Dinner Tables",
+      scans_count: 0,
+      contributors_count: 0,
+      media_count: 0,
+    },
+    {
+      id: "src_bar",
+      source: "bar",
+      label: "Cocktail Bar",
+      scans_count: 0,
+      contributors_count: 0,
+      media_count: 0,
+    },
+    {
+      id: "src_dance_floor",
+      source: "dance_floor",
+      label: "Dance Floor",
+      scans_count: 0,
+      contributors_count: 0,
+      media_count: 0,
+    },
+    {
+      id: "src_invitation",
+      source: "invitation",
+      label: "Printed Invitation",
+      scans_count: 0,
+      contributors_count: 0,
+      media_count: 0,
+    },
+    {
+      id: "src_screen",
+      source: "screen",
+      label: "Live Screen Display",
+      scans_count: 0,
+      contributors_count: 0,
+      media_count: 0,
+    },
+  ];
 }
 
 export function createDefaultQrSources(): QRSourceMetric[] {
@@ -409,6 +462,13 @@ export function addStoredMediaItem(
   const updatedItems = [item, ...currentItems];
   const photosCount = updatedItems.filter((i) => !i.is_video).length;
   const videosCount = updatedItems.filter((i) => i.is_video).length;
+  const contributorsCount = (existing.metrics?.contributors_count || 0) + 1;
+  const participationRate = existing.expected_guest_count
+    ? Math.min(
+        100,
+        Math.round((contributorsCount / existing.expected_guest_count) * 100),
+      )
+    : existing.metrics?.participation_rate || 0;
 
   return updateStoredEvent(eventId, {
     media_items: updatedItems,
@@ -417,7 +477,8 @@ export function addStoredMediaItem(
           ...existing.metrics,
           photos_count: photosCount,
           videos_count: videosCount,
-          contributors_count: (existing.metrics.contributors_count || 0) + 1,
+          contributors_count: contributorsCount,
+          participation_rate: participationRate,
         }
       : undefined,
   });
@@ -462,17 +523,15 @@ export function createLocalEvent(input: {
     setup_checklist: createInitialChecklist(
       Boolean(input.expected_guest_count),
     ),
-    media_items: createDefaultSampleMedia(),
-    qr_sources: createDefaultQrSources(),
+    media_items: [],
+    qr_sources: createInitialQrSources(),
     metrics: {
-      scans_count: 12,
-      visitors_count: 8,
-      contributors_count: 4,
-      photos_count: 10,
+      scans_count: 0,
+      visitors_count: 0,
+      contributors_count: 0,
+      photos_count: 0,
       videos_count: 0,
-      participation_rate: input.expected_guest_count
-        ? Math.round((4 / input.expected_guest_count) * 100)
-        : 10,
+      participation_rate: 0,
     },
   };
 

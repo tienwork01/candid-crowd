@@ -17,6 +17,9 @@ import type { AppLocale } from "@/i18n/locales";
 import { Button } from "@/components/ui";
 import type { CandidEvent } from "../../types/event";
 import { getEventPublicCode } from "../../types/event";
+import { loadQRConfig } from "../../lib/qr-customize-storage";
+import { generateHighResQRDataUrl } from "../../lib/qr-generator";
+import type { QRCustomizeState } from "../qr-customize/qr-customize-types";
 import {
   PRINT_DIMENSIONS,
   type PrintFormat,
@@ -30,6 +33,8 @@ import { downloadPrintableSign } from "./print-pdf-generator";
 type EventPrintModalProps = {
   event: CandidEvent;
   qrDataUrl?: string;
+  config?: QRCustomizeState | null;
+  configVersion?: number;
   isOpen: boolean;
   onClose: () => void;
 };
@@ -72,6 +77,8 @@ const FORMAT_OPTIONS: Array<{
 export function EventPrintModal({
   event,
   qrDataUrl,
+  config: propConfig,
+  configVersion,
   isOpen,
   onClose,
 }: EventPrintModalProps) {
@@ -114,28 +121,26 @@ export function EventPrintModal({
     }
   }, [event.event_date, locale]);
 
-  // Public short URL
-  const publicCode = useMemo(() => getEventPublicCode(event), [event]);
+  // Destination guest URL for actual QR scan
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const publicPath = event.public_url || (event.slug ? `/e/${event.slug}` : "");
+  const targetGuestUrl = event.guest_url || `${origin}${publicPath}`;
 
+  // Public short URL for manual entry display
+  const publicCode = useMemo(() => getEventPublicCode(event), [event]);
   const shortUrl = `candidcrowd.life/e/${publicCode}`;
 
   const [highResQrUrl, setHighResQrUrl] = useState<string>("");
 
-  // Generate high-resolution supersampled QR code (1400px, ECC H) for crisp print rendering
+  // Generate high-resolution supersampled QR code (1400px, ECC H) for crisp print rendering,
+  // honoring customized branding, logo, colors, and dot/corner styling when available.
   useEffect(() => {
     if (!isOpen) return;
 
     let active = true;
+    const currentCustomConfig = propConfig ?? loadQRConfig(event.id);
 
-    void import("qrcode")
-      .then((qr) =>
-        qr.toDataURL(`https://${shortUrl}`, {
-          width: 1400,
-          margin: 1.5,
-          color: { dark: "#181e17", light: "#ffffff" },
-          errorCorrectionLevel: "H",
-        }),
-      )
+    void generateHighResQRDataUrl(targetGuestUrl, currentCustomConfig, 1400)
       .then((url) => {
         if (active) {
           setHighResQrUrl(url);
@@ -146,7 +151,7 @@ export function EventPrintModal({
     return () => {
       active = false;
     };
-  }, [isOpen, shortUrl]);
+  }, [isOpen, targetGuestUrl, propConfig, event.id, configVersion]);
 
   // Theme-specific headline text
   const headlineText = useMemo(() => {

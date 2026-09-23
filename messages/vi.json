@@ -7,7 +7,8 @@
       "save": "Lưu",
       "cancel": "Hủy",
       "close": "Đóng",
-      "back": "Quay lại"
+      "back": "Quay lại",
+      "edit": "Chỉnh sửa"
     },
     "errors": {
       "USER_ALREADY_EXISTS": "Tài khoản với email này đã tồn tại. Vui lòng đăng nhập.",
@@ -491,7 +492,6 @@
       "linkCopied": "Đã sao chép liên kết khách mời!",
       "openGuestPage": "Mở trang khách mời",
       "previewAsGuest": "Xem trước với tư cách khách",
-      "previewNotice": "Mở ở chế độ xem trước để ảnh tải lên thử nghiệm không ảnh hưởng đến số liệu",
       "goToOverview": "Đi đến sự kiện"
     },
     "checklist": {
@@ -504,8 +504,7 @@
       "itemCustomizeQr": "Tùy chỉnh thẻ QR",
       "itemCustomizePage": "Tùy chỉnh trang khách",
       "completed": "Đã hoàn thành",
-      "optional": "Tùy chọn",
-      "comingSoon": "Sắp ra mắt"
+      "optional": "Tùy chọn"
     },
     "guestCount": {
       "heading": "Bạn dự kiến có bao nhiêu khách?",
@@ -513,7 +512,8 @@
       "placeholder": "vd: 120",
       "save": "Lưu ước tính",
       "skip": "Bỏ qua lúc này",
-      "savedToast": "Đã lưu số lượng khách dự kiến"
+      "savedToast": "Đã lưu số lượng khách dự kiến",
+      "countLabel": "khách"
     },
     "overview": {
       "breadcrumb": "Tất cả sự kiện",
@@ -755,6 +755,57 @@
       "reassurance": "Không cần ứng dụng · Không cần đăng ký",
       "poweredBy": "Powered by CandidCrowd",
       "preview": "Xem trước"
+    },
+    "qrCustomize": {
+      "title": "Tùy chỉnh thẻ QR",
+      "subtitle": "Cá nhân hóa màu sắc, họa tiết và thương hiệu cho sự kiện",
+      "previewLabel": "Xem trước trực tiếp",
+      "resetDefaults": "Đặt lại mặc định",
+      "resetSuccess": "Đã đặt lại về kiểu dáng mặc định",
+      "apply": "Áp dụng & Lưu",
+      "applied": "Đã lưu tùy chỉnh thẻ QR!",
+      "noLogoWarning": "Hãy tải lên logo để thẻ QR dễ nhận diện hơn",
+      "colorScheme": "Bảng màu",
+      "custom": "Tùy chọn",
+      "colorClassic": "Cổ điển",
+      "colorMoss": "Rêu sồi",
+      "colorNavy": "Xanh navy",
+      "colorForest": "Rừng thông",
+      "colorWine": "Rượu vang",
+      "colorMidnight": "Nửa đêm",
+      "colorOcean": "Đại dương",
+      "colorSunset": "Hoàng hôn",
+      "dotStyle": "Kiểu điểm QR",
+      "dotRounded": "Bo tròn",
+      "dotSquare": "Vuông",
+      "dotDots": "Chấm tròn",
+      "dotClassy": "Sang trọng",
+      "cornerStyle": "Kiểu góc QR",
+      "cornerRounded": "Bo tròn",
+      "cornerSquare": "Vuông",
+      "cornerDot": "Chấm tròn",
+      "logo": "Logo trung tâm",
+      "requiredBadge": "Khuyên dùng",
+      "logoAdded": "Đã thêm logo",
+      "logoRequiredPrompt": "Thêm logo của bạn",
+      "uploadLogoFormats": "PNG, JPG, SVG, WebP (tối đa 5MB)",
+      "logoUploaded": "Đã tải lên logo thành công",
+      "uploadLogo": "Không thể tải lên logo",
+      "logoCustom": "Logo sự kiện tùy chỉnh",
+      "clickToReplace": "Nhấp để thay thế hoặc kéo thả ảnh mới",
+      "removeLogo": "Xóa logo",
+      "processingLogo": "Đang xử lý logo...",
+      "uploadLogoDrag": "Tải lên logo sự kiện hoặc chữ lồng",
+      "logoSize": "Kích thước logo",
+      "logoSizeSmall": "Nhỏ gọn",
+      "logoSizeBalanced": "Cân đối",
+      "logoSizeProminent": "Nổi bật",
+      "destinationLabel": "Đích đến của mã QR",
+      "destinationHint": "Mã QR này luôn mở trực tiếp trang tải ảnh sự kiện của khách mời.",
+      "customFg": "Mã QR & Văn bản",
+      "customBg": "Hình nền",
+      "vectorBadge": "Chất lượng Vector",
+      "logoAlt": "Logo sự kiện"
     }
   },
   "guest": {

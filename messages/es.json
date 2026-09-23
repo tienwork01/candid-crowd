@@ -7,7 +7,8 @@
       "save": "Guardar",
       "cancel": "Cancelar",
       "close": "Cerrar",
-      "back": "Volver"
+      "back": "Volver",
+      "edit": "Editar"
     },
     "errors": {
       "USER_ALREADY_EXISTS": "Ya existe una cuenta con este correo. Inicie sesión en su lugar.",
@@ -491,7 +492,6 @@
       "linkCopied": "¡Enlace de invitados copiado!",
       "openGuestPage": "Abrir página de invitados",
       "previewAsGuest": "Vista previa como invitado",
-      "previewNotice": "Se abre en modo vista previa para que las pruebas no afecten a tus estadísticas",
       "goToOverview": "Ir al evento"
     },
     "checklist": {
@@ -504,8 +504,7 @@
       "itemCustomizeQr": "Personalizar tarjeta QR",
       "itemCustomizePage": "Personalizar página de invitados",
       "completed": "Completado",
-      "optional": "Opcional",
-      "comingSoon": "Próximamente"
+      "optional": "Opcional"
     },
     "guestCount": {
       "heading": "¿Cuántos invitados esperas?",
@@ -513,7 +512,8 @@
       "placeholder": "ej. 120",
       "save": "Guardar estimación",
       "skip": "Omitir por ahora",
-      "savedToast": "Número de invitados guardado"
+      "savedToast": "Número de invitados guardado",
+      "countLabel": "invitados"
     },
     "overview": {
       "breadcrumb": "Todos los eventos",
@@ -755,6 +755,57 @@
       "reassurance": "Sin app · Sin registro",
       "poweredBy": "Powered by CandidCrowd",
       "preview": "Vista previa"
+    },
+    "qrCustomize": {
+      "title": "Personalizar tarjeta QR",
+      "subtitle": "Personaliza colores, formas y marca para tu evento",
+      "previewLabel": "Vista previa en vivo",
+      "resetDefaults": "Restablecer valores predeterminados",
+      "resetSuccess": "Restablecido al estilo predeterminado",
+      "apply": "Aplicar y guardar",
+      "applied": "¡Tarjeta QR personalizada con éxito!",
+      "noLogoWarning": "Recuerda subir un logo para mayor reconocimiento",
+      "colorScheme": "Paleta de colores",
+      "custom": "Personalizado",
+      "colorClassic": "Clásico",
+      "colorMoss": "Musgo",
+      "colorNavy": "Azul marino",
+      "colorForest": "Bosque",
+      "colorWine": "Vino",
+      "colorMidnight": "Medianoche",
+      "colorOcean": "Océano",
+      "colorSunset": "Atardecer",
+      "dotStyle": "Estilo de puntos",
+      "dotRounded": "Redondeado",
+      "dotSquare": "Cuadrado",
+      "dotDots": "Puntos",
+      "dotClassy": "Elegante",
+      "cornerStyle": "Estilo de esquinas",
+      "cornerRounded": "Redondeado",
+      "cornerSquare": "Cuadrado",
+      "cornerDot": "Punto",
+      "logo": "Logo central",
+      "requiredBadge": "Recomendado",
+      "logoAdded": "Logo añadido",
+      "logoRequiredPrompt": "Añade tu logo",
+      "uploadLogoFormats": "PNG, JPG, SVG, WebP (máx. 5MB)",
+      "logoUploaded": "Logo subido con éxito",
+      "uploadLogo": "Error al subir el logo",
+      "logoCustom": "Logo personalizado del evento",
+      "clickToReplace": "Haz clic para cambiar o arrastra una nueva imagen",
+      "removeLogo": "Eliminar logo",
+      "processingLogo": "Procesando logo...",
+      "uploadLogoDrag": "Sube el logo o monograma del evento",
+      "logoSize": "Tamaño del logo",
+      "logoSizeSmall": "Compacto",
+      "logoSizeBalanced": "Equilibrado",
+      "logoSizeProminent": "Destacado",
+      "destinationLabel": "Destino del código QR",
+      "destinationHint": "Este código QR siempre abre directamente la página de subida de fotos para invitados.",
+      "customFg": "QR y texto",
+      "customBg": "Fondo",
+      "vectorBadge": "Calidad Vector",
+      "logoAlt": "Logo del evento"
     }
   },
   "guest": {

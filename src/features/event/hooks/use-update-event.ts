@@ -6,7 +6,12 @@ import { updateStoredEvent } from "../lib/event-store";
 
 export type UpdateEventInput = {
   id: string;
+  name?: string;
+  event_type?: CandidEvent["event_type"];
+  event_date?: string | null;
+  date_unknown?: boolean;
   expected_guest_count?: number | null;
+  gallery_enabled?: boolean;
   setup_checklist?: Partial<NonNullable<CandidEvent["setup_checklist"]>>;
   lifecycle_phase?: CandidEvent["lifecycle_phase"];
 };
@@ -32,7 +37,20 @@ export function useUpdateEvent() {
       }
 
       const updated = updateStoredEvent(input.id, {
-        expected_guest_count: input.expected_guest_count,
+        ...(input.name ? { name: input.name } : {}),
+        ...(input.event_type ? { event_type: input.event_type } : {}),
+        ...(input.event_date !== undefined
+          ? { event_date: input.event_date }
+          : {}),
+        ...(input.date_unknown !== undefined
+          ? { date_unknown: input.date_unknown }
+          : {}),
+        ...(input.expected_guest_count !== undefined
+          ? { expected_guest_count: input.expected_guest_count }
+          : {}),
+        ...(input.gallery_enabled !== undefined
+          ? { gallery_enabled: input.gallery_enabled }
+          : {}),
         ...(input.setup_checklist
           ? {
               setup_checklist: {

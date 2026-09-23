@@ -7,7 +7,8 @@
       "save": "Save",
       "cancel": "Cancel",
       "close": "Close",
-      "back": "Back"
+      "back": "Back",
+      "edit": "Edit"
     },
     "errors": {
       "USER_ALREADY_EXISTS": "An account with this email already exists. Please log in instead.",
@@ -491,7 +492,6 @@
       "linkCopied": "Guest link copied to clipboard!",
       "openGuestPage": "Open guest page",
       "previewAsGuest": "Preview as guest",
-      "previewNotice": "Opens in preview mode so test uploads don't affect your stats",
       "goToOverview": "Go to event"
     },
     "checklist": {
@@ -504,8 +504,7 @@
       "itemCustomizeQr": "Customize QR card",
       "itemCustomizePage": "Customize guest page",
       "completed": "Completed",
-      "optional": "Optional",
-      "comingSoon": "Coming soon"
+      "optional": "Optional"
     },
     "guestCount": {
       "heading": "How many guests are you expecting?",
@@ -513,7 +512,8 @@
       "placeholder": "e.g. 120",
       "save": "Save estimate",
       "skip": "Skip for now",
-      "savedToast": "Expected guest count saved"
+      "savedToast": "Expected guest count saved",
+      "countLabel": "guests"
     },
     "overview": {
       "breadcrumb": "All events",
@@ -755,6 +755,57 @@
       "reassurance": "No app needed · No sign-up",
       "poweredBy": "Powered by CandidCrowd",
       "preview": "Preview"
+    },
+    "qrCustomize": {
+      "title": "Customize QR Card",
+      "subtitle": "Personalize colors, shapes, and branding for your event",
+      "previewLabel": "Live Preview",
+      "resetDefaults": "Reset to defaults",
+      "resetSuccess": "Reset to default styling",
+      "apply": "Apply & Save",
+      "applied": "QR card customized successfully!",
+      "noLogoWarning": "Remember to upload a logo for maximum recognition",
+      "colorScheme": "Color Scheme",
+      "custom": "Custom",
+      "colorClassic": "Classic",
+      "colorMoss": "Moss",
+      "colorNavy": "Navy",
+      "colorForest": "Forest",
+      "colorWine": "Wine",
+      "colorMidnight": "Midnight",
+      "colorOcean": "Ocean",
+      "colorSunset": "Sunset",
+      "dotStyle": "Dot Style",
+      "dotRounded": "Rounded",
+      "dotSquare": "Square",
+      "dotDots": "Dots",
+      "dotClassy": "Classy",
+      "cornerStyle": "Corner Style",
+      "cornerRounded": "Rounded",
+      "cornerSquare": "Square",
+      "cornerDot": "Dot",
+      "logo": "Center Logo",
+      "requiredBadge": "Recommended",
+      "logoAdded": "Logo uploaded",
+      "logoRequiredPrompt": "Add your logo",
+      "uploadLogoFormats": "PNG, JPG, SVG, WebP (max 5MB)",
+      "logoUploaded": "Logo uploaded successfully",
+      "uploadLogo": "Failed to upload logo",
+      "logoCustom": "Custom event logo",
+      "clickToReplace": "Click to replace or drop new image",
+      "removeLogo": "Remove logo",
+      "processingLogo": "Processing logo...",
+      "uploadLogoDrag": "Upload event logo or monogram",
+      "logoSize": "Logo Size",
+      "logoSizeSmall": "Compact",
+      "logoSizeBalanced": "Balanced",
+      "logoSizeProminent": "Prominent",
+      "destinationLabel": "QR destination",
+      "destinationHint": "This QR code always opens your event guest upload page directly.",
+      "customFg": "QR & Text",
+      "customBg": "Background",
+      "vectorBadge": "Vector Quality",
+      "logoAlt": "Event Logo"
     }
   },
   "guest": {

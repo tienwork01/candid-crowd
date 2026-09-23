@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { appFetch } from "@/lib/api-client";
+import { appFetch, clearAuthTokenCache } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
 import { getErrorMessage } from "@/lib/errors";
 
@@ -30,6 +30,7 @@ export function useDeleteAccount() {
     },
     onSuccess: async () => {
       queryClient.clear();
+      clearAuthTokenCache();
       await authClient.signOut();
       toast.success(tPages("deleteAccount"));
       router.replace("/");
