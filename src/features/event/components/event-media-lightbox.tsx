@@ -8,15 +8,16 @@ import {
   DownloadSimple,
   Eye,
   EyeSlash,
+  Heart,
   QrCode,
   User,
+  VideoCamera,
   X,
 } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
 import type { EventMediaItem } from "../types/event";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
-import { Button } from "@/components/ui";
 
 type EventMediaLightboxProps = {
   item: EventMediaItem | null;
@@ -27,8 +28,11 @@ type EventMediaLightboxProps = {
   hasPrev?: boolean;
   hasNext?: boolean;
   onToggleStatus?: (id: string) => void;
+  onToggleFavorite?: (id: string) => void;
   currentIndex?: number;
   totalItems?: number;
+  items?: EventMediaItem[];
+  onSelectItem?: (index: number) => void;
 };
 
 export function EventMediaLightbox({
@@ -40,16 +44,32 @@ export function EventMediaLightbox({
   hasPrev = false,
   hasNext = false,
   onToggleStatus,
+  onToggleFavorite,
   currentIndex,
   totalItems,
+  items,
+  onSelectItem,
 }: EventMediaLightboxProps) {
   const t = useTranslations("event");
   const locale = useLocale() as AppLocale;
   const dialogRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const activeThumbRef = useRef<HTMLButtonElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
   const descriptionId = useId();
 
+  // Auto-scroll active thumbnail into view
+  useEffect(() => {
+    if (activeThumbRef.current) {
+      activeThumbRef.current.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, [currentIndex]);
+
+  // Keyboard navigation & trap focus
   useEffect(() => {
     if (!isOpen) return;
 
@@ -88,6 +108,7 @@ export function EventMediaLightbox({
     };
   }, [isOpen, hasPrev, hasNext, onPrev, onNext, onClose]);
 
+  // Lock body scroll and manage focus
   useEffect(() => {
     if (!isOpen) return;
 
@@ -120,81 +141,156 @@ export function EventMediaLightbox({
     const link = document.createElement("a");
 
     link.href = item.url;
-    link.download = `candid-memory-${item.id}.jpg`;
+    link.download = `candid-memory-${item.id}.${item.is_video ? "mp4" : "jpg"}`;
     link.click();
   };
+
+  const isFeatured = item.status === "featured";
+  const isHidden = item.status === "hidden";
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={item.caption || "Event photo lightbox"}
+      aria-label={item.caption || "Event media theater"}
       aria-describedby={descriptionId}
-      className="event-lightbox"
+      className="event-lightbox event-lightbox--immersive"
       onClick={onClose}
     >
       <div
         ref={dialogRef}
-        className="event-lightbox__inner"
+        className="event-lightbox__theater"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="event-lightbox__topbar">
-          <div className="event-lightbox__context">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {item.is_video ? "Video" : "Photo"}
+        {/* ─── Top Floating HUD ─── */}
+        <header className="event-lightbox__hud">
+          <div className="event-lightbox__hud-context">
+            <span className="event-lightbox__type-badge">
+              {item.is_video ? (
+                <>
+                  <VideoCamera size={13} weight="fill" aria-hidden="true" />
+                  <span>Video</span>
+                </>
+              ) : (
+                <span>Photo</span>
+              )}
             </span>
+
             {typeof currentIndex === "number" && totalItems && (
-              <span
-                className="event-lightbox__counter"
-                aria-label={t("guest.tabMemoriesCount", { count: totalItems })}
-              >
+              <span className="event-lightbox__counter">
                 {currentIndex + 1} / {totalItems}
               </span>
             )}
-            {item.status === "hidden" && (
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-destructive/15 text-destructive">
+
+            {isHidden && (
+              <span className="event-lightbox__status-badge event-lightbox__status-badge--hidden">
                 {t("gallery.statusHidden")}
               </span>
             )}
-            {item.status === "featured" && (
-              <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-primary/15 text-primary">
-                {t("gallery.statusFeatured")}
+
+            {isFeatured && (
+              <span className="event-lightbox__status-badge event-lightbox__status-badge--featured">
+                <Heart size={11} weight="fill" aria-hidden="true" />
+                <span>{t("gallery.statusFeatured")}</span>
               </span>
             )}
           </div>
 
-          <button
-            ref={closeButtonRef}
-            type="button"
-            onClick={onClose}
-            className="event-lightbox__close"
-            aria-label="Close lightbox"
-          >
-            <X size={18} aria-hidden="true" />
-          </button>
-        </div>
+          {/* Quick HUD Actions */}
+          <div className="event-lightbox__hud-actions">
+            {onToggleFavorite && (
+              <button
+                type="button"
+                onClick={() => onToggleFavorite(item.id)}
+                className={`event-lightbox__hud-btn ${
+                  isFeatured ? "event-lightbox__hud-btn--featured" : ""
+                }`}
+                title={
+                  isFeatured
+                    ? t("gallery.itemUnfavorite")
+                    : t("gallery.itemFavorite")
+                }
+                aria-label={
+                  isFeatured
+                    ? t("gallery.itemUnfavorite")
+                    : t("gallery.itemFavorite")
+                }
+              >
+                <Heart
+                  size={18}
+                  weight={isFeatured ? "fill" : "bold"}
+                  className={isFeatured ? "text-rose-500" : "text-white"}
+                  aria-hidden="true"
+                />
+              </button>
+            )}
 
-        <div className="event-lightbox__image-box">
+            {onToggleStatus && (
+              <button
+                type="button"
+                onClick={() => onToggleStatus(item.id)}
+                className="event-lightbox__hud-btn"
+                title={isHidden ? t("gallery.itemShow") : t("gallery.itemHide")}
+                aria-label={
+                  isHidden ? t("gallery.itemShow") : t("gallery.itemHide")
+                }
+              >
+                {isHidden ? (
+                  <Eye size={18} aria-hidden="true" />
+                ) : (
+                  <EyeSlash size={18} aria-hidden="true" />
+                )}
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="event-lightbox__hud-btn"
+              title={t("gallery.itemDownload")}
+              aria-label={t("gallery.itemDownload")}
+            >
+              <DownloadSimple size={18} aria-hidden="true" />
+            </button>
+
+            <button
+              ref={closeButtonRef}
+              type="button"
+              onClick={onClose}
+              className="event-lightbox__hud-btn event-lightbox__hud-btn--close"
+              aria-label="Close theater"
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
+          </div>
+        </header>
+
+        {/* ─── Main Media Stage ─── */}
+        <div className="event-lightbox__stage">
           {item.is_video ? (
             <video
               src={item.url}
               controls
               playsInline
-              className="h-full w-full object-contain"
+              autoPlay
+              className="event-lightbox__video"
               preload="metadata"
             />
           ) : (
-            <Image
-              src={item.url}
-              alt={item.caption || "Event memory"}
-              fill
-              unoptimized
-              className="object-contain"
-              sizes="(max-width: 900px) 100vw, 900px"
-              priority
-            />
+            <div className="event-lightbox__media-wrap">
+              <Image
+                src={item.url}
+                alt={item.caption || "Event memory"}
+                fill
+                unoptimized
+                className="object-contain"
+                sizes="(max-width: 1200px) 100vw, 1200px"
+                priority
+              />
+            </div>
           )}
 
+          {/* Prev / Next Carets */}
           {hasPrev && onPrev && (
             <button
               type="button"
@@ -202,7 +298,7 @@ export function EventMediaLightbox({
               className="event-lightbox__nav event-lightbox__nav--previous"
               aria-label="Previous photo"
             >
-              <CaretLeft size={22} weight="bold" aria-hidden="true" />
+              <CaretLeft size={24} weight="bold" aria-hidden="true" />
             </button>
           )}
 
@@ -213,75 +309,81 @@ export function EventMediaLightbox({
               className="event-lightbox__nav event-lightbox__nav--next"
               aria-label="Next photo"
             >
-              <CaretRight size={22} weight="bold" aria-hidden="true" />
+              <CaretRight size={24} weight="bold" aria-hidden="true" />
             </button>
           )}
         </div>
 
-        <div className="event-lightbox__footer" id={descriptionId}>
-          <div className="event-lightbox__details">
+        {/* ─── Bottom Footer & Metadata ─── */}
+        <footer className="event-lightbox__bottom" id={descriptionId}>
+          <div className="event-lightbox__info">
             {item.caption && (
-              <p className="font-heading text-base font-semibold text-ink">
-                {item.caption}
-              </p>
+              <p className="event-lightbox__caption">{item.caption}</p>
             )}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-1">
+
+            <div className="event-lightbox__meta-tags">
               {item.guest_name && (
-                <span className="inline-flex items-center gap-1">
-                  <User size={13} aria-hidden="true" />
+                <span className="event-lightbox__tag">
+                  <User size={12} aria-hidden="true" />
                   <span>
                     {t("gallery.uploadedBy", { name: item.guest_name })}
                   </span>
                 </span>
               )}
               {item.qr_source && (
-                <span className="inline-flex items-center gap-1">
-                  <QrCode size={13} aria-hidden="true" />
+                <span className="event-lightbox__tag">
+                  <QrCode size={12} aria-hidden="true" />
                   <span>
                     {t("gallery.scannedAt", { source: item.qr_source })}
                   </span>
                 </span>
               )}
-              <span>{formattedTime}</span>
+              <span className="event-lightbox__tag-time">{formattedTime}</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
-            {onToggleStatus && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => onToggleStatus(item.id)}
-                className="text-xs h-9 gap-1.5"
-              >
-                {item.status === "hidden" ? (
-                  <>
-                    <Eye size={15} aria-hidden="true" />
-                    <span>{t("gallery.itemShow")}</span>
-                  </>
-                ) : (
-                  <>
-                    <EyeSlash size={15} aria-hidden="true" />
-                    <span>{t("gallery.itemHide")}</span>
-                  </>
-                )}
-              </Button>
-            )}
-
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleDownload}
-              className="text-xs h-9 gap-1.5"
-              title={t("gallery.itemDownload")}
+          {/* Filmstrip Thumbnail Bar */}
+          {items && items.length > 1 && onSelectItem && (
+            <div
+              className="event-lightbox__filmstrip"
+              role="tablist"
+              aria-label="Photo carousel"
             >
-              <DownloadSimple size={15} aria-hidden="true" />
-              <span>{t("gallery.itemDownload")}</span>
-            </Button>
-          </div>
-        </div>
+              {items.map((thumb, idx) => {
+                const isActive = idx === currentIndex;
+
+                return (
+                  <button
+                    key={thumb.id}
+                    ref={isActive ? activeThumbRef : null}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    onClick={() => onSelectItem(idx)}
+                    className={`event-lightbox__filmstrip-item ${
+                      isActive ? "event-lightbox__filmstrip-item--active" : ""
+                    }`}
+                    title={thumb.caption || `Photo ${idx + 1}`}
+                    aria-label={`Photo ${idx + 1}`}
+                  >
+                    <Image
+                      src={thumb.url}
+                      alt={thumb.caption || ""}
+                      fill
+                      className="object-cover"
+                      sizes="48px"
+                    />
+                    {thumb.is_video && (
+                      <span className="event-lightbox__filmstrip-video-icon">
+                        <VideoCamera size={10} weight="fill" />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </footer>
       </div>
     </div>
   );

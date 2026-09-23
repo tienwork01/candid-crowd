@@ -521,6 +521,28 @@
     color-mix(in srgb, var(--crimson, #e11d48) 35%, transparent);
 }
 
+.guest-upload__thumb--duplicate {
+  border-color: #c47817;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #c47817 35%, transparent);
+}
+
+.guest-upload__duplicate-label {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  max-width: calc(100% - 8px);
+  overflow: hidden;
+  border-radius: 999px;
+  background: #7a4710;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 5px 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .guest-upload__retry-item-btn {
   position: absolute;
   top: 4px;

@@ -7,6 +7,7 @@ import {
   Check,
   CircleNotch,
   CreditCard,
+  DeviceMobile,
   Globe,
   Images,
   Question,
@@ -31,6 +32,7 @@ import {
 } from "@/components/ui";
 import { localeLabels, locales } from "@/i18n/locales";
 import { useLocaleSwitcher } from "@/i18n/use-locale-switcher";
+import { usePWA } from "@/features/pwa/components";
 import { authClient } from "@/lib/auth-client";
 import { clearAuthTokenCache } from "@/lib/api-client";
 import { siteConfig } from "@/lib/config";
@@ -75,6 +77,7 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
   } = useLocaleSwitcher();
   const t = useTranslations("host.accountMenu");
   const { user, isPending, clear: clearHostCache } = useHostProfile();
+  const { canInstall, openInstallPrompt } = usePWA();
   const router = useRouter();
 
   const userPlan = (
@@ -279,6 +282,16 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
               })}
             </DropdownMenuSubContent>
           </DropdownMenuSub>
+
+          {canInstall && (
+            <DropdownMenuItem
+              onClick={openInstallPrompt}
+              className="min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg text-primary"
+            >
+              <DeviceMobile size={16} className="text-primary shrink-0" />
+              <span>{t("installApp")}</span>
+            </DropdownMenuItem>
+          )}
 
           <DropdownMenuItem
             render={<a href={`mailto:${siteConfig.supportEmail}`} />}

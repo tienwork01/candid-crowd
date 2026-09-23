@@ -584,6 +584,8 @@
       "uploadRetry": "Riprova caricamento",
       "retryFailedCount": "Riprova {count, plural, one {# caricamento fallito} other {# caricamenti falliti}}",
       "partialSuccessDesc": "{successCount} su {totalCount} ricordi condivisi. Tocca qui sotto per riprovare i file non riusciti.",
+      "duplicateUpload": "{count, plural, one {Questa foto è già stata aggiunta a questo evento.} other {# foto sono già state aggiunte a questo evento.}}",
+      "duplicateBadge": "Già aggiunta",
       "tabShare": "Condividi",
       "tabMemories": "Ricordi",
       "tabMemoriesCount": "Ricordi ({count})",
@@ -595,7 +597,8 @@
       "eventUnavailableDesc": "Controlla la connessione e riprova.",
       "silentModeNotice": "Evento in corso. Goditi il momento insieme a noi. Condividi le tue foto più tardi.",
       "silentModeNotice_Wedding": "Cerimonia in corso. Goditi il momento insieme a noi. Condividi le tue foto più tardi.",
-      "afterModeNotice": "Hai foto nel rullino? Condividi i tuoi ricordi della festa!"
+      "afterModeNotice": "Hai foto nel rullino? Condividi i tuoi ricordi della festa!",
+      "saveEventBtn": "Salva evento"
     },
     "camera": {
       "candidCameraBtn": "Candid Camera",
@@ -674,6 +677,21 @@
       "sortNewest": "Più recenti",
       "sortOldest": "Meno recenti",
       "sortLabel": "Ordina",
+      "layoutMasonry": "Mosaico",
+      "layoutGrid": "Griglia quadrata",
+      "batchSelect": "Seleziona",
+      "batchSelectedCount": "{count} selezionati",
+      "batchCancel": "Deseleziona",
+      "batchDownload": "Scarica ({count})",
+      "batchHide": "Nascondi ({count})",
+      "batchShow": "Mostra ({count})",
+      "batchFavorite": "Preferito ({count})",
+      "batchDelete": "Elimina ({count})",
+      "batchDeleteConfirm": "Sei sicuro di voler eliminare {count} ricordi selezionati?",
+      "itemFavorite": "Aggiungi ai preferiti",
+      "itemUnfavorite": "Rimuovi dai preferiti",
+      "mediaFavorited": "Aggiunto ai preferiti",
+      "mediaUnfavorited": "Rimosso dai preferiti",
       "viewAsGuest": "Visualizza come ospite",
       "shareQr": "Condividi QR"
     },
@@ -860,7 +878,8 @@
       "planAndBilling": "Piano e fatturazione",
       "language": "Lingua",
       "helpSupport": "Guida e supporto",
-      "logOut": "Disconnetti"
+      "logOut": "Disconnetti",
+      "installApp": "Installa app"
     },
     "pages": {
       "createMetaTitle": "Crea un evento — CandidCrowd",
@@ -909,6 +928,10 @@
       "passwordMismatch": "Le password non corrispondono",
       "passwordChanged": "Password modificata con successo",
       "passwordChangeFailed": "Impossibile modificare la password. Controlla la password attuale e riprova.",
+      "setPassword": "Imposta password",
+      "setPasswordDescription": "Aggiungi una password per accedere con l'email insieme al tuo account social.",
+      "passwordSetSuccess": "Password impostata con successo",
+      "passwordSetFailed": "Impossibile impostare la password. Riprova.",
       "changeAvatar": "Modifica foto profilo",
       "dangerZoneTitle": "Zona di pericolo",
       "dangerZoneDescription": "Elimina definitivamente il tuo account e tutti i dati associati.",
@@ -1067,5 +1090,30 @@
     "polaroidCaption": "Negativo #404",
     "backHome": "Torna alla home",
     "createEvent": "Crea un evento"
+  },
+  "pwa": {
+    "offline": {
+      "message": "Sei offline. Le foto e le modifiche verranno caricate automaticamente non appena riconnesso.",
+      "reconnected": "Di nuovo online! Sincronizzazione..."
+    },
+    "install": {
+      "title": "Installa CandidCrowd",
+      "description": "Aggiungi CandidCrowd alla schermata home per accesso istantaneo, coda foto offline e visualizzazione eventi a schermo intero.",
+      "buttonInstall": "Installa app",
+      "buttonLater": "Più tardi",
+      "iosInstruction1": "Tocca il pulsante Condividi",
+      "iosInstruction2": "Seleziona 'Aggiungi a schermata Home'"
+    },
+    "offlinePage": {
+      "badge": "Connessione in pausa",
+      "title": "Sei offline",
+      "description": "Il segnale Wi-Fi o mobile della location è caduto. Nessun problema: i tuoi ricordi sono salvati al sicuro e verranno sincronizzati appena tornerà la linea.",
+      "polaroidCaption": "Segnale perso alla location",
+      "retry": "Riprova connessione",
+      "checking": "Verifica connessione in corso...",
+      "stillOffline": "Ancora offline. Controlla il Wi-Fi.",
+      "restored": "Segnale ripristinato! Ricaricamento...",
+      "backHome": "Torna alla home"
+    }
   }
 }

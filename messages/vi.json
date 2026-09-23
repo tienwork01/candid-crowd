@@ -584,6 +584,8 @@
       "uploadRetry": "Thử lại",
       "retryFailedCount": "Thử lại {count} tệp chưa tải được",
       "partialSuccessDesc": "Đã chia sẻ {successCount} / {totalCount} kỷ niệm. Nhấn bên dưới để thử lại các tệp chưa thành công.",
+      "duplicateUpload": "{count, plural, one {Ảnh này đã có trong sự kiện này.} other {# ảnh đã có trong sự kiện này.}}",
+      "duplicateBadge": "Đã có",
       "tabShare": "Chia sẻ",
       "tabMemories": "Kỷ niệm",
       "tabMemoriesCount": "Kỷ niệm ({count})",
@@ -595,7 +597,8 @@
       "eventUnavailableDesc": "Kiểm tra kết nối rồi thử lại nhé.",
       "silentModeNotice": "Chương trình đang diễn ra trang trọng. Hãy cùng tận hưởng khoảnh khắc và chia sẻ ảnh sau nhé.",
       "silentModeNotice_Wedding": "Lễ cưới đang diễn ra trang trọng. Hãy cùng tận hưởng khoảnh khắc và chia sẻ ảnh sau nhé.",
-      "afterModeNotice": "Bạn còn ảnh chưa kịp gửi? Hãy cùng chia sẻ vào album nhé!"
+      "afterModeNotice": "Bạn còn ảnh chưa kịp gửi? Hãy cùng chia sẻ vào album nhé!",
+      "saveEventBtn": "Lưu sự kiện"
     },
     "camera": {
       "candidCameraBtn": "Candid Camera",
@@ -674,6 +677,21 @@
       "sortNewest": "Mới nhất",
       "sortOldest": "Cũ nhất",
       "sortLabel": "Sắp xếp",
+      "layoutMasonry": "Tự nhiên",
+      "layoutGrid": "Lưới ô vuông",
+      "batchSelect": "Chọn nhiều",
+      "batchSelectedCount": "Đã chọn {count}",
+      "batchCancel": "Bỏ chọn",
+      "batchDownload": "Tải {count} mục",
+      "batchHide": "Ẩn ({count})",
+      "batchShow": "Hiện ({count})",
+      "batchFavorite": "Yêu thích ({count})",
+      "batchDelete": "Xóa ({count})",
+      "batchDeleteConfirm": "Bạn có chắc muốn xóa {count} kỷ niệm đã chọn?",
+      "itemFavorite": "Đánh dấu yêu thích",
+      "itemUnfavorite": "Bỏ yêu thích",
+      "mediaFavorited": "Đã thêm vào mục yêu thích",
+      "mediaUnfavorited": "Đã bỏ khỏi mục yêu thích",
       "viewAsGuest": "Xem như khách",
       "shareQr": "Chia sẻ QR"
     },
@@ -860,7 +878,8 @@
       "planAndBilling": "Gói & thanh toán",
       "language": "Ngôn ngữ",
       "helpSupport": "Trợ giúp & hỗ trợ",
-      "logOut": "Đăng xuất"
+      "logOut": "Đăng xuất",
+      "installApp": "Cài đặt ứng dụng"
     },
     "pages": {
       "createMetaTitle": "Tạo sự kiện — CandidCrowd",
@@ -909,6 +928,10 @@
       "passwordMismatch": "Mật khẩu không khớp",
       "passwordChanged": "Đã đổi mật khẩu thành công",
       "passwordChangeFailed": "Không thể đổi mật khẩu. Kiểm tra mật khẩu hiện tại và thử lại.",
+      "setPassword": "Thiết lập mật khẩu",
+      "setPasswordDescription": "Thêm mật khẩu để đăng nhập bằng email bên cạnh tài khoản mạng xã hội.",
+      "passwordSetSuccess": "Thiết lập mật khẩu thành công",
+      "passwordSetFailed": "Không thể thiết lập mật khẩu. Vui lòng thử lại.",
       "changeAvatar": "Thay đổi ảnh đại diện",
       "dangerZoneTitle": "Khu vực nguy hiểm",
       "dangerZoneDescription": "Xóa vĩnh viễn tài khoản của bạn và toàn bộ dữ liệu liên quan.",
@@ -1067,5 +1090,30 @@
     "polaroidCaption": "Bản phim số 404",
     "backHome": "Về trang chủ",
     "createEvent": "Tạo sự kiện"
+  },
+  "pwa": {
+    "offline": {
+      "message": "Bạn đang ngoại tuyến. Ảnh và thay đổi sẽ tự động tải lên khi có kết nối lại.",
+      "reconnected": "Đã có mạng lại! Đang đồng bộ..."
+    },
+    "install": {
+      "title": "Cài đặt CandidCrowd",
+      "description": "Thêm CandidCrowd vào màn hình chính để truy cập tức thì, lưu hàng đợi ảnh ngoại tuyến và xem sự kiện toàn màn hình.",
+      "buttonInstall": "Cài đặt ứng dụng",
+      "buttonLater": "Để sau",
+      "iosInstruction1": "Nhấn vào nút Chia sẻ",
+      "iosInstruction2": "Chọn 'Thêm vào MH chính'"
+    },
+    "offlinePage": {
+      "badge": "Tạm dừng kết nối",
+      "title": "Bạn đang ngoại tuyến",
+      "description": "Sóng Wi-Fi hoặc 4G tại địa điểm bị gián đoạn. Đừng lo lắng — ảnh chụp và hàng đợi tải lên đều được lưu an toàn và sẽ tự động đồng bộ ngay khi có mạng lại.",
+      "polaroidCaption": "Mất tín hiệu tại sự kiện",
+      "retry": "Thử kết nối lại",
+      "checking": "Đang kiểm tra kết nối...",
+      "stillOffline": "Vẫn chưa có mạng. Vui lòng kiểm tra Wi-Fi.",
+      "restored": "Đã có mạng lại! Đang tải...",
+      "backHome": "Về trang chủ"
+    }
   }
 }

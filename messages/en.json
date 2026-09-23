@@ -584,6 +584,8 @@
       "uploadRetry": "Retry upload",
       "retryFailedCount": "Retry {count, plural, one {# failed upload} other {# failed uploads}}",
       "partialSuccessDesc": "{successCount} of {totalCount} memories shared. Tap below to retry failed items.",
+      "duplicateUpload": "{count, plural, one {This photo has already been added to this event.} other {# photos have already been added to this event.}}",
+      "duplicateBadge": "Already added",
       "tabShare": "Share",
       "tabMemories": "Memories",
       "tabMemoriesCount": "Memories ({count})",
@@ -595,7 +597,8 @@
       "eventUnavailableDesc": "Check your connection and try again.",
       "silentModeNotice": "Event in progress. Enjoy the moment with us. Feel free to contribute afterwards.",
       "silentModeNotice_Wedding": "Ceremony in progress. Enjoy the moment with us. Feel free to contribute afterwards.",
-      "afterModeNotice": "Got photos in your camera roll? Share memories from the celebration!"
+      "afterModeNotice": "Got photos in your camera roll? Share memories from the celebration!",
+      "saveEventBtn": "Save event"
     },
     "camera": {
       "candidCameraBtn": "Candid Camera",
@@ -674,6 +677,21 @@
       "sortNewest": "Newest first",
       "sortOldest": "Oldest first",
       "sortLabel": "Sort",
+      "layoutMasonry": "Masonry",
+      "layoutGrid": "Square Grid",
+      "batchSelect": "Select",
+      "batchSelectedCount": "{count} selected",
+      "batchCancel": "Deselect",
+      "batchDownload": "Download ({count})",
+      "batchHide": "Hide ({count})",
+      "batchShow": "Show ({count})",
+      "batchFavorite": "Favorite ({count})",
+      "batchDelete": "Delete ({count})",
+      "batchDeleteConfirm": "Are you sure you want to delete {count} selected memories?",
+      "itemFavorite": "Add to favorites",
+      "itemUnfavorite": "Remove favorite",
+      "mediaFavorited": "Added to favorites",
+      "mediaUnfavorited": "Removed from favorites",
       "viewAsGuest": "View as guest",
       "shareQr": "Share QR"
     },
@@ -860,7 +878,8 @@
       "planAndBilling": "Plan & billing",
       "language": "Language",
       "helpSupport": "Help & support",
-      "logOut": "Log out"
+      "logOut": "Log out",
+      "installApp": "Install App"
     },
     "pages": {
       "createMetaTitle": "Create an event — CandidCrowd",
@@ -909,6 +928,10 @@
       "passwordMismatch": "Passwords do not match",
       "passwordChanged": "Password changed successfully",
       "passwordChangeFailed": "Could not change password. Check your current password and try again.",
+      "setPassword": "Set password",
+      "setPasswordDescription": "Add a password to sign in with email alongside your social account.",
+      "passwordSetSuccess": "Password set successfully",
+      "passwordSetFailed": "Could not set password. Please try again.",
       "changeAvatar": "Change profile photo",
       "dangerZoneTitle": "Danger zone",
       "dangerZoneDescription": "Permanently delete your account and all associated data.",
@@ -1067,5 +1090,30 @@
     "polaroidCaption": "Negative #404",
     "backHome": "Back to homepage",
     "createEvent": "Create an event"
+  },
+  "pwa": {
+    "offline": {
+      "message": "You are currently offline. Photos and changes will upload automatically when reconnected.",
+      "reconnected": "Back online! Syncing..."
+    },
+    "install": {
+      "title": "Install CandidCrowd",
+      "description": "Add CandidCrowd to your home screen for instant access, offline photo queuing, and full-screen event viewing.",
+      "buttonInstall": "Install App",
+      "buttonLater": "Maybe Later",
+      "iosInstruction1": "Tap the Share button",
+      "iosInstruction2": "Select 'Add to Home Screen'"
+    },
+    "offlinePage": {
+      "badge": "Connection Paused",
+      "title": "You are currently offline",
+      "description": "Venue Wi-Fi or mobile reception dropped. Don't worry — your memories and staged uploads are preserved and will automatically sync as soon as you reconnect.",
+      "polaroidCaption": "Signal lost at the venue",
+      "retry": "Retry Connection",
+      "checking": "Checking connection...",
+      "stillOffline": "Still offline. Please check Wi-Fi.",
+      "restored": "Signal restored! Reloading...",
+      "backHome": "Back Home"
+    }
   }
 }

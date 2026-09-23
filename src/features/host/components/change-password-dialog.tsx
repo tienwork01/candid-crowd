@@ -18,7 +18,15 @@ import {
 import { authClient } from "@/lib/auth-client";
 import { getErrorMessage } from "@/lib/errors";
 
-export function ChangePasswordDialog() {
+export interface ChangePasswordDialogProps {
+  hasPassword?: boolean;
+  onSuccess?: () => void;
+}
+
+export function ChangePasswordDialog({
+  hasPassword = true,
+  onSuccess,
+}: ChangePasswordDialogProps) {
   const t = useTranslations("host.pages");
   const tErrors = useTranslations("common.errors");
   const [open, setOpen] = useState(false);
@@ -51,6 +59,36 @@ export function ChangePasswordDialog() {
 
     setIsPending(true);
 
+    if (!hasPassword) {
+      try {
+        const response = await fetch("/api/account/set-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newPassword }),
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        setIsPending(false);
+
+        if (!response.ok || !result.success) {
+          setError(result.message || t("passwordSetFailed"));
+
+          return;
+        }
+
+        toast.success(t("passwordSetSuccess"));
+        setOpen(false);
+        resetForm();
+        onSuccess?.();
+      } catch {
+        setIsPending(false);
+        setError(t("passwordSetFailed"));
+      }
+
+      return;
+    }
+
     const result = await authClient.changePassword({
       currentPassword,
       newPassword,
@@ -69,6 +107,7 @@ export function ChangePasswordDialog() {
     toast.success(t("passwordChanged"));
     setOpen(false);
     resetForm();
+    onSuccess?.();
   }
 
   function resetForm() {
@@ -77,6 +116,11 @@ export function ChangePasswordDialog() {
     setShowConfirm(false);
     setError("");
   }
+
+  const actionLabel = hasPassword ? t("changePassword") : t("setPassword");
+  const dialogDescription = hasPassword
+    ? t("passwordDescription")
+    : t("setPasswordDescription");
 
   return (
     <Dialog
@@ -91,16 +135,16 @@ export function ChangePasswordDialog() {
         render={
           <Button variant="outline" size="sm">
             <Lock size={14} aria-hidden="true" />
-            {t("changePassword")}
+            {actionLabel}
           </Button>
         }
       />
       <DialogContent className="max-w-md">
         <DialogTitle className="text-lg font-semibold mb-1">
-          {t("changePassword")}
+          {actionLabel}
         </DialogTitle>
         <DialogDescription className="text-sm text-muted-foreground mb-6">
-          {t("passwordDescription")}
+          {dialogDescription}
         </DialogDescription>
 
         <form
@@ -109,30 +153,32 @@ export function ChangePasswordDialog() {
           noValidate
         >
           {/* Current password */}
-          <div className="profile-page__field">
-            <Label htmlFor="cp-current">{t("currentPassword")}</Label>
-            <div className="profile-page__password-row">
-              <Input
-                id="cp-current"
-                name="currentPassword"
-                type={showCurrent ? "text" : "password"}
-                autoComplete="current-password"
-                required
-              />
-              <button
-                type="button"
-                className="profile-page__password-toggle"
-                onClick={() => setShowCurrent((v) => !v)}
-                aria-label={showCurrent ? "Hide password" : "Show password"}
-              >
-                {showCurrent ? (
-                  <EyeSlash size={18} aria-hidden="true" />
-                ) : (
-                  <Eye size={18} aria-hidden="true" />
-                )}
-              </button>
+          {hasPassword && (
+            <div className="profile-page__field">
+              <Label htmlFor="cp-current">{t("currentPassword")}</Label>
+              <div className="profile-page__password-row">
+                <Input
+                  id="cp-current"
+                  name="currentPassword"
+                  type={showCurrent ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                />
+                <button
+                  type="button"
+                  className="profile-page__password-toggle"
+                  onClick={() => setShowCurrent((v) => !v)}
+                  aria-label={showCurrent ? "Hide password" : "Show password"}
+                >
+                  {showCurrent ? (
+                    <EyeSlash size={18} aria-hidden="true" />
+                  ) : (
+                    <Eye size={18} aria-hidden="true" />
+                  )}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* New password */}
           <div className="profile-page__field">
@@ -204,7 +250,7 @@ export function ChangePasswordDialog() {
                 {t("saving")}
               </>
             ) : (
-              t("changePassword")
+              actionLabel
             )}
           </Button>
         </form>

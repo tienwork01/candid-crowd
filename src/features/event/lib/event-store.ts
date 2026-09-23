@@ -450,6 +450,75 @@ export function deleteStoredMediaItem(
   });
 }
 
+export function toggleStoredMediaFeatured(
+  eventId: string,
+  mediaId: string,
+): CandidEvent | null {
+  const existing = getStoredEvent(eventId);
+
+  if (!existing || !existing.media_items) return null;
+
+  const updatedItems = existing.media_items.map((item) => {
+    if (item.id === mediaId) {
+      const nextStatus = item.status === "featured" ? "ready" : "featured";
+
+      return { ...item, status: nextStatus as EventMediaItem["status"] };
+    }
+
+    return item;
+  });
+
+  return updateStoredEvent(eventId, { media_items: updatedItems });
+}
+
+export function batchUpdateStoredMediaStatus(
+  eventId: string,
+  mediaIds: string[],
+  status: EventMediaItem["status"],
+): CandidEvent | null {
+  const existing = getStoredEvent(eventId);
+
+  if (!existing || !existing.media_items || mediaIds.length === 0) return null;
+
+  const targetSet = new Set(mediaIds);
+  const updatedItems = existing.media_items.map((item) => {
+    if (targetSet.has(item.id)) {
+      return { ...item, status };
+    }
+
+    return item;
+  });
+
+  return updateStoredEvent(eventId, { media_items: updatedItems });
+}
+
+export function batchDeleteStoredMedia(
+  eventId: string,
+  mediaIds: string[],
+): CandidEvent | null {
+  const existing = getStoredEvent(eventId);
+
+  if (!existing || !existing.media_items || mediaIds.length === 0) return null;
+
+  const targetSet = new Set(mediaIds);
+  const updatedItems = existing.media_items.filter(
+    (item) => !targetSet.has(item.id),
+  );
+  const photosCount = updatedItems.filter((i) => !i.is_video).length;
+  const videosCount = updatedItems.filter((i) => i.is_video).length;
+
+  return updateStoredEvent(eventId, {
+    media_items: updatedItems,
+    metrics: existing.metrics
+      ? {
+          ...existing.metrics,
+          photos_count: photosCount,
+          videos_count: videosCount,
+        }
+      : undefined,
+  });
+}
+
 export function addStoredMediaItem(
   eventId: string,
   item: EventMediaItem,

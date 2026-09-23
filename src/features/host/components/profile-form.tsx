@@ -14,7 +14,7 @@ import { Button, Input, Label, Spinner } from "@/components/ui";
 import { authClient } from "@/lib/auth-client";
 import { getErrorMessage } from "@/lib/errors";
 import { cn } from "@/lib/utils";
-import { useHostProfile } from "../hooks";
+import { useHostProfile, useUserAccounts } from "../hooks";
 import { ChangePasswordDialog } from "./change-password-dialog";
 import { DeleteAccountDialog } from "./delete-account-dialog";
 import { HostUserCard } from "./host-user-card";
@@ -23,6 +23,7 @@ export function ProfileForm() {
   const t = useTranslations("host.pages");
   const tErrors = useTranslations("common.errors");
   const { user, isPending: sessionLoading, invalidate } = useHostProfile();
+  const { hasPassword, invalidate: invalidateAccounts } = useUserAccounts();
 
   const [name, setName] = useState("");
   const [nameInitialized, setNameInitialized] = useState(false);
@@ -218,11 +219,18 @@ export function ProfileForm() {
             </div>
             <div>
               <h3>{t("passwordTitle")}</h3>
-              <p>{t("passwordDescription")}</p>
+              <p>
+                {hasPassword
+                  ? t("passwordDescription")
+                  : t("setPasswordDescription")}
+              </p>
             </div>
           </div>
           <div className="profile-page__card-actions">
-            <ChangePasswordDialog />
+            <ChangePasswordDialog
+              hasPassword={hasPassword}
+              onSuccess={invalidateAccounts}
+            />
           </div>
         </div>
 

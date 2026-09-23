@@ -52,6 +52,7 @@ export const CACHE_TIMES = {
 export const QUERY_KEYS = {
   host: {
     profile: ["host", "profile"] as const,
+    accounts: ["host", "accounts"] as const,
   },
   event: {
     all: ["events"] as const,

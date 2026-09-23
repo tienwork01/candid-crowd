@@ -584,6 +584,8 @@
       "uploadRetry": "Réessayer",
       "retryFailedCount": "Réessayer {count, plural, one {# téléversement échoué} other {# téléversements échoués}}",
       "partialSuccessDesc": "{successCount} sur {totalCount} souvenirs partagés. Appuyez ci-dessous pour réessayer les fichiers échoués.",
+      "duplicateUpload": "{count, plural, one {Cette photo a déjà été ajoutée à cet événement.} other {# photos ont déjà été ajoutées à cet événement.}}",
+      "duplicateBadge": "Déjà ajoutée",
       "tabShare": "Partager",
       "tabMemories": "Souvenirs",
       "tabMemoriesCount": "Souvenirs ({count})",
@@ -595,7 +597,8 @@
       "eventUnavailableDesc": "Vérifiez votre connexion et réessayez.",
       "silentModeNotice": "Célébration en cours. Profitez de l'instant présent. Vous pourrez partager vos photos plus tard.",
       "silentModeNotice_Wedding": "La cérémonie a commencé. Profitez de l'instant avec nous. Partagez vos photos ensuite.",
-      "afterModeNotice": "Des photos dans votre pellicule ? Partagez vos souvenirs de la fête !"
+      "afterModeNotice": "Des photos dans votre pellicule ? Partagez vos souvenirs de la fête !",
+      "saveEventBtn": "Enregistrer l'événement"
     },
     "camera": {
       "candidCameraBtn": "Candid Camera",
@@ -674,6 +677,21 @@
       "sortNewest": "Plus récents",
       "sortOldest": "Plus anciens",
       "sortLabel": "Trier",
+      "layoutMasonry": "Mosaïque",
+      "layoutGrid": "Grille carrée",
+      "batchSelect": "Sélectionner",
+      "batchSelectedCount": "{count} sélectionnés",
+      "batchCancel": "Désélectionner",
+      "batchDownload": "Télécharger ({count})",
+      "batchHide": "Masquer ({count})",
+      "batchShow": "Afficher ({count})",
+      "batchFavorite": "Favori ({count})",
+      "batchDelete": "Supprimer ({count})",
+      "batchDeleteConfirm": "Êtes-vous sûr de vouloir supprimer {count} souvenirs sélectionnés ?",
+      "itemFavorite": "Ajouter aux favoris",
+      "itemUnfavorite": "Retirer des favoris",
+      "mediaFavorited": "Ajouté aux favoris",
+      "mediaUnfavorited": "Retiré des favoris",
       "viewAsGuest": "Voir en tant qu'invité",
       "shareQr": "Partager QR"
     },
@@ -860,7 +878,8 @@
       "planAndBilling": "Forfait et facturation",
       "language": "Langue",
       "helpSupport": "Aide et support",
-      "logOut": "Se déconnecter"
+      "logOut": "Se déconnecter",
+      "installApp": "Installer l'app"
     },
     "pages": {
       "createMetaTitle": "Créer un événement — CandidCrowd",
@@ -909,6 +928,10 @@
       "passwordMismatch": "Les mots de passe ne correspondent pas",
       "passwordChanged": "Mot de passe modifié avec succès",
       "passwordChangeFailed": "Impossible de modifier le mot de passe. Vérifiez votre mot de passe actuel et réessayez.",
+      "setPassword": "Définir le mot de passe",
+      "setPasswordDescription": "Ajoutez un mot de passe pour vous connecter avec un e-mail en plus de votre compte social.",
+      "passwordSetSuccess": "Mot de passe défini avec succès",
+      "passwordSetFailed": "Impossible de définir le mot de passe. Veuillez réessayer.",
       "changeAvatar": "Changer la photo de profil",
       "dangerZoneTitle": "Zone dangereuse",
       "dangerZoneDescription": "Supprimez définitivement votre compte et toutes les données associées.",
@@ -1067,5 +1090,30 @@
     "polaroidCaption": "Négatif #404",
     "backHome": "Retour à l'accueil",
     "createEvent": "Créer un événement"
+  },
+  "pwa": {
+    "offline": {
+      "message": "Vous êtes hors ligne. Les photos et modifications seront automatiquement téléversées dès la reconnexion.",
+      "reconnected": "De nouveau en ligne ! Synchronisation..."
+    },
+    "install": {
+      "title": "Installer CandidCrowd",
+      "description": "Ajoutez CandidCrowd à votre écran d'accueil pour un accès instantané, la file d'attente hors ligne et l'affichage plein écran.",
+      "buttonInstall": "Installer l'app",
+      "buttonLater": "Plus tard",
+      "iosInstruction1": "Appuyez sur le bouton Partager",
+      "iosInstruction2": "Sélectionnez 'Sur l'écran d'accueil'"
+    },
+    "offlinePage": {
+      "badge": "Connexion interrompue",
+      "title": "Vous êtes hors ligne",
+      "description": "La réception Wi-Fi ou mobile sur le lieu de l'événement est coupée. Ne vous inquiétez pas — vos souvenirs sont préservés et seront synchronisés dès la reconnexion.",
+      "polaroidCaption": "Signal perdu sur le lieu",
+      "retry": "Réessayer la connexion",
+      "checking": "Vérification de la connexion...",
+      "stillOffline": "Toujours hors ligne. Vérifiez votre Wi-Fi.",
+      "restored": "Signal rétabli ! Rechargement...",
+      "backHome": "Retour à l'accueil"
+    }
   }
 }

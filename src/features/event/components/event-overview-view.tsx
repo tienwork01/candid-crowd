@@ -8,7 +8,10 @@ import "./event.css";
 import type { CandidEvent, EventMediaItem, EventMode } from "../types/event";
 import { getEventLifecycleStatus, getEventPublicCode } from "../types/event";
 import {
+  batchDeleteStoredMedia,
+  batchUpdateStoredMediaStatus,
   deleteStoredMediaItem,
+  toggleStoredMediaFeatured,
   toggleStoredMediaStatus,
   updateStoredEvent,
   updateStoredEventMode,
@@ -19,7 +22,6 @@ import { EventEngageView } from "./event-engage-view";
 import { EventGalleryView } from "./event-gallery-view";
 import { EventHubHeader } from "./event-hub-header";
 import { EventLiveWallModal } from "./event-live-wall-modal";
-import { EventMediaLightbox } from "./event-media-lightbox";
 import { EventSharePopover } from "./event-share-popover";
 import { EventPrintModal } from "./print";
 import { formatDate } from "@/i18n/format";
@@ -43,7 +45,6 @@ export function EventOverviewView({
   const [activeTab, setActiveTab] = useState<ActiveTab>("memories");
 
   // Modals state
-  const [lightboxItem, setLightboxItem] = useState<EventMediaItem | null>(null);
   const [isLiveWallOpen, setIsLiveWallOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
@@ -119,16 +120,51 @@ export function EventOverviewView({
     }
   };
 
+  const handleToggleMediaFavorite = (mediaId: string) => {
+    const updated = toggleStoredMediaFeatured(currentEvent.id, mediaId);
+
+    if (updated) {
+      setCurrentEvent(updated);
+
+      const target = updated.media_items?.find((m) => m.id === mediaId);
+
+      if (target?.status === "featured") {
+        toast.success(t("gallery.mediaFavorited"));
+      } else {
+        toast.info(t("gallery.mediaUnfavorited"));
+      }
+    }
+  };
+
+  const handleBatchStatusChange = (
+    mediaIds: string[],
+    status: EventMediaItem["status"],
+  ) => {
+    const updated = batchUpdateStoredMediaStatus(
+      currentEvent.id,
+      mediaIds,
+      status,
+    );
+
+    if (updated) {
+      setCurrentEvent(updated);
+    }
+  };
+
+  const handleBatchDelete = (mediaIds: string[]) => {
+    const updated = batchDeleteStoredMedia(currentEvent.id, mediaIds);
+
+    if (updated) {
+      setCurrentEvent(updated);
+    }
+  };
+
   const handleDeleteMedia = (mediaId: string) => {
     const updated = deleteStoredMediaItem(currentEvent.id, mediaId);
 
     if (updated) {
       setCurrentEvent(updated);
       toast.success(t("gallery.mediaDeleted"));
-
-      if (lightboxItem?.id === mediaId) {
-        setLightboxItem(null);
-      }
     }
   };
 
@@ -153,22 +189,6 @@ export function EventOverviewView({
     } catch {
       toast.error(t("overview.copyReminderLink"));
     }
-  };
-
-  // Lightbox navigation
-  const visibleItems = mediaItems.filter((m) => m.status !== "hidden");
-  const lightboxIndex = lightboxItem
-    ? visibleItems.findIndex((m) => m.id === lightboxItem.id)
-    : -1;
-  const hasPrev = lightboxIndex > 0;
-  const hasNext = lightboxIndex >= 0 && lightboxIndex < visibleItems.length - 1;
-
-  const handlePrevLightbox = () => {
-    if (hasPrev) setLightboxItem(visibleItems[lightboxIndex - 1]);
-  };
-
-  const handleNextLightbox = () => {
-    if (hasNext) setLightboxItem(visibleItems[lightboxIndex + 1]);
   };
 
   const formattedDate = currentEvent.event_date
@@ -310,8 +330,10 @@ export function EventOverviewView({
             items={mediaItems}
             eventName={currentEvent.name}
             publicCode={publicCode}
-            onOpenLightbox={(item) => setLightboxItem(item)}
             onToggleStatus={handleToggleMediaStatus}
+            onToggleFavorite={handleToggleMediaFavorite}
+            onBatchStatusChange={handleBatchStatusChange}
+            onBatchDelete={handleBatchDelete}
             onDeleteMedia={handleDeleteMedia}
             guestUrl={testGuestUrl}
             onOpenShare={() => setIsShareOpen(true)}
@@ -405,18 +427,6 @@ export function EventOverviewView({
           </div>
         </div>
       )}
-
-      {/* Lightbox Modal */}
-      <EventMediaLightbox
-        item={lightboxItem}
-        isOpen={Boolean(lightboxItem)}
-        onClose={() => setLightboxItem(null)}
-        onPrev={handlePrevLightbox}
-        onNext={handleNextLightbox}
-        hasPrev={hasPrev}
-        hasNext={hasNext}
-        onToggleStatus={handleToggleMediaStatus}
-      />
 
       {/* Fullscreen Live Wall */}
       <EventLiveWallModal

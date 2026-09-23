@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { QueryProvider } from "@/components/providers";
+import { PWAProvider } from "@/features/pwa/components";
 import "./globals.css";
 
 const sans = Plus_Jakarta_Sans({
@@ -25,12 +26,24 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: "/icon.svg",
+    apple: "/icons/apple-touch-icon.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "CandidCrowd",
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#46533a",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -39,7 +52,9 @@ export default function RootLayout({
   return (
     <html data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className={`${sans.variable} ${serif.variable}`}>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <PWAProvider>{children}</PWAProvider>
+        </QueryProvider>
         {process.env.NODE_ENV === "production" && (
           <GoogleAnalytics gaId="G-REK9J5QXX2" />
         )}

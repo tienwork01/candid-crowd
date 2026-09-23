@@ -29,7 +29,8 @@ export type GuestAnalyticsEvent =
   | "guest_camera_shared"
   | "guest_camera_upload_started"
   | "guest_camera_upload_completed"
-  | "guest_camera_upload_failed";
+  | "guest_camera_upload_failed"
+  | "guest_save_event_pwa_clicked";
 
 export type AnalyticsPayload = Record<
   string,

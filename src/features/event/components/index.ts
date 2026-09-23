@@ -11,6 +11,12 @@ export { EventsListClient } from "./events-list-client";
 export { EventHubHeader } from "./event-hub-header";
 export { EventModeSelector } from "./event-mode-selector";
 export { EventGalleryView } from "./event-gallery-view";
+export {
+  EventGalleryToolbar,
+  EventMediaCard,
+  EventBatchActionBar,
+  EventGalleryEmptyState,
+} from "./gallery";
 export { EventMediaLightbox } from "./event-media-lightbox";
 export { EventAnalyticsView } from "./event-analytics-view";
 export { EventLiveWallModal } from "./event-live-wall-modal";

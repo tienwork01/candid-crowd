@@ -37,7 +37,11 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     if (!apiUpstreamURL) {
-      throw new Error("API_UPSTREAM_URL is required to proxy /api/v1 requests");
+      // A frontend-only build (for example, a preview deployment) does not
+      // require an API server. Do not make compilation depend on a runtime
+      // proxy target; requests to /api/v1 will receive the normal Next.js 404
+      // until API_UPSTREAM_URL is configured for that environment.
+      return [];
     }
 
     return [

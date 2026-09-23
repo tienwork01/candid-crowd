@@ -17,6 +17,7 @@ import {
   Eye,
   Heart,
   Images,
+  DeviceMobile,
   Moon,
   Plus,
   Sparkle,
@@ -37,7 +38,9 @@ import { Spinner } from "@/components/ui";
 import { EventMediaLightbox } from "./event-media-lightbox";
 import { CandidCameraModal } from "./candid-camera-modal";
 import { trackEvent } from "@/lib/analytics";
+import { APIError } from "@/lib/api-client";
 import { useGuestUpload } from "@/features/upload/hooks";
+import { usePWA } from "@/features/pwa/components";
 import { usePublicMedia } from "../hooks/use-public-media";
 import "./guest-upload.css";
 
@@ -46,7 +49,8 @@ type GuestEventViewProps = {
   isTest?: boolean;
 };
 
-type StagedFileStatus = "idle" | "uploading" | "success" | "error";
+type StagedFileStatus =
+  "idle" | "uploading" | "success" | "error" | "duplicate";
 
 type StagedFile = {
   id: string;
@@ -56,6 +60,18 @@ type StagedFile = {
   sizeFormatted: string;
   status: StagedFileStatus;
 };
+
+function newUploadID(): string {
+  // All supported guest browsers have randomUUID. The fallback retains the
+  // RFC4122 shape for older embedded browsers and backend UUID validation.
+  if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+    const value = Math.floor(Math.random() * 16);
+
+    return (char === "x" ? value : (value & 0x3) | 0x8).toString(16);
+  });
+}
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) {
@@ -141,6 +157,8 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   const locale = useLocale() as AppLocale;
   const copy = getEventTypeCopy(event.event_type, t);
 
+  const { canInstall, openInstallPrompt } = usePWA();
+
   const cameraInputId = useId();
   const libraryInputId = useId();
 
@@ -184,6 +202,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadCurrentIndex, setUploadCurrentIndex] = useState(0);
   const [lastUploadedCount, setLastUploadedCount] = useState(0);
+  const [restoredQueueReady, setRestoredQueueReady] = useState(false);
 
   const [guestLikes, setGuestLikes] = useState<Record<string, boolean>>({});
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -191,7 +210,42 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
   const mode = event.event_mode || "social";
   const galleryAllowed = event.gallery_enabled !== false;
-  const { uploadFile } = useGuestUpload(event.slug);
+  const { uploadFile, restorePendingUploads } = useGuestUpload(event.slug);
+
+  // Restore only files that have not reached server verification. They are
+  // shown as retryable until the browser is online and the queue runs again.
+  useEffect(() => {
+    let cancelled = false;
+
+    void restorePendingUploads().then((items) => {
+      if (cancelled) return;
+
+      if (items.length === 0) {
+        setRestoredQueueReady(true);
+
+        return;
+      }
+
+      setStagedFiles((previous) => [
+        ...previous,
+        ...items
+          .filter((item) => !previous.some((file) => file.id === item.id))
+          .map((item) => ({
+            id: item.id,
+            file: item.file,
+            previewUrl: URL.createObjectURL(item.file),
+            isVideo: item.mimeType.startsWith("video/"),
+            sizeFormatted: formatFileSize(item.size),
+            status: "error" as const,
+          })),
+      ]);
+      setRestoredQueueReady(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [restorePendingUploads]);
 
   // Track event view on mount
   useEffect(() => {
@@ -287,7 +341,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
         const previewUrl = URL.createObjectURL(file);
 
         newFiles.push({
-          id: `stage_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 6)}`,
+          id: newUploadID(),
           file,
           previewUrl,
           isVideo,
@@ -358,7 +412,9 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     // Filter files to upload
     const targetFiles = onlyFailed
       ? sourceFiles.filter((f) => f.status === "error")
-      : sourceFiles.filter((f) => f.status !== "success");
+      : sourceFiles.filter(
+          (f) => f.status !== "success" && f.status !== "duplicate",
+        );
 
     if (targetFiles.length === 0) return;
 
@@ -383,6 +439,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     const total = targetFiles.length;
     const successfulUploadedItems: EventMediaItem[] = [];
     const failedIds: string[] = [];
+    const duplicateIDs: string[] = [];
 
     // Progressive upload steps per file
     for (let i = 0; i < total; i++) {
@@ -404,6 +461,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
       try {
         const uploaded = await uploadFile(currentTarget.file, {
+          id: currentTarget.id,
           onProgress: (percent) => {
             const overall = Math.round(15 + ((i + percent / 100) / total) * 80);
 
@@ -429,11 +487,21 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
             f.id === currentTarget.id ? { ...f, status: "success" } : f,
           ),
         );
-      } catch {
-        failedIds.push(currentTarget.id);
+      } catch (error) {
+        const isDuplicate =
+          error instanceof APIError && error.code === "duplicate_media";
+
+        if (isDuplicate) {
+          duplicateIDs.push(currentTarget.id);
+        } else {
+          failedIds.push(currentTarget.id);
+        }
+
         setStagedFiles((prev) =>
           prev.map((f) =>
-            f.id === currentTarget.id ? { ...f, status: "error" } : f,
+            f.id === currentTarget.id
+              ? { ...f, status: isDuplicate ? "duplicate" : "error" }
+              : f,
           ),
         );
       }
@@ -442,6 +510,17 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     setUploadProgress(100);
 
     if (failedIds.length === 0) {
+      if (duplicateIDs.length > 0) {
+        toast.error(t("guest.duplicateUpload", { count: duplicateIDs.length }));
+      }
+
+      if (successfulUploadedItems.length === 0) {
+        setUploadPhase("idle");
+        setUploadProgress(0);
+
+        return;
+      }
+
       // Complete success!
       setLocalGalleryMedia((prev) => [...successfulUploadedItems, ...prev]);
       setLastUploadedCount(successfulUploadedItems.length);
@@ -478,6 +557,26 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     }
   };
 
+  const handleUploadSubmitRef = useRef(handleUploadSubmit);
+
+  useEffect(() => {
+    handleUploadSubmitRef.current = handleUploadSubmit;
+  });
+
+  // An already-persisted queue should continue without asking the guest to
+  // choose the same photos again when they reopen the event with connectivity.
+  useEffect(() => {
+    if (!restoredQueueReady || !navigator.onLine) return;
+
+    const timeout = window.setTimeout(() => {
+      if (stagedFilesRef.current.some((file) => file.status === "error")) {
+        handleUploadSubmitRef.current(true);
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
+  }, [restoredQueueReady]);
+
   const handleRetrySingleItem = (id: string) => {
     setStagedFiles((prev) =>
       prev.map((f) => (f.id === id ? { ...f, status: "idle" } : f)),
@@ -485,11 +584,32 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     handleUploadSubmit(true);
   };
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleOnline = () => {
+      const hasErrors = stagedFilesRef.current.some(
+        (f) => f.status === "error",
+      );
+
+      if (hasErrors) {
+        toast.info(t("guest.uploadRetry"));
+        handleUploadSubmitRef.current(true);
+      }
+    };
+
+    window.addEventListener("online", handleOnline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+    };
+  }, [t]);
+
   const handleCameraShare = (files: File[]) => {
     if (files.length === 0) return;
 
     const newFiles: StagedFile[] = files.map((file, index) => ({
-      id: `stage_cam_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 6)}`,
+      id: newUploadID(),
       file,
       previewUrl: URL.createObjectURL(file),
       isVideo: false,
@@ -796,7 +916,9 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                         className={`guest-upload__thumb ${
                           item.status === "error"
                             ? "guest-upload__thumb--error"
-                            : ""
+                            : item.status === "duplicate"
+                              ? "guest-upload__thumb--duplicate"
+                              : ""
                         }`}
                       >
                         {item.isVideo ? (
@@ -840,6 +962,12 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                             item.sizeFormatted
                           )}
                         </div>
+
+                        {item.status === "duplicate" && (
+                          <span className="guest-upload__duplicate-label">
+                            {t("guest.duplicateBadge")}
+                          </span>
+                        )}
                       </div>
                     ))}
 
@@ -1025,6 +1153,24 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                     >
                       <Images size={17} weight="bold" aria-hidden="true" />
                       <span>{t("guest.viewMemoriesBtn")}</span>
+                    </button>
+                  )}
+
+                  {canInstall && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackEvent("guest_save_event_pwa_clicked");
+                        openInstallPrompt();
+                      }}
+                      className="guest-upload__btn guest-upload__btn--secondary"
+                    >
+                      <DeviceMobile
+                        size={17}
+                        weight="bold"
+                        aria-hidden="true"
+                      />
+                      <span>{t("guest.saveEventBtn")}</span>
                     </button>
                   )}
                 </div>

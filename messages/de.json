@@ -584,6 +584,8 @@
       "uploadRetry": "Erneut versuchen",
       "retryFailedCount": "{count, plural, one {# fehlgeschlagenen Upload} other {# fehlgeschlagene Uploads}} wiederholen",
       "partialSuccessDesc": "{successCount} von {totalCount} Erinnerungen geteilt. Tippen Sie unten, um fehlgeschlagene Dateien zu wiederholen.",
+      "duplicateUpload": "{count, plural, one {Dieses Foto wurde diesem Event bereits hinzugefügt.} other {# Fotos wurden diesem Event bereits hinzugefügt.}}",
+      "duplicateBadge": "Bereits hinzugefügt",
       "tabShare": "Teilen",
       "tabMemories": "Erinnerungen",
       "tabMemoriesCount": "Erinnerungen ({count})",
@@ -595,7 +597,8 @@
       "eventUnavailableDesc": "Überprüfen Sie die Verbindung und versuchen Sie es erneut.",
       "silentModeNotice": "Veranstaltung läuft. Genießen Sie den Moment mit uns. Sie können Ihre Fotos später teilen.",
       "silentModeNotice_Wedding": "Zeremonie läuft. Genießen Sie den Moment mit uns. Teilen Sie Ihre Fotos gerne danach.",
-      "afterModeNotice": "Fotos in Ihrer Galerie? Teilen Sie Erinnerungen an die Feier!"
+      "afterModeNotice": "Fotos in Ihrer Galerie? Teilen Sie Erinnerungen an die Feier!",
+      "saveEventBtn": "Event speichern"
     },
     "camera": {
       "candidCameraBtn": "Candid Camera",
@@ -674,6 +677,21 @@
       "sortNewest": "Neueste zuerst",
       "sortOldest": "Älteste zuerst",
       "sortLabel": "Sortieren",
+      "layoutMasonry": "Mauerwerk",
+      "layoutGrid": "Quadratgitter",
+      "batchSelect": "Auswählen",
+      "batchSelectedCount": "{count} ausgewählt",
+      "batchCancel": "Abwählen",
+      "batchDownload": "Herunterladen ({count})",
+      "batchHide": "Ausblenden ({count})",
+      "batchShow": "Einblenden ({count})",
+      "batchFavorite": "Favorit ({count})",
+      "batchDelete": "Löschen ({count})",
+      "batchDeleteConfirm": "Möchten Sie {count} ausgewählte Erinnerungen wirklich löschen?",
+      "itemFavorite": "Zu Favoriten hinzufügen",
+      "itemUnfavorite": "Aus Favoriten entfernen",
+      "mediaFavorited": "Zu Favoriten hinzugefügt",
+      "mediaUnfavorited": "Aus Favoriten entfernt",
       "viewAsGuest": "Als Gast ansehen",
       "shareQr": "QR teilen"
     },
@@ -860,7 +878,8 @@
       "planAndBilling": "Tarif & Abrechnung",
       "language": "Sprache",
       "helpSupport": "Hilfe & Support",
-      "logOut": "Abmelden"
+      "logOut": "Abmelden",
+      "installApp": "App installieren"
     },
     "pages": {
       "createMetaTitle": "Event erstellen — CandidCrowd",
@@ -909,6 +928,10 @@
       "passwordMismatch": "Passwörter stimmen nicht überein",
       "passwordChanged": "Passwort erfolgreich geändert",
       "passwordChangeFailed": "Passwort konnte nicht geändert werden. Überprüfen Sie Ihr aktuelles Passwort und versuchen Sie es erneut.",
+      "setPassword": "Passwort festlegen",
+      "setPasswordDescription": "Fügen Sie ein Passwort hinzu, um sich neben Ihrem Social-Konto auch mit E-Mail anzumelden.",
+      "passwordSetSuccess": "Passwort erfolgreich festgelegt",
+      "passwordSetFailed": "Passwort konnte nicht festgelegt werden. Bitte versuchen Sie es erneut.",
       "changeAvatar": "Profilfoto ändern",
       "dangerZoneTitle": "Gefahrenbereich",
       "dangerZoneDescription": "Löschen Sie Ihr Konto und alle zugehörigen Daten dauerhaft.",
@@ -1067,5 +1090,30 @@
     "polaroidCaption": "Negativ #404",
     "backHome": "Zurück zur Startseite",
     "createEvent": "Event erstellen"
+  },
+  "pwa": {
+    "offline": {
+      "message": "Sie sind offline. Fotos und Änderungen werden bei Wiederverbindung automatisch hochgeladen.",
+      "reconnected": "Wieder online! Synchronisierung..."
+    },
+    "install": {
+      "title": "CandidCrowd installieren",
+      "description": "Fügen Sie CandidCrowd zu Ihrem Startbildschirm hinzu für schnellen Zugriff, Offline-Fotowarteschlange und Vollbildanzeige.",
+      "buttonInstall": "App installieren",
+      "buttonLater": "Vielleicht später",
+      "iosInstruction1": "Tippen Sie auf Teilen",
+      "iosInstruction2": "Wählen Sie 'Zum Home-Bildschirm'"
+    },
+    "offlinePage": {
+      "badge": "Verbindung pausiert",
+      "title": "Sie sind offline",
+      "description": "Das WLAN oder der Mobilfunkempfang am Veranstaltungsort ist unterbrochen. Keine Sorge – Ihre Fotos sind sicher gespeichert und werden synchronisiert, sobald Sie wieder online sind.",
+      "polaroidCaption": "Signal am Veranstaltungsort verloren",
+      "retry": "Verbindung erneut versuchen",
+      "checking": "Verbindung wird geprüft...",
+      "stillOffline": "Immer noch offline. Bitte WLAN prüfen.",
+      "restored": "Signal wiederhergestellt! Ladevorgang...",
+      "backHome": "Zur Startseite"
+    }
   }
 }
