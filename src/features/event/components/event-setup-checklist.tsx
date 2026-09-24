@@ -31,6 +31,7 @@ type EventSetupChecklistProps = {
   onOpenPrintModal?: () => void;
   onPreviewClick?: () => void;
   onOpenCustomizeQr?: () => void;
+  onOpenCustomizePage?: () => void;
   onOpenEditPage?: () => void;
 };
 
@@ -41,6 +42,7 @@ export function EventSetupChecklist({
   onOpenPrintModal,
   onPreviewClick,
   onOpenCustomizeQr,
+  onOpenCustomizePage,
   onOpenEditPage,
 }: EventSetupChecklistProps) {
   const t = useTranslations("event");
@@ -48,6 +50,7 @@ export function EventSetupChecklist({
   const locale = useLocale() as AppLocale;
   const { mutateAsync: updateEvent, isPending: isUpdating } = useUpdateEvent();
   const handleOpenCustomize = onOpenCustomizeQr || onOpenPrintModal;
+  const handleOpenCustomizePage = onOpenCustomizePage || onOpenEditPage;
 
   const [guestCount, setGuestCount] = useState<string>(
     event.expected_guest_count ? String(event.expected_guest_count) : "",
@@ -351,14 +354,14 @@ export function EventSetupChecklist({
                       )}
                     </div>
 
-                    {onOpenEditPage && (
+                    {handleOpenCustomizePage && (
                       <Button
                         type="button"
                         variant={
                           checklist.customizedPage ? "outline" : "default"
                         }
                         size="sm"
-                        onClick={onOpenEditPage}
+                        onClick={handleOpenCustomizePage}
                         className="h-8 px-3.5 text-xs font-medium inline-flex items-center gap-1.5 rounded-lg shadow-xs transition-all"
                       >
                         <PencilSimple size={13} aria-hidden="true" />

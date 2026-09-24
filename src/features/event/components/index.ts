@@ -34,3 +34,8 @@ export { EventHubSkeleton } from "./event-hub-skeleton";
 export { EventPrintModal } from "./print";
 export { CandidCameraModal } from "./candid-camera-modal";
 export { QRCustomizeModal, QRCustomizePanel } from "./qr-customize";
+export {
+  GuestThemeCustomizeModal,
+  GuestPhoneMockup,
+  type GuestThemeConfig,
+} from "./guest-theme";

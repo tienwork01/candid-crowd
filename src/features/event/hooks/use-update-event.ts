@@ -12,6 +12,7 @@ export type UpdateEventInput = {
   date_unknown?: boolean;
   expected_guest_count?: number | null;
   gallery_enabled?: boolean;
+  guest_theme?: CandidEvent["guest_theme"];
   setup_checklist?: Partial<NonNullable<CandidEvent["setup_checklist"]>>;
   lifecycle_phase?: CandidEvent["lifecycle_phase"];
 };
@@ -50,6 +51,9 @@ export function useUpdateEvent() {
           : {}),
         ...(input.gallery_enabled !== undefined
           ? { gallery_enabled: input.gallery_enabled }
+          : {}),
+        ...(input.guest_theme !== undefined
+          ? { guest_theme: input.guest_theme }
           : {}),
         ...(input.setup_checklist
           ? {

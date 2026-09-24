@@ -9,6 +9,9 @@ export type PublicEventData = {
   event_date: string | null;
   event_type: string;
   gallery_enabled: boolean;
+  guest_theme?:
+    | import("../components/guest-theme/guest-theme-types").GuestThemeConfig
+    | null;
 };
 
 /**

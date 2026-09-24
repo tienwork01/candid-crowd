@@ -18,7 +18,10 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { trackEvent } from "@/lib/analytics";
-import { applyEventFrameToCanvas } from "../lib/camera-frames";
+import {
+  applyEventFrameToCanvas,
+  type CameraFrameStyle,
+} from "../lib/camera-frames";
 import { useCameraShutterSound, useCameraStream } from "../hooks";
 import type { EventMode } from "../types/event";
 import "./candid-camera.css";
@@ -30,6 +33,7 @@ export interface CandidCameraModalProps {
   onFallbackToLibrary?: () => void;
   onFallbackToNativeCamera?: () => void;
   eventMode?: EventMode;
+  cameraFrameStyle?: CameraFrameStyle;
 }
 
 export function CandidCameraModal({
@@ -39,6 +43,7 @@ export function CandidCameraModal({
   onFallbackToLibrary,
   onFallbackToNativeCamera,
   eventMode,
+  cameraFrameStyle,
 }: CandidCameraModalProps) {
   const t = useTranslations("event.camera");
 
@@ -258,7 +263,12 @@ export function CandidCameraModal({
 
       // Apply event frame overlay if enabled
       if (isFrameEnabled) {
-        applyEventFrameToCanvas(ctx, canvas.width, canvas.height);
+        applyEventFrameToCanvas(
+          ctx,
+          canvas.width,
+          canvas.height,
+          cameraFrameStyle,
+        );
       }
 
       // Export JPEG file
@@ -287,6 +297,7 @@ export function CandidCameraModal({
       // Fallback if canvas rendering fails
     }
   }, [
+    cameraFrameStyle,
     capturedFiles.length,
     facingMode,
     isFrameEnabled,

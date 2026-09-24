@@ -42,6 +42,8 @@ import { APIError } from "@/lib/api-client";
 import { useGuestUpload } from "@/features/upload/hooks";
 import { usePWA } from "@/features/pwa/components";
 import { usePublicMedia } from "../hooks/use-public-media";
+import { loadGuestThemeConfig } from "../lib/guest-theme-storage";
+import type { GuestThemeConfig } from "./guest-theme";
 import "./guest-upload.css";
 
 type GuestEventViewProps = {
@@ -207,6 +209,21 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   const [guestLikes, setGuestLikes] = useState<Record<string, boolean>>({});
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+
+  const guestTheme = useMemo<GuestThemeConfig | null>(() => {
+    return event.guest_theme || loadGuestThemeConfig(event.id);
+  }, [event.guest_theme, event.id]);
+
+  const displayTitle = guestTheme?.eventTitleOverride?.trim() || event.name;
+
+  const fontHeadingFamily =
+    guestTheme?.fontHeading === "serif"
+      ? "var(--font-serif), Georgia, serif"
+      : guestTheme?.fontHeading === "classic"
+        ? "Georgia, 'Times New Roman', serif"
+        : guestTheme?.fontHeading === "mono"
+          ? "ui-monospace, SFMono-Regular, monospace"
+          : "var(--font-sans), sans-serif";
 
   const mode = event.event_mode || "social";
   const galleryAllowed = event.gallery_enabled !== false;
@@ -720,8 +737,24 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   const isCandidCameraEnabled =
     !isAfterMode && event.candid_camera_enabled !== false;
 
+  const isDarkTheme =
+    guestTheme?.bgColor === "#09090b" ||
+    guestTheme?.bgColor?.toLowerCase().includes("09090b");
+
   return (
-    <div className="guest-event-page">
+    <div
+      className={`guest-event-page ${isDarkTheme ? "guest-event-page--dark" : ""}`}
+      style={
+        guestTheme
+          ? {
+              ["--background" as string]: guestTheme.bgColor,
+              ["--surface" as string]: guestTheme.surfaceColor,
+              ["--primary" as string]: guestTheme.primaryColor,
+              ["--font-heading" as string]: fontHeadingFamily,
+            }
+          : undefined
+      }
+    >
       {/* Hidden file inputs: Multi-file library vs Direct camera */}
       <input
         id={libraryInputId}
@@ -730,7 +763,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
         multiple
         accept="image/*,video/*"
         className="sr-only"
-        aria-label={t("guest.selectFiles")}
+        aria-label={guestTheme?.ctaText?.trim() || t("guest.selectFiles")}
         onChange={(e) => handleFilesSelected(e.target.files)}
       />
       <input
@@ -795,13 +828,96 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
       <main className="guest-event__content">
         {/* Compact Event Header */}
         <header className="guest-event__header">
+          {/* Customized Hero Presentation */}
+          {guestTheme?.heroStyle === "banner" && guestTheme.coverUrl && (
+            <div className="guest-event__hero-banner">
+              <Image
+                src={guestTheme.coverUrl}
+                alt={displayTitle}
+                fill
+                unoptimized
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
+
+          {guestTheme?.heroStyle === "avatar" && (
+            <div className="guest-event__avatar-badge">
+              <div className="guest-event__avatar-inner">
+                {guestTheme.coverUrl ? (
+                  <Image
+                    src={guestTheme.coverUrl}
+                    alt={displayTitle}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    priority
+                  />
+                ) : (
+                  <span
+                    className="text-lg font-bold"
+                    style={{
+                      color: guestTheme.primaryColor,
+                      fontFamily: fontHeadingFamily,
+                    }}
+                  >
+                    {guestTheme.monogram}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {guestTheme?.heroStyle === "monogram" && guestTheme.monogram && (
+            <div className="guest-event__monogram-crest">
+              <span>{guestTheme.monogram}</span>
+            </div>
+          )}
+
           <div className="guest-event__badge">
             <Sparkle size={12} weight="fill" className="text-primary" />
             <span>{t(`types.${event.event_type}`)}</span>
           </div>
 
-          <h1 className="guest-event__title">{event.name}</h1>
+          <h1 className="guest-event__title">{displayTitle}</h1>
           <time className="guest-event__date">{formattedDate}</time>
+
+          {/* Welcome Message Note */}
+          {guestTheme?.welcomeMessage?.trim() && (
+            <div className="guest-event__welcome-card">
+              &ldquo;{guestTheme.welcomeMessage.trim()}&rdquo;
+            </div>
+          )}
+
+          {/* Photo Prompts / Inspiration Chips (Participation Engine) */}
+          {guestTheme?.photoPrompts && guestTheme.photoPrompts.length > 0 && (
+            <div className="guest-prompts">
+              <span className="guest-prompts__title">
+                ✨ {t("guestTheme.photoMissionsTitle")}
+              </span>
+              <div className="guest-prompts__list">
+                {guestTheme.photoPrompts.map((prompt, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      if (activeTab !== "upload") setActiveTab("upload");
+                      cameraInputRef.current?.click();
+                    }}
+                    className="guest-prompts__chip"
+                  >
+                    <Sparkle
+                      size={11}
+                      weight="fill"
+                      className="guest-prompts__sparkle"
+                    />
+                    <span>{prompt}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Subtle trust note (Replaces loud trust line) */}
           <p className="guest-event__trust-line" title={t("guest.trustLine")}>
@@ -901,7 +1017,9 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                       className="guest-upload__btn guest-upload__btn--primary guest-upload__btn--library"
                     >
                       <Images size={19} weight="bold" aria-hidden="true" />
-                      <span>{t("guest.selectFiles")}</span>
+                      <span>
+                        {guestTheme?.ctaText?.trim() || t("guest.selectFiles")}
+                      </span>
                     </button>
 
                     {/* SECONDARY: Candid Camera (De-emphasized/hidden in after mode or if disabled by host) */}
@@ -1305,7 +1423,13 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                 </button>
               </div>
             ) : (
-              <div className="guest-gallery__grid">
+              <div
+                className={`guest-gallery__grid ${
+                  guestTheme?.galleryLayout === "grid"
+                    ? "guest-gallery__grid--balanced"
+                    : "guest-gallery__grid--masonry"
+                }`}
+              >
                 {galleryMedia.map((item, index) => (
                   <div key={item.id} className="guest-gallery__item">
                     <button
@@ -1411,6 +1535,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
           onFallbackToLibrary={() => libraryInputRef.current?.click()}
           onFallbackToNativeCamera={() => cameraInputRef.current?.click()}
           eventMode={mode}
+          cameraFrameStyle={guestTheme?.cameraFrame}
         />
       )}
     </div>

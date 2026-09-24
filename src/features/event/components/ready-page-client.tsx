@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Plus, Sparkle } from "@phosphor-icons/react";
+import { ArrowLeft, PencilSimple, Plus, Sparkle } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEvent, useMounted, useUpdateEvent } from "../hooks";
 import "./event.css";
@@ -10,6 +10,7 @@ import { EventReadyCard } from "./event-ready-card";
 import { EventSetupChecklist } from "./event-setup-checklist";
 import { EventPrintModal } from "./print";
 import { QRCustomizeModal } from "./qr-customize";
+import { GuestThemeCustomizeModal } from "./guest-theme";
 import { EventEditDialog } from "./event-edit-dialog";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
@@ -31,6 +32,8 @@ export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isCustomizeQrOpen, setIsCustomizeQrOpen] = useState(false);
+  const [isCustomizeGuestPageOpen, setIsCustomizeGuestPageOpen] =
+    useState(false);
   const [isEditEventOpen, setIsEditEventOpen] = useState(false);
   const [qrConfigVersion, setQrConfigVersion] = useState(0);
 
@@ -150,14 +153,25 @@ export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
         </div>
 
         {/* Heading & Meta Subtitle */}
-        <div>
-          <h1 className="font-heading text-lg sm:text-xl lg:text-2xl text-ink font-semibold tracking-tight">
-            {t("ready.heroTitle")}
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {t(`types.${event.event_type}`)}
-            {event.event_date ? ` · ${formattedDate}` : ""}
-          </p>
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h1 className="font-heading text-lg sm:text-xl lg:text-2xl text-ink font-semibold tracking-tight">
+              {t("ready.heroTitle")}
+            </h1>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {t(`types.${event.event_type}`)}
+              {event.event_date ? ` · ${formattedDate}` : ""}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsEditEventOpen(true)}
+            className="text-xs text-muted-foreground hover:text-ink flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-line hover:border-line-hover transition-colors bg-surface shrink-0"
+            title="Edit event name and date"
+          >
+            <PencilSimple size={13} />
+            <span className="hidden sm:inline">Edit Details</span>
+          </button>
         </div>
       </div>
 
@@ -179,6 +193,7 @@ export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
             event={event}
             onOpenPrintModal={() => setIsPrintModalOpen(true)}
             onOpenCustomizeQr={() => setIsCustomizeQrOpen(true)}
+            onOpenCustomizePage={() => setIsCustomizeGuestPageOpen(true)}
             onOpenEditPage={() => setIsEditEventOpen(true)}
             onPreviewClick={handlePreviewOpened}
           />
@@ -209,6 +224,24 @@ export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
               id: event.id,
               setup_checklist: {
                 customizedQr: true,
+              },
+            });
+          }
+        }}
+      />
+
+      {/* Guest Page Theme Customizer Modal */}
+      <GuestThemeCustomizeModal
+        event={event}
+        isOpen={isCustomizeGuestPageOpen}
+        onClose={() => setIsCustomizeGuestPageOpen(false)}
+        onApplied={(themeConfig) => {
+          if (event) {
+            void updateEvent({
+              id: event.id,
+              guest_theme: themeConfig,
+              setup_checklist: {
+                customizedPage: true,
               },
             });
           }

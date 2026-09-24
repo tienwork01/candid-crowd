@@ -19,6 +19,7 @@ import type { CandidEvent } from "../../types/event";
 import { getEventPublicCode } from "../../types/event";
 import { loadQRConfig } from "../../lib/qr-customize-storage";
 import { generateHighResQRDataUrl } from "../../lib/qr-generator";
+import { loadGuestThemeConfig } from "../../lib/guest-theme-storage";
 import type { QRCustomizeState } from "../qr-customize/qr-customize-types";
 import {
   PRINT_DIMENSIONS,
@@ -38,6 +39,27 @@ type EventPrintModalProps = {
   isOpen: boolean;
   onClose: () => void;
 };
+
+const PRESET_TO_PRINT_THEME: Record<string, PrintTheme> = {
+  editorial: "editorial",
+  minimal: "minimal",
+  romantic: "romantic",
+  botanical: "botanical",
+  modern: "modern",
+  luxury: "wedding",
+  film: "editorial",
+  vintage: "romantic",
+};
+
+function getInitialPrintTheme(event: CandidEvent): PrintTheme {
+  const guestTheme = event.guest_theme || loadGuestThemeConfig(event.id);
+
+  if (guestTheme?.presetId && PRESET_TO_PRINT_THEME[guestTheme.presetId]) {
+    return PRESET_TO_PRINT_THEME[guestTheme.presetId];
+  }
+
+  return event.event_type === "Wedding" ? "wedding" : "editorial";
+}
 
 const THEME_OPTIONS: Array<{
   theme: PrintTheme;
@@ -86,8 +108,8 @@ export function EventPrintModal({
   const tCommon = useTranslations("common");
   const locale = useLocale() as AppLocale;
 
-  const [theme, setTheme] = useState<PrintTheme>(
-    event.event_type === "Wedding" ? "wedding" : "editorial",
+  const [theme, setTheme] = useState<PrintTheme>(() =>
+    getInitialPrintTheme(event),
   );
   const [size, setSize] = useState<PrintSize>("5x7");
   const [format, setFormat] = useState<PrintFormat>("pdf");

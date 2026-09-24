@@ -88,6 +88,7 @@ export type CandidEvent = {
   gallery_enabled?: boolean;
   candid_camera_enabled?: boolean;
   setup_checklist?: EventSetupChecklist;
+  guest_theme?: import("../components/guest-theme/guest-theme-types").GuestThemeConfig;
   media_items?: EventMediaItem[];
   qr_sources?: QRSourceMetric[];
   // Metrics summary for overview

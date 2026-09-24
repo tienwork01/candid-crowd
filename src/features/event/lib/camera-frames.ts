@@ -1,4 +1,5 @@
 export type CameraFrameId = "none" | "event";
+export type CameraFrameStyle = "35mm" | "polaroid" | "minimal" | "gold";
 
 export type CameraFrame = {
   id: CameraFrameId;
@@ -65,11 +66,43 @@ function drawSparkle(
 }
 
 /**
- * Composites the Editorial Photobooth Event Frame onto a Canvas 2D context.
- * Creates an elegant keepsake with an inset rounded border, photobooth L-bracket
- * corner accents, and a small top ornament without placing text over the memory.
+ * Minimalist viewfinder corner marks.
  */
-export function applyEventFrameToCanvas(
+function applyMinimalFrame(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+) {
+  const minDim = Math.min(width, height);
+  const markLength = Math.round(minDim * 0.04);
+  const markInset = Math.round(minDim * 0.04);
+
+  ctx.save();
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
+  ctx.lineWidth = Math.max(2, Math.round(minDim * 0.004));
+
+  const corners = [
+    [markInset, markInset, 1, 1],
+    [width - markInset, markInset, -1, 1],
+    [markInset, height - markInset, 1, -1],
+    [width - markInset, height - markInset, -1, -1],
+  ] as const;
+
+  corners.forEach(([x, y, horizontal, vertical]) => {
+    ctx.beginPath();
+    ctx.moveTo(x, y + markLength * vertical);
+    ctx.lineTo(x, y);
+    ctx.lineTo(x + markLength * horizontal, y);
+    ctx.stroke();
+  });
+
+  ctx.restore();
+}
+
+/**
+ * Gold leaf luxury editorial frame with corner accents and sparkles.
+ */
+function applyGoldFrame(
   ctx: CanvasRenderingContext2D,
   width: number,
   height: number,
@@ -111,7 +144,6 @@ export function applyEventFrameToCanvas(
   ctx.stroke();
 
   const centerX = width / 2;
-  // Four restrained gold corner marks make the frame recognizable at a glance.
   const markLength = Math.round(minDim * 0.035);
   const markInset = innerInset + Math.round(minDim * 0.015);
 
@@ -167,4 +199,109 @@ export function applyEventFrameToCanvas(
   });
 
   ctx.restore();
+}
+
+/**
+ * 35mm Analog Film Frame with sprocket holes and film labels.
+ */
+function apply35mmFrame(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+) {
+  const stripHeight = Math.round(height * 0.065);
+  const holeWidth = Math.round(stripHeight * 0.45);
+  const holeHeight = Math.round(stripHeight * 0.65);
+  const holeRadius = 2;
+  const holeSpacing = Math.round(holeWidth * 1.8);
+
+  ctx.save();
+
+  // Top and bottom black film strips
+  ctx.fillStyle = "#121212";
+  ctx.fillRect(0, 0, width, stripHeight);
+  ctx.fillRect(0, height - stripHeight, width, stripHeight);
+
+  // Sprocket holes
+  ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+
+  const numHoles = Math.floor(width / holeSpacing);
+  const startX = Math.round((width - numHoles * holeSpacing) / 2);
+
+  for (let i = 0; i < numHoles; i++) {
+    const x = startX + i * holeSpacing;
+    const topY = Math.round((stripHeight - holeHeight) / 2);
+    const botY = height - stripHeight + topY;
+
+    drawRoundedRect(ctx, x, topY, holeWidth, holeHeight, holeRadius);
+    ctx.fill();
+    drawRoundedRect(ctx, x, botY, holeWidth, holeHeight, holeRadius);
+    ctx.fill();
+  }
+
+  // Vintage amber film imprint
+  ctx.fillStyle = "#f59e0b";
+  ctx.font = `600 ${Math.max(9, Math.round(stripHeight * 0.35))}px monospace`;
+  ctx.fillText("35mm FILM", 12, height - Math.round(stripHeight * 0.35));
+  ctx.fillText("ISO 400", width - 70, height - Math.round(stripHeight * 0.35));
+
+  ctx.restore();
+}
+
+/**
+ * Classic Instant Polaroid Frame.
+ */
+function applyPolaroidFrame(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+) {
+  const minDim = Math.min(width, height);
+  const sideBorder = Math.round(minDim * 0.035);
+  const bottomBorder = Math.round(minDim * 0.12);
+
+  ctx.save();
+  ctx.fillStyle = "#faf7f2";
+
+  // Top, Left, Right, Bottom border fills
+  ctx.fillRect(0, 0, width, sideBorder);
+  ctx.fillRect(0, 0, sideBorder, height);
+  ctx.fillRect(width - sideBorder, 0, sideBorder, height);
+  ctx.fillRect(0, height - bottomBorder, width, bottomBorder);
+
+  // Subtle separator line above the bottom margin
+  ctx.strokeStyle = "rgba(0, 0, 0, 0.08)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(sideBorder, height - bottomBorder);
+  ctx.lineTo(width - sideBorder, height - bottomBorder);
+  ctx.stroke();
+
+  ctx.restore();
+}
+
+/**
+ * Composites the selected Event Frame onto a Canvas 2D context.
+ */
+export function applyEventFrameToCanvas(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  style: CameraFrameStyle = "minimal",
+) {
+  switch (style) {
+    case "35mm":
+      apply35mmFrame(ctx, width, height);
+      break;
+    case "polaroid":
+      applyPolaroidFrame(ctx, width, height);
+      break;
+    case "gold":
+      applyGoldFrame(ctx, width, height);
+      break;
+    case "minimal":
+    default:
+      applyMinimalFrame(ctx, width, height);
+      break;
+  }
 }

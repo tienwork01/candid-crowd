@@ -75,6 +75,7 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
         ? `${window.location.origin}/e/${publicEvent.slug}`
         : `${siteConfig.appUrl}/e/${publicEvent.slug}`,
     gallery_enabled: publicEvent.gallery_enabled,
+    guest_theme: publicEvent.guest_theme || undefined,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };

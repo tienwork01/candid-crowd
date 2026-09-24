@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChartBar, Gear, Images, Megaphone, X } from "@phosphor-icons/react";
+import {
+  ChartBar,
+  Gear,
+  Images,
+  Megaphone,
+  PaintBrush,
+  X,
+} from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import "./event.css";
@@ -18,12 +25,14 @@ import {
 } from "../lib/event-store";
 import { EventAnalyticsView } from "./event-analytics-view";
 import { EventEditDialog } from "./event-edit-dialog";
+import { GuestThemeCustomizeModal } from "./guest-theme";
 import { EventEngageView } from "./event-engage-view";
 import { EventGalleryView } from "./event-gallery-view";
 import { EventHubHeader } from "./event-hub-header";
 import { EventLiveWallModal } from "./event-live-wall-modal";
 import { EventSharePopover } from "./event-share-popover";
 import { EventPrintModal } from "./print";
+import { useUpdateEvent } from "../hooks";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
 import { Button } from "@/components/ui";
@@ -43,11 +52,14 @@ export function EventOverviewView({
 
   const [currentEvent, setCurrentEvent] = useState<CandidEvent>(initialEvent);
   const [activeTab, setActiveTab] = useState<ActiveTab>("memories");
+  const { mutateAsync: updateEvent } = useUpdateEvent();
 
   // Modals state
   const [isLiveWallOpen, setIsLiveWallOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [isCustomizeGuestPageOpen, setIsCustomizeGuestPageOpen] =
+    useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isRecoveryDismissed, setIsRecoveryDismissed] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
@@ -426,6 +438,37 @@ export function EventOverviewView({
               </span>
             </div>
           </div>
+
+          {/* Guest Page Customization Card */}
+          <div className="bg-surface border border-line rounded-2xl p-5 shadow-card mt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <PaintBrush size={20} weight="bold" />
+                </div>
+                <div>
+                  <h3 className="font-heading text-sm font-semibold text-ink">
+                    Guest Page Look & Branding
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    Customize design preset, colors, cover photo, and welcome
+                    note.
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="default"
+                size="sm"
+                onClick={() => setIsCustomizeGuestPageOpen(true)}
+                className="text-xs h-9 gap-1.5 shadow-xs shrink-0"
+              >
+                <PaintBrush size={14} weight="bold" />
+                <span>Customize Guest Page</span>
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -449,6 +492,37 @@ export function EventOverviewView({
         qrDataUrl={qrDataUrl}
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
+      />
+
+      {/* Guest Page Theme Customizer Modal */}
+      <GuestThemeCustomizeModal
+        event={currentEvent}
+        isOpen={isCustomizeGuestPageOpen}
+        onClose={() => setIsCustomizeGuestPageOpen(false)}
+        onApplied={(themeConfig) => {
+          setCurrentEvent((prev) => ({
+            ...prev,
+            guest_theme: themeConfig,
+            setup_checklist: {
+              ...(prev.setup_checklist || {
+                eventCreated: true,
+                qrReady: true,
+                testedGuestExperience: false,
+                addedGuestCount: false,
+                customizedQr: false,
+                customizedPage: false,
+              }),
+              customizedPage: true,
+            },
+          }));
+          void updateEvent({
+            id: currentEvent.id,
+            guest_theme: themeConfig,
+            setup_checklist: {
+              customizedPage: true,
+            },
+          });
+        }}
       />
 
       {/* Edit Event Dialog */}
