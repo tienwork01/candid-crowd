@@ -23,7 +23,7 @@ export type PendingUploadItem = {
 };
 
 const DB_NAME = "candidcrowd_pwa_db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "pending_uploads";
 
 function openDatabase(): Promise<IDBDatabase> {
@@ -142,6 +142,30 @@ export async function removePendingUpload(id: string): Promise<void> {
       const request = store.delete(id);
 
       request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch {
+    // Gracefully ignore deletion failures
+  }
+}
+
+export async function clearPendingUploads(slug: string): Promise<void> {
+  try {
+    const db = await openDatabase();
+
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      const store = tx.objectStore(STORE_NAME);
+      const index = store.index("slug");
+      const request = index.getAllKeys(slug);
+
+      request.onsuccess = () => {
+        const keys = request.result;
+
+        keys.forEach((key) => store.delete(key));
+        resolve();
+      };
+
       request.onerror = () => reject(request.error);
     });
   } catch {

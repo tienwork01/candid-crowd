@@ -57,14 +57,20 @@ export function EventOverviewView({
   const lifecycleStatus = getEventLifecycleStatus(currentEvent);
   const publicCode = getEventPublicCode(currentEvent);
 
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const publicPath = currentEvent.slug
+    ? `/e/${currentEvent.slug}`
+    : currentEvent.public_url || `/e/${publicCode}`;
+  const fullGuestUrl = currentEvent.guest_url || `${origin}${publicPath}`;
+  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
+
   // Pre-generate QR code for instant modal & print responsiveness
   useEffect(() => {
     let active = true;
-    const publicGuestUrl = `https://candidcrowd.life/e/${publicCode}`;
 
     void import("qrcode")
       .then((qr) =>
-        qr.toDataURL(publicGuestUrl, {
+        qr.toDataURL(fullGuestUrl, {
           width: 600,
           margin: 1.5,
           color: { dark: "#181e17", light: "#ffffff" },
@@ -79,12 +85,7 @@ export function EventOverviewView({
     return () => {
       active = false;
     };
-  }, [publicCode]);
-
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const publicPath = currentEvent.public_url || `/e/${currentEvent.slug}`;
-  const fullGuestUrl = currentEvent.guest_url || `${origin}${publicPath}`;
-  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
+  }, [fullGuestUrl]);
 
   // --- Participation summary data ---
   const expectedGuests = currentEvent.expected_guest_count || 100;

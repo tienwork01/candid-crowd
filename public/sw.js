@@ -67,9 +67,11 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
 
-  // Bypass API routes, Auth endpoints, and external storage/upload endpoints
+  // Bypass API routes, Auth endpoints, development HMR, and external storage/upload endpoints
   if (
     url.pathname.startsWith("/api/") ||
+    url.pathname.includes("webpack-hmr") ||
+    url.pathname.includes(".hot-update.") ||
     url.hostname.includes("r2.cloudflarestorage.com") ||
     url.searchParams.has("X-Amz-Signature") ||
     url.searchParams.has("upload_token")

@@ -584,6 +584,11 @@
       "uploadRetry": "Reintentar subida",
       "retryFailedCount": "Reintentar {count, plural, one {# subida fallida} other {# subidas fallidas}}",
       "partialSuccessDesc": "{successCount} de {totalCount} recuerdos compartidos. Pulsa abajo para reintentar los fallidos.",
+      "allFailedDesc": "No se pudieron subir {count, plural, one {# recuerdo} other {# recuerdos}}. Comprueba tu conexión e inténtalo de nuevo o elimina los archivos fallidos.",
+      "removeFailedCount": "Eliminar {count, plural, one {# subida fallida} other {# subidas fallidas}}",
+      "failedRemovedToast": "{count, plural, one {Se eliminó # archivo fallido} other {Se eliminaron # archivos fallidos}}",
+      "removeFile": "Eliminar archivo",
+      "statusFailed": "Error",
       "duplicateUpload": "{count, plural, one {Esta foto ya se añadió a este evento.} other {# fotos ya se añadieron a este evento.}}",
       "duplicateBadge": "Ya añadida",
       "tabShare": "Compartir",
@@ -1093,8 +1098,11 @@
   },
   "pwa": {
     "offline": {
-      "message": "Estás sin conexión. Las fotos y cambios se subirán automáticamente al reconectar.",
-      "reconnected": "¡En línea de nuevo! Sincronizando..."
+      "title": "Estás sin conexión",
+      "message": "Las fotos y cambios se subirán automáticamente al reconectar.",
+      "reconnectedTitle": "De nuevo en línea",
+      "reconnected": "Sincronizando tus cambios ahora...",
+      "dismiss": "Cerrar"
     },
     "install": {
       "title": "Instalar CandidCrowd",
@@ -1113,7 +1121,11 @@
       "checking": "Comprobando conexión...",
       "stillOffline": "Aún sin conexión. Revisa tu Wi-Fi.",
       "restored": "¡Señal recuperada! Recargando...",
-      "backHome": "Ir al inicio"
+      "backHome": "Ir al inicio",
+      "goBack": "Volver",
+      "pendingUploadsCount": "{count} fotos en cola",
+      "pendingUploadsBadge": "Guardado seguro en tu dispositivo",
+      "pendingUploadsDesc": "Tus fotos capturadas están guardadas de forma segura y se subirán automáticamente al álbum del evento cuando vuelva la conexión."
     }
   }
 }

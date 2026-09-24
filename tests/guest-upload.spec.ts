@@ -3,6 +3,78 @@ import { expect, test } from "@playwright/test";
 test.describe("Guest Upload UI & Mobile Ergonomics", () => {
   test.use({ viewport: { width: 375, height: 667 } }); // Mobile iPhone SE viewport
 
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/v1/public/events/demo-wedding", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          id: "event-demo-wedding-123",
+          name: "Emma & Liam's Wedding",
+          event_type: "Wedding",
+          event_date: "2026-10-15",
+          slug: "demo-wedding",
+          gallery_enabled: true,
+          candid_camera_enabled: true,
+          event_mode: "social",
+          media_items: [],
+        }),
+      });
+    });
+
+    await page.route(
+      "**/api/v1/public/events/demo-wedding/sessions",
+      async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            guest_session_token: "mock-token-abc",
+          }),
+        });
+      },
+    );
+
+    await page.route(
+      "**/api/v1/public/events/demo-wedding/media",
+      async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify([]),
+        });
+      },
+    );
+
+    await page.route("**/api/v1/public/events/**/uploads", async (route) => {
+      if (route.request().method() === "POST") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            media_id: "media-mock-123",
+            upload_url: "https://r2-mock.example.com/upload",
+            expires_at: new Date(Date.now() + 3600000).toISOString(),
+            required_headers: {},
+          }),
+        });
+      } else {
+        await route.continue();
+      }
+    });
+
+    await page.route("https://r2-mock.example.com/**", async (route) => {
+      await route.fulfill({ status: 200 });
+    });
+
+    await page.route(
+      "**/api/v1/public/events/**/uploads/**/complete",
+      async (route) => {
+        await route.fulfill({ status: 200 });
+      },
+    );
+  });
+
   test("renders mobile guest upload interface with dual capture actions", async ({
     page,
   }) => {
@@ -243,5 +315,78 @@ test.describe("Guest Upload UI & Mobile Ergonomics", () => {
 
     await closeBtn.click();
     await expect(modal).toBeHidden();
+  });
+
+  test("allows removing and retrying failed uploads in the staging tray", async ({
+    page,
+  }) => {
+    // Intercept upload requests to simulate failure
+    await page.route("**/api/v1/public/events/**/uploads", async (route) => {
+      await route.abort("failed");
+    });
+
+    await page.goto("/e/demo-wedding?is_test=true");
+
+    const buffer = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+      "base64",
+    );
+
+    const fileInput = page.locator('input[type="file"][multiple]');
+
+    await fileInput.setInputFiles([
+      {
+        name: "failed-photo-1.png",
+        mimeType: "image/png",
+        buffer,
+      },
+      {
+        name: "failed-photo-2.png",
+        mimeType: "image/png",
+        buffer,
+      },
+    ]);
+
+    await expect(page.locator(".guest-upload__thumb")).toHaveCount(2);
+
+    const submitBtn = page.locator(".guest-upload__submit-btn");
+
+    await submitBtn.click();
+
+    // Verify error state on thumbnails
+    await expect(page.locator(".guest-upload__thumb--error")).toHaveCount(2, {
+      timeout: 10000,
+    });
+
+    // Verify center retry button and remove button exist on thumbnail
+    const firstThumb = page.locator(".guest-upload__thumb--error").first();
+
+    await expect(
+      firstThumb.locator(".guest-upload__retry-item-btn"),
+    ).toBeVisible();
+    await expect(firstThumb.locator(".guest-upload__remove-btn")).toBeVisible();
+
+    // Verify error box is visible with both retry and remove failed buttons
+    const errorBox = page.locator(".guest-upload__error-box");
+
+    await expect(errorBox).toBeVisible();
+
+    // Verify remove button on single thumbnail works
+    const firstRemoveBtn = firstThumb.locator(".guest-upload__remove-btn");
+
+    await firstRemoveBtn.click();
+
+    // Now 1 item remains
+    await expect(page.locator(".guest-upload__thumb")).toHaveCount(1);
+
+    // Verify bulk remove failed button works on remaining item
+    const removeFailedBtn = page.locator(".guest-upload__btn--danger-outline");
+
+    await expect(removeFailedBtn).toBeVisible();
+    await removeFailedBtn.click();
+
+    // Tray becomes empty, returns to initial picker
+    await expect(page.locator(".guest-upload__staging")).toHaveCount(0);
+    await expect(page.locator(".guest-upload__picker-card")).toBeVisible();
   });
 });

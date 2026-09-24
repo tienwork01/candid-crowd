@@ -1,24 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { WifiSlash, WifiHigh } from "@phosphor-icons/react";
+import { useEffect, useState, useCallback } from "react";
+import { usePathname } from "next/navigation";
+import { WifiSlash, WifiHigh, X } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { useNetworkStatus } from "../hooks";
 import "./pwa.css";
 
 export function OfflineIndicator() {
+  const pathname = usePathname();
   const { isOnline } = useNetworkStatus();
   const [showReconnected, setShowReconnected] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
 
+  let title = "You are offline";
   let message =
-    "You are currently offline. Photos and changes will upload automatically when reconnected.";
-  let reconnectedText = "Back online! Syncing...";
+    "Photos and changes will upload automatically when reconnected.";
+  let reconnectedTitle = "Back online";
+  let reconnectedText = "Syncing your changes now...";
+  let dismissLabel = "Dismiss";
 
   try {
-    const t = useTranslations("pwa");
+    const t = useTranslations("pwa.offline");
 
-    message = t("offline.message");
-    reconnectedText = t("offline.reconnected");
+    title = t("title");
+    message = t("message");
+    reconnectedTitle = t("reconnectedTitle");
+    reconnectedText = t("reconnected");
+    dismissLabel = t("dismiss");
   } catch {
     // Graceful fallback when rendered outside NextIntlClientProvider
   }
@@ -29,21 +38,33 @@ export function OfflineIndicator() {
     let timer: NodeJS.Timeout;
 
     const handleOnline = () => {
+      setIsDismissed(false);
       setShowReconnected(true);
       timer = setTimeout(() => {
         setShowReconnected(false);
       }, 3500);
     };
 
+    const handleOffline = () => {
+      setIsDismissed(false);
+    };
+
     window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     return () => {
       window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
       if (timer) clearTimeout(timer);
     };
   }, []);
 
-  const isVisible = !isOnline || showReconnected;
+  const handleDismiss = useCallback(() => {
+    setIsDismissed(true);
+  }, []);
+
+  const isVisible =
+    (!isOnline || showReconnected) && !isDismissed && pathname !== "/offline";
 
   if (!isVisible) {
     return null;
@@ -61,16 +82,31 @@ export function OfflineIndicator() {
           : "pwa-offline-indicator--online"
       }`}
     >
-      <div className="pwa-offline-indicator__icon" aria-hidden="true">
+      <div className="pwa-offline-indicator__icon-box" aria-hidden="true">
         {isOfflineState ? (
-          <WifiSlash size={16} weight="bold" />
+          <WifiSlash size={18} weight="bold" />
         ) : (
-          <WifiHigh size={16} weight="bold" />
+          <WifiHigh size={18} weight="bold" />
         )}
       </div>
-      <span className="pwa-offline-indicator__text">
-        {isOfflineState ? message : reconnectedText}
-      </span>
+
+      <div className="pwa-offline-indicator__body">
+        <span className="pwa-offline-indicator__title">
+          {isOfflineState ? title : reconnectedTitle}
+        </span>
+        <span className="pwa-offline-indicator__desc">
+          {isOfflineState ? message : reconnectedText}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        onClick={handleDismiss}
+        className="pwa-offline-indicator__close"
+        aria-label={dismissLabel}
+      >
+        <X size={14} weight="bold" />
+      </button>
     </div>
   );
 }

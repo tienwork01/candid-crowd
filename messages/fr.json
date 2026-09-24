@@ -584,6 +584,11 @@
       "uploadRetry": "Réessayer",
       "retryFailedCount": "Réessayer {count, plural, one {# téléversement échoué} other {# téléversements échoués}}",
       "partialSuccessDesc": "{successCount} sur {totalCount} souvenirs partagés. Appuyez ci-dessous pour réessayer les fichiers échoués.",
+      "allFailedDesc": "Impossible d'envoyer {count, plural, one {# souvenir} other {# souvenirs}}. Vérifiez votre connexion et réessayez ou supprimez les fichiers en échec.",
+      "removeFailedCount": "Supprimer {count, plural, one {# envoi en échec} other {# envois en échec}}",
+      "failedRemovedToast": "{count, plural, one {# fichier en échec supprimé} other {# fichiers en échec supprimés}}",
+      "removeFile": "Supprimer le fichier",
+      "statusFailed": "Échec",
       "duplicateUpload": "{count, plural, one {Cette photo a déjà été ajoutée à cet événement.} other {# photos ont déjà été ajoutées à cet événement.}}",
       "duplicateBadge": "Déjà ajoutée",
       "tabShare": "Partager",
@@ -1093,8 +1098,11 @@
   },
   "pwa": {
     "offline": {
-      "message": "Vous êtes hors ligne. Les photos et modifications seront automatiquement téléversées dès la reconnexion.",
-      "reconnected": "De nouveau en ligne ! Synchronisation..."
+      "title": "Vous êtes hors ligne",
+      "message": "Les photos et modifications seront automatiquement téléversées dès la reconnexion.",
+      "reconnectedTitle": "De nouveau en ligne",
+      "reconnected": "Synchronisation de vos modifications...",
+      "dismiss": "Fermer"
     },
     "install": {
       "title": "Installer CandidCrowd",
@@ -1113,7 +1121,11 @@
       "checking": "Vérification de la connexion...",
       "stillOffline": "Toujours hors ligne. Vérifiez votre Wi-Fi.",
       "restored": "Signal rétabli ! Rechargement...",
-      "backHome": "Retour à l'accueil"
+      "backHome": "Retour à l'accueil",
+      "goBack": "Retour",
+      "pendingUploadsCount": "{count} photos en attente",
+      "pendingUploadsBadge": "Sauvegardé sur cet appareil",
+      "pendingUploadsDesc": "Vos photos sont conservées en toute sécurité sur votre appareil et seront envoyées vers l'album dès le retour de la connexion."
     }
   }
 }

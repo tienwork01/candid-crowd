@@ -210,7 +210,12 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
   const mode = event.event_mode || "social";
   const galleryAllowed = event.gallery_enabled !== false;
-  const { uploadFile, restorePendingUploads } = useGuestUpload(event.slug);
+  const {
+    uploadFile,
+    restorePendingUploads,
+    removePendingItem,
+    clearPendingItems,
+  } = useGuestUpload(event.slug);
 
   // Restore only files that have not reached server verification. They are
   // shown as retryable until the browser is online and the queue runs again.
@@ -320,7 +325,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
       let hasOversized = false;
       let hasUnsupported = false;
 
-      Array.from(fileList).forEach((file, index) => {
+      Array.from(fileList).forEach((file) => {
         const maxFileBytes = file.type.startsWith("video/")
           ? 500 * 1024 * 1024
           : 25 * 1024 * 1024;
@@ -388,8 +393,49 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
         URL.revokeObjectURL(target.previewUrl);
       }
 
-      return prev.filter((item) => item.id !== id);
+      const remaining = prev.filter((item) => item.id !== id);
+
+      if (
+        remaining.length === 0 ||
+        remaining.every(
+          (item) => item.status === "idle" || item.status === "success",
+        )
+      ) {
+        setUploadPhase("idle");
+        setUploadProgress(0);
+      }
+
+      return remaining;
     });
+
+    void removePendingItem(id);
+  };
+
+  const removeFailedFiles = () => {
+    const failed = stagedFiles.filter((item) => item.status === "error");
+
+    failed.forEach((item) => {
+      URL.revokeObjectURL(item.previewUrl);
+      void removePendingItem(item.id);
+    });
+
+    setStagedFiles((prev) => {
+      const remaining = prev.filter((item) => item.status !== "error");
+
+      if (
+        remaining.length === 0 ||
+        remaining.every(
+          (item) => item.status === "idle" || item.status === "success",
+        )
+      ) {
+        setUploadPhase("idle");
+        setUploadProgress(0);
+      }
+
+      return remaining;
+    });
+
+    toast.success(t("guest.failedRemovedToast", { count: failed.length }));
   };
 
   const clearStagedFiles = () => {
@@ -397,6 +443,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     setStagedFiles([]);
     setUploadPhase("idle");
     setUploadProgress(0);
+    void clearPendingItems();
   };
 
   // Perform upload submission with per-item status & progressive feedback
@@ -608,7 +655,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   const handleCameraShare = (files: File[]) => {
     if (files.length === 0) return;
 
-    const newFiles: StagedFile[] = files.map((file, index) => ({
+    const newFiles: StagedFile[] = files.map((file) => ({
       id: newUploadID(),
       file,
       previewUrl: URL.createObjectURL(file),
@@ -934,7 +981,21 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                           />
                         )}
 
-                        {item.status === "error" ? (
+                        <button
+                          type="button"
+                          onClick={() => removeStagedFile(item.id)}
+                          aria-label={t("guest.removeFile")}
+                          className={`guest-upload__remove-btn ${
+                            item.status === "error"
+                              ? "guest-upload__remove-btn--error"
+                              : ""
+                          }`}
+                          title={t("guest.removeFile")}
+                        >
+                          <X size={14} weight="bold" />
+                        </button>
+
+                        {item.status === "error" && (
                           <button
                             type="button"
                             onClick={() => handleRetrySingleItem(item.id)}
@@ -942,21 +1003,23 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                             className="guest-upload__retry-item-btn"
                             title={t("guest.uploadRetry")}
                           >
-                            <ArrowCounterClockwise size={14} weight="bold" />
-                          </button>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => removeStagedFile(item.id)}
-                            aria-label="Remove item"
-                            className="guest-upload__remove-btn"
-                          >
-                            <X size={14} weight="bold" />
+                            <ArrowCounterClockwise size={16} weight="bold" />
                           </button>
                         )}
 
-                        <div className="guest-upload__thumb-badge">
-                          {item.isVideo ? (
+                        <div
+                          className={`guest-upload__thumb-badge ${
+                            item.status === "error"
+                              ? "guest-upload__thumb-badge--error"
+                              : ""
+                          }`}
+                        >
+                          {item.status === "error" ? (
+                            <>
+                              <WarningCircle size={10} weight="fill" />
+                              <span>{t("guest.statusFailed")}</span>
+                            </>
+                          ) : item.isVideo ? (
                             <VideoCamera size={10} weight="fill" />
                           ) : (
                             item.sizeFormatted
@@ -983,31 +1046,53 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                     </button>
                   </div>
 
-                  {/* Partial Failure Notice if any file had error */}
+                  {/* Failure Notice if any file had error */}
                   {failedFiles.length > 0 && (
                     <div className="guest-upload__error-box mb-4">
-                      <div className="flex items-center gap-2 text-crimson font-medium text-xs mb-2">
-                        <WarningCircle size={15} weight="fill" />
+                      <div className="flex items-center gap-2 text-crimson font-medium text-xs mb-2.5">
+                        <WarningCircle
+                          size={16}
+                          weight="fill"
+                          className="shrink-0"
+                        />
                         <span>
-                          {t("guest.partialSuccessDesc", {
-                            successCount:
-                              stagedFiles.length - failedFiles.length,
-                            totalCount: stagedFiles.length,
-                          })}
+                          {stagedFiles.length === failedFiles.length
+                            ? t("guest.allFailedDesc", {
+                                count: failedFiles.length,
+                              })
+                            : t("guest.partialSuccessDesc", {
+                                successCount:
+                                  stagedFiles.length - failedFiles.length,
+                                totalCount: stagedFiles.length,
+                              })}
                         </span>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleUploadSubmit(true)}
-                        className="guest-upload__btn guest-upload__btn--secondary text-xs py-2 w-full"
-                      >
-                        <ArrowCounterClockwise size={14} weight="bold" />
-                        <span>
-                          {t("guest.retryFailedCount", {
-                            count: failedFiles.length,
-                          })}
-                        </span>
-                      </button>
+                      <div className="guest-upload__error-actions">
+                        <button
+                          type="button"
+                          onClick={() => handleUploadSubmit(true)}
+                          className="guest-upload__btn guest-upload__btn--secondary guest-upload__btn--retry text-xs py-2"
+                        >
+                          <ArrowCounterClockwise size={14} weight="bold" />
+                          <span>
+                            {t("guest.retryFailedCount", {
+                              count: failedFiles.length,
+                            })}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={removeFailedFiles}
+                          className="guest-upload__btn guest-upload__btn--danger-outline text-xs py-2"
+                        >
+                          <Trash size={14} weight="bold" />
+                          <span>
+                            {t("guest.removeFailedCount", {
+                              count: failedFiles.length,
+                            })}
+                          </span>
+                        </button>
+                      </div>
                     </div>
                   )}
 
@@ -1176,24 +1261,6 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                 </div>
               </div>
             )}
-
-            {/* Case E: Full Error / Retry State */}
-            {uploadPhase === "error" &&
-              failedFiles.length === stagedFiles.length && (
-                <div className="guest-upload__progress-wrap">
-                  <p className="text-sm text-crimson font-medium mb-4">
-                    {t("guest.uploadRetry")}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => handleUploadSubmit(false)}
-                    className="guest-upload__btn guest-upload__btn--primary"
-                  >
-                    <ArrowCounterClockwise size={16} weight="bold" />
-                    <span>{t("guest.uploadRetry")}</span>
-                  </button>
-                </div>
-              )}
           </div>
         )}
 

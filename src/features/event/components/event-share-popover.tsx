@@ -36,15 +36,14 @@ export function EventSharePopover({
   const [copied, setCopied] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
 
-  // Clean public URL formatting: candidcrowd.life/e/CB0449
-  const publicCode = getEventPublicCode(event);
-  const displayUrl = `candidcrowd.life/e/${publicCode}`;
-  const publicGuestUrl = `https://${displayUrl}`;
-
-  // Local/app preview URL for host testing in preview mode
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const publicPath = event.public_url || `/e/${publicCode}`;
-  const testGuestUrl = `${event.guest_url || `${origin}${publicPath}`}?is_test=true`;
+  const publicPath = event.slug
+    ? `/e/${event.slug}`
+    : event.public_url || `/e/${getEventPublicCode(event)}`;
+  const fullGuestUrl = event.guest_url || `${origin}${publicPath}`;
+  const displayUrl = fullGuestUrl.replace(/^https?:\/\//, "");
+  const publicGuestUrl = fullGuestUrl;
+  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
 
   // Close on Escape key
   useEffect(() => {

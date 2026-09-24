@@ -27,9 +27,7 @@ export function EventGalleryEmptyState({
   // Dynamically generate real scannable event QR code for empty state showcase
   useEffect(() => {
     let active = true;
-    const qrTargetUrl = publicCode
-      ? `https://candidcrowd.life/e/${publicCode}`
-      : guestUrl || "";
+    const qrTargetUrl = guestUrl || (publicCode ? `/e/${publicCode}` : "");
 
     if (!qrTargetUrl) return;
 

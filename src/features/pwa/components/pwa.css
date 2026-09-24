@@ -5,24 +5,25 @@
 /* ── Offline Connectivity Indicator ── */
 .pwa-offline-indicator {
   position: fixed;
-  top: 16px;
+  top: max(16px, env(safe-area-inset-top, 16px));
   left: 50%;
-  transform: translate(-50%, -120%);
+  transform: translate(-50%, -130%);
   z-index: 9999;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  border-radius: var(--primitive-radius-full);
+  align-items: flex-start;
+  gap: 12px;
+  width: min(calc(100vw - 32px), 400px);
+  padding: 12px 14px;
+  border-radius: var(--primitive-radius-xl);
   font-family: var(--font-sans), system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: var(--primitive-shadow-floating);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 16px 36px -6px rgba(18, 24, 16, 0.35),
+    0 2px 8px -2px rgba(18, 24, 16, 0.16);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transition:
-    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.3s ease;
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.25s ease;
   opacity: 0;
   pointer-events: none;
 }
@@ -34,34 +35,93 @@
 }
 
 .pwa-offline-indicator--offline {
-  background-color: rgba(30, 24, 20, 0.92);
+  background-color: rgba(28, 22, 18, 0.94);
   color: #fff9f0;
-  border: 1px solid rgba(220, 100, 70, 0.4);
+  border: 1px solid rgba(220, 100, 70, 0.35);
 }
 
 .pwa-offline-indicator--online {
-  background-color: rgba(36, 48, 30, 0.94);
+  background-color: rgba(24, 36, 22, 0.94);
   color: #f8f7f2;
-  border: 1px solid rgba(130, 170, 110, 0.4);
+  border: 1px solid rgba(110, 180, 90, 0.35);
 }
 
-.pwa-offline-indicator__icon {
+.pwa-offline-indicator__icon-box {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--primitive-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-top: 1px;
 }
 
-.pwa-offline-indicator--offline .pwa-offline-indicator__icon {
-  color: #f88;
+.pwa-offline-indicator--offline .pwa-offline-indicator__icon-box {
+  background-color: rgba(220, 100, 70, 0.18);
+  color: #fca5a5;
+  border: 1px solid rgba(220, 100, 70, 0.25);
 }
 
-.pwa-offline-indicator--online .pwa-offline-indicator__icon {
-  color: #9fe29d;
+.pwa-offline-indicator--online .pwa-offline-indicator__icon-box {
+  background-color: rgba(110, 180, 90, 0.18);
+  color: #86efac;
+  border: 1px solid rgba(110, 180, 90, 0.25);
 }
 
-.pwa-offline-indicator__text {
+.pwa-offline-indicator__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-offline-indicator__title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.3;
+}
+
+.pwa-offline-indicator--offline .pwa-offline-indicator__title {
+  color: #fff9f0;
+}
+
+.pwa-offline-indicator--online .pwa-offline-indicator__title {
+  color: #f8f7f2;
+}
+
+.pwa-offline-indicator__desc {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: rgba(248, 247, 242, 0.72);
+}
+
+.pwa-offline-indicator__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--primitive-radius-full);
+  background: transparent;
+  border: none;
+  color: rgba(248, 247, 242, 0.55);
+  cursor: pointer;
+  padding: 0;
+  margin-top: 2px;
+  margin-left: 2px;
+  flex-shrink: 0;
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.pwa-offline-indicator__close:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 /* ── Install Modal / A2HS Prompt ── */

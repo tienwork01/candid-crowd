@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, Playfair_Display } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { QueryProvider } from "@/components/providers";
 import { PWAProvider } from "@/features/pwa/components";
+import { siteConfig } from "@/lib/config";
 import "./globals.css";
 
 const sans = Plus_Jakarta_Sans({
@@ -19,7 +20,7 @@ const serif = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://candidcrowd.com"),
+  metadataBase: new URL(siteConfig.appUrl),
   title: {
     default: "CandidCrowd",
     template: "%s | CandidCrowd",

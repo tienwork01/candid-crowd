@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useMounted, usePublicEvent } from "../hooks";
 import { GuestEventView } from "./guest-event-view";
+import { getStoredEvent } from "../lib/event-store";
 import { Spinner } from "@/components/ui";
 import { siteConfig } from "@/lib/config";
 
@@ -26,6 +27,12 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
   }
 
   if (isError || !publicEvent) {
+    const local = getStoredEvent(slug);
+
+    if (local) {
+      return <GuestEventView event={local} isTest={true} />;
+    }
+
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
         <h1 className="text-xl font-semibold">
@@ -72,5 +79,9 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
     updated_at: new Date().toISOString(),
   };
 
-  return <GuestEventView event={displayEvent} />;
+  const isTest =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).get("is_test") === "true";
+
+  return <GuestEventView event={displayEvent} isTest={isTest} />;
 }

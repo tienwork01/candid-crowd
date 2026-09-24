@@ -584,6 +584,11 @@
       "uploadRetry": "Retry upload",
       "retryFailedCount": "Retry {count, plural, one {# failed upload} other {# failed uploads}}",
       "partialSuccessDesc": "{successCount} of {totalCount} memories shared. Tap below to retry failed items.",
+      "allFailedDesc": "Unable to upload {count, plural, one {# memory} other {# memories}}. Please check your connection and retry or remove failed files.",
+      "removeFailedCount": "Remove {count, plural, one {# failed upload} other {# failed uploads}}",
+      "failedRemovedToast": "{count, plural, one {Removed # failed file} other {Removed # failed files}}",
+      "removeFile": "Remove file",
+      "statusFailed": "Failed",
       "duplicateUpload": "{count, plural, one {This photo has already been added to this event.} other {# photos have already been added to this event.}}",
       "duplicateBadge": "Already added",
       "tabShare": "Share",
@@ -1093,8 +1098,11 @@
   },
   "pwa": {
     "offline": {
-      "message": "You are currently offline. Photos and changes will upload automatically when reconnected.",
-      "reconnected": "Back online! Syncing..."
+      "title": "You are offline",
+      "message": "Photos and changes will upload automatically when reconnected.",
+      "reconnectedTitle": "Back online",
+      "reconnected": "Syncing your changes now...",
+      "dismiss": "Dismiss"
     },
     "install": {
       "title": "Install CandidCrowd",
@@ -1113,7 +1121,11 @@
       "checking": "Checking connection...",
       "stillOffline": "Still offline. Please check Wi-Fi.",
       "restored": "Signal restored! Reloading...",
-      "backHome": "Back Home"
+      "backHome": "Back Home",
+      "goBack": "Go Back",
+      "pendingUploadsCount": "{count} photos queued",
+      "pendingUploadsBadge": "Saved safely on device",
+      "pendingUploadsDesc": "Your captured moments are safely preserved on this device and will automatically sync to the event album once connection is restored."
     }
   }
 }

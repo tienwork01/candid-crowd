@@ -584,6 +584,11 @@
       "uploadRetry": "Thử lại",
       "retryFailedCount": "Thử lại {count} tệp chưa tải được",
       "partialSuccessDesc": "Đã chia sẻ {successCount} / {totalCount} kỷ niệm. Nhấn bên dưới để thử lại các tệp chưa thành công.",
+      "allFailedDesc": "Không thể tải lên {count} kỷ niệm. Vui lòng kiểm tra kết nối rồi thử lại hoặc xoá tệp lỗi.",
+      "removeFailedCount": "Xoá {count} tệp lỗi",
+      "failedRemovedToast": "Đã xoá {count} tệp bị lỗi",
+      "removeFile": "Xoá tệp",
+      "statusFailed": "Lỗi",
       "duplicateUpload": "{count, plural, one {Ảnh này đã có trong sự kiện này.} other {# ảnh đã có trong sự kiện này.}}",
       "duplicateBadge": "Đã có",
       "tabShare": "Chia sẻ",
@@ -1093,8 +1098,11 @@
   },
   "pwa": {
     "offline": {
-      "message": "Bạn đang ngoại tuyến. Ảnh và thay đổi sẽ tự động tải lên khi có kết nối lại.",
-      "reconnected": "Đã có mạng lại! Đang đồng bộ..."
+      "title": "Bạn đang ngoại tuyến",
+      "message": "Ảnh và thay đổi sẽ tự động tải lên khi có kết nối lại.",
+      "reconnectedTitle": "Đã có mạng trở lại",
+      "reconnected": "Đang tiếp tục đồng bộ dữ liệu...",
+      "dismiss": "Đóng"
     },
     "install": {
       "title": "Cài đặt CandidCrowd",
@@ -1113,7 +1121,11 @@
       "checking": "Đang kiểm tra kết nối...",
       "stillOffline": "Vẫn chưa có mạng. Vui lòng kiểm tra Wi-Fi.",
       "restored": "Đã có mạng lại! Đang tải...",
-      "backHome": "Về trang chủ"
+      "backHome": "Về trang chủ",
+      "goBack": "Quay lại",
+      "pendingUploadsCount": "{count} ảnh đang chờ tải",
+      "pendingUploadsBadge": "Đã lưu an toàn trong máy",
+      "pendingUploadsDesc": "Những khoảnh khắc bạn vừa chụp đã được lưu an toàn trên máy và sẽ tự động tải lên album sự kiện ngay khi có kết nối trở lại."
     }
   }
 }

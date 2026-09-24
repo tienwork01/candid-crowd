@@ -584,6 +584,11 @@
       "uploadRetry": "Erneut versuchen",
       "retryFailedCount": "{count, plural, one {# fehlgeschlagenen Upload} other {# fehlgeschlagene Uploads}} wiederholen",
       "partialSuccessDesc": "{successCount} von {totalCount} Erinnerungen geteilt. Tippen Sie unten, um fehlgeschlagene Dateien zu wiederholen.",
+      "allFailedDesc": "{count, plural, one {# Erinnerung} other {# Erinnerungen}} konnten nicht hochgeladen werden. Bitte Verbindung prüfen und wiederholen oder fehlerhafte Dateien entfernen.",
+      "removeFailedCount": "{count, plural, one {# fehlgeschlagenen Upload} other {# fehlgeschlagene Uploads}} entfernen",
+      "failedRemovedToast": "{count, plural, one {# fehlgeschlagene Datei entfernt} other {# fehlgeschlagene Dateien entfernt}}",
+      "removeFile": "Datei entfernen",
+      "statusFailed": "Fehler",
       "duplicateUpload": "{count, plural, one {Dieses Foto wurde diesem Event bereits hinzugefügt.} other {# Fotos wurden diesem Event bereits hinzugefügt.}}",
       "duplicateBadge": "Bereits hinzugefügt",
       "tabShare": "Teilen",
@@ -1093,8 +1098,11 @@
   },
   "pwa": {
     "offline": {
-      "message": "Sie sind offline. Fotos und Änderungen werden bei Wiederverbindung automatisch hochgeladen.",
-      "reconnected": "Wieder online! Synchronisierung..."
+      "title": "Sie sind offline",
+      "message": "Fotos und Änderungen werden bei Wiederverbindung automatisch hochgeladen.",
+      "reconnectedTitle": "Wieder online",
+      "reconnected": "Änderungen werden synchronisiert...",
+      "dismiss": "Schließen"
     },
     "install": {
       "title": "CandidCrowd installieren",
@@ -1113,7 +1121,11 @@
       "checking": "Verbindung wird geprüft...",
       "stillOffline": "Immer noch offline. Bitte WLAN prüfen.",
       "restored": "Signal wiederhergestellt! Ladevorgang...",
-      "backHome": "Zur Startseite"
+      "backHome": "Zur Startseite",
+      "goBack": "Zurück",
+      "pendingUploadsCount": "{count} Fotos in Warteschlange",
+      "pendingUploadsBadge": "Sicher auf dem Gerät gespeichert",
+      "pendingUploadsDesc": "Ihre Fotos sind sicher auf diesem Gerät gespeichert und werden automatisch hochgeladen, sobald Sie wieder verbunden sind."
     }
   }
 }

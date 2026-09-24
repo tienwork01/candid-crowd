@@ -3,6 +3,7 @@
 import { useCallback, useRef } from "react";
 import { APIError, publicClient } from "@/lib/api-client";
 import {
+  clearPendingUploads,
   getPendingUploads,
   removePendingUpload,
   savePendingUpload,
@@ -232,5 +233,18 @@ export function useGuestUpload(slug: string) {
     [getSessionToken, slug],
   );
 
-  return { uploadFile, restorePendingUploads };
+  const removePendingItem = useCallback(async (id: string) => {
+    await removePendingUpload(id);
+  }, []);
+
+  const clearPendingItems = useCallback(async () => {
+    await clearPendingUploads(slug);
+  }, [slug]);
+
+  return {
+    uploadFile,
+    restorePendingUploads,
+    removePendingItem,
+    clearPendingItems,
+  };
 }

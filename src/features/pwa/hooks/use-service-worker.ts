@@ -20,10 +20,13 @@ export function useServiceWorker(): ServiceWorkerStatus {
     useState<ServiceWorkerRegistration | null>(null);
 
   useEffect(() => {
+    const isDev = process.env.NODE_ENV === "development";
+    const enableInDev = process.env.NEXT_PUBLIC_ENABLE_PWA_DEV === "true";
+
     if (
       typeof window === "undefined" ||
       !("serviceWorker" in navigator) ||
-      process.env.NODE_ENV === "development"
+      (isDev && !enableInDev)
     ) {
       return;
     }

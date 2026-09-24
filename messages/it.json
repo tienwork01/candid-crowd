@@ -584,6 +584,11 @@
       "uploadRetry": "Riprova caricamento",
       "retryFailedCount": "Riprova {count, plural, one {# caricamento fallito} other {# caricamenti falliti}}",
       "partialSuccessDesc": "{successCount} su {totalCount} ricordi condivisi. Tocca qui sotto per riprovare i file non riusciti.",
+      "allFailedDesc": "Impossibile caricare {count, plural, one {# ricordo} other {# ricordi}}. Controlla la connessione e riprova o rimuovi i file non riusciti.",
+      "removeFailedCount": "Rimuovi {count, plural, one {# caricamento fallito} other {# caricamenti falliti}}",
+      "failedRemovedToast": "{count, plural, one {# file non riuscito rimosso} other {# file non riusciti rimossi}}",
+      "removeFile": "Rimuovi file",
+      "statusFailed": "Errore",
       "duplicateUpload": "{count, plural, one {Questa foto è già stata aggiunta a questo evento.} other {# foto sono già state aggiunte a questo evento.}}",
       "duplicateBadge": "Già aggiunta",
       "tabShare": "Condividi",
@@ -1093,8 +1098,11 @@
   },
   "pwa": {
     "offline": {
-      "message": "Sei offline. Le foto e le modifiche verranno caricate automaticamente non appena riconnesso.",
-      "reconnected": "Di nuovo online! Sincronizzazione..."
+      "title": "Sei offline",
+      "message": "Le foto e le modifiche verranno caricate automaticamente non appena riconnesso.",
+      "reconnectedTitle": "Di nuovo online",
+      "reconnected": "Sincronizzazione modifiche in corso...",
+      "dismiss": "Chiudi"
     },
     "install": {
       "title": "Installa CandidCrowd",
@@ -1113,7 +1121,11 @@
       "checking": "Verifica connessione in corso...",
       "stillOffline": "Ancora offline. Controlla il Wi-Fi.",
       "restored": "Segnale ripristinato! Ricaricamento...",
-      "backHome": "Torna alla home"
+      "backHome": "Torna alla home",
+      "goBack": "Torna indietro",
+      "pendingUploadsCount": "{count} foto in coda",
+      "pendingUploadsBadge": "Salvate al sicuro sul dispositivo",
+      "pendingUploadsDesc": "I tuoi scatti sono al sicuro su questo dispositivo e verranno caricati automaticamente nell'album non appena tornerà la connessione."
     }
   }
 }

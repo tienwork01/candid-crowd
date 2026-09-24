@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   WifiSlash,
   WifiHigh,
@@ -9,15 +10,59 @@ import {
   CircleNotch,
   House,
   WarningCircle,
+  ArrowLeft,
+  Images,
 } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
+import { getPendingUploads, type PendingUploadItem } from "@/features/pwa/lib";
 import "./offline.css";
 
 type RetryState = "idle" | "checking" | "failed" | "restored";
 
 export function OfflineView() {
+  const router = useRouter();
   const [retryState, setRetryState] = useState<RetryState>("idle");
+  const [pendingUploads, setPendingUploads] = useState<PendingUploadItem[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const t = useTranslations("pwa.offlinePage");
+
+  // Load and preview offline pending uploads from IndexedDB
+  useEffect(() => {
+    let isMounted = true;
+    let createdUrls: string[] = [];
+
+    getPendingUploads().then((items) => {
+      if (!isMounted) return;
+
+      setPendingUploads(items);
+
+      const urls: string[] = [];
+
+      for (const item of items.slice(0, 4)) {
+        if (item.fileBlob && item.mimeType?.startsWith("image/")) {
+          try {
+            urls.push(URL.createObjectURL(item.fileBlob));
+          } catch {
+            // Ignore object URL creation errors
+          }
+        }
+      }
+
+      createdUrls = urls;
+      setPreviewUrls(urls);
+    });
+
+    return () => {
+      isMounted = false;
+      createdUrls.forEach((url) => {
+        try {
+          URL.revokeObjectURL(url);
+        } catch {
+          // Ignore revocation errors
+        }
+      });
+    };
+  }, []);
 
   const checkConnectivity = useCallback(async (): Promise<boolean> => {
     if (typeof navigator !== "undefined" && !navigator.onLine) {
@@ -59,6 +104,14 @@ export function OfflineView() {
     }
   };
 
+  const handleGoBack = () => {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      window.history.back();
+    } else {
+      router.push("/");
+    }
+  };
+
   // Smart Auto-Recovery: detect when network restores in background
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -80,33 +133,36 @@ export function OfflineView() {
   const isChecking = retryState === "checking";
   const isFailed = retryState === "failed";
   const isRestored = retryState === "restored";
+  const pendingCount = pendingUploads.length;
 
   return (
     <main className="offline-page" role="main">
       <div className="offline-page__inner">
-        {/* Visual Artifact: Editorial Offline Polaroid Frame */}
+        {/* Visual Artifact: Editorial Polaroid with Washi Tape */}
         <div className="offline-page__visual" aria-hidden="true">
+          <div className="offline-page__washi-tape" />
           <div
             className={`offline-page__polaroid ${
               isRestored ? "offline-page__polaroid--restored" : ""
             }`}
           >
             <div className="offline-page__polaroid-frame">
+              <div className="offline-page__polaroid-overlay" />
               {isRestored ? (
                 <WifiHigh
-                  size={36}
+                  size={38}
                   weight="duotone"
                   className="offline-page__polaroid-icon offline-page__polaroid-icon--online"
                 />
               ) : (
                 <WifiSlash
-                  size={36}
+                  size={38}
                   weight="duotone"
                   className="offline-page__polaroid-icon"
                 />
               )}
               <span className="offline-page__polaroid-code">
-                {isRestored ? "CONNECTED" : "OFFLINE"}
+                {isRestored ? "CONNECTED // READY" : "OFFLINE // PAUSED"}
               </span>
             </div>
             <span className="offline-page__polaroid-caption">
@@ -152,6 +208,56 @@ export function OfflineView() {
           <h1 className="offline-page__title">{t("title")}</h1>
           <p className="offline-page__lead">{t("description")}</p>
 
+          {/* Pending Uploads Card (Reassurance Feature) */}
+          {pendingCount > 0 && (
+            <div
+              className="offline-page__queue-card"
+              role="region"
+              aria-label={t("pendingUploadsBadge")}
+            >
+              <div className="offline-page__queue-header">
+                <div className="offline-page__queue-icon" aria-hidden="true">
+                  <Images size={20} weight="duotone" />
+                </div>
+                <div className="offline-page__queue-meta">
+                  <span className="offline-page__queue-title">
+                    {t("pendingUploadsCount", { count: pendingCount })}
+                  </span>
+                  <span className="offline-page__queue-badge">
+                    {t("pendingUploadsBadge")}
+                  </span>
+                </div>
+              </div>
+              <p className="offline-page__queue-desc">
+                {t("pendingUploadsDesc")}
+              </p>
+              {previewUrls.length > 0 && (
+                <div
+                  className="offline-page__queue-previews"
+                  aria-hidden="true"
+                >
+                  {previewUrls.map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={i}
+                      src={url}
+                      alt=""
+                      className="offline-page__queue-thumb"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ))}
+                  {pendingCount > previewUrls.length && (
+                    <span className="offline-page__queue-more">
+                      +{pendingCount - previewUrls.length}
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Primary & Secondary Actions */}
           <div className="offline-page__actions">
             <button
@@ -190,14 +296,20 @@ export function OfflineView() {
               )}
             </button>
 
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={handleGoBack}
               className="offline-page__btn offline-page__btn--secondary"
             >
-              <House size={18} aria-hidden="true" />
-              <span>{t("backHome")}</span>
-            </Link>
+              <ArrowLeft size={18} weight="bold" aria-hidden="true" />
+              <span>{t("goBack")}</span>
+            </button>
           </div>
+
+          <Link href="/" className="offline-page__link-home">
+            <House size={15} aria-hidden="true" />
+            <span>{t("backHome")}</span>
+          </Link>
         </div>
       </div>
 

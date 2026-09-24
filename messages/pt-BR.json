@@ -584,6 +584,11 @@
       "uploadRetry": "Tentar novamente",
       "retryFailedCount": "Repetir {count, plural, one {# envio com falha} other {# envios com falha}}",
       "partialSuccessDesc": "{successCount} de {totalCount} memórias compartilhadas. Toque abaixo para tentar novamente os arquivos com falha.",
+      "allFailedDesc": "Não foi possível enviar {count, plural, one {# memória} other {# memórias}}. Verifique sua conexão e tente novamente ou remova os arquivos com falha.",
+      "removeFailedCount": "Remover {count, plural, one {# envio com falha} other {# envios com falha}}",
+      "failedRemovedToast": "{count, plural, one {# arquivo com falha removido} other {# arquivos com falha removidos}}",
+      "removeFile": "Remover arquivo",
+      "statusFailed": "Falha",
       "duplicateUpload": "{count, plural, one {Esta foto já foi adicionada a este evento.} other {# fotos já foram adicionadas a este evento.}}",
       "duplicateBadge": "Já adicionada",
       "tabShare": "Compartilhar",
@@ -1093,8 +1098,11 @@
   },
   "pwa": {
     "offline": {
-      "message": "Você está offline. Fotos e alterações serão enviadas automaticamente assim que reconectar.",
-      "reconnected": "De volta online! Sincronizando..."
+      "title": "Você está offline",
+      "message": "Fotos e alterações serão enviadas automaticamente assim que reconectar.",
+      "reconnectedTitle": "De volta online",
+      "reconnected": "Sincronizando suas alterações...",
+      "dismiss": "Fechar"
     },
     "install": {
       "title": "Instalar CandidCrowd",
@@ -1113,7 +1121,11 @@
       "checking": "Verificando conexão...",
       "stillOffline": "Ainda sem conexão. Verifique o Wi-Fi.",
       "restored": "Sinal restaurado! Recarregando...",
-      "backHome": "Voltar ao início"
+      "backHome": "Voltar ao início",
+      "goBack": "Volver",
+      "pendingUploadsCount": "{count} fotos na fila",
+      "pendingUploadsBadge": "Salvo com segurança no aparelho",
+      "pendingUploadsDesc": "Suas fotos estão guardadas em segurança neste dispositivo e serão enviadas automaticamente ao álbum assim que a conexão retornar."
     }
   }
 }

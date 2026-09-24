@@ -5,6 +5,7 @@ import type {
   EventSetupChecklist,
   QRSourceMetric,
 } from "../types/event";
+import { getEventPublicCode } from "../types/event";
 import { siteConfig } from "@/lib/config";
 
 const STORAGE_KEY = "candidcrowd.events.v1";
@@ -359,8 +360,12 @@ export function getStoredEvent(idOrSlug: string): CandidEvent | null {
     return events[idOrSlug];
   }
 
+  const normalized = idOrSlug.toUpperCase();
   const found = Object.values(events).find(
-    (item) => item.id === idOrSlug || item.slug === idOrSlug,
+    (item) =>
+      item.id === idOrSlug ||
+      item.slug === idOrSlug ||
+      getEventPublicCode(item).toUpperCase() === normalized,
   );
 
   return found ?? null;
