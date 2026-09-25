@@ -1,9 +1,9 @@
 "use client";
 
+import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useMounted, usePublicEvent } from "../hooks";
 import { GuestEventView } from "./guest-event-view";
-import { getStoredEvent } from "../lib/event-store";
 import { Spinner } from "@/components/ui";
 import { siteConfig } from "@/lib/config";
 
@@ -15,7 +15,16 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
   const t = useTranslations("event");
   const mounted = useMounted();
 
-  const { data: publicEvent, isLoading, isError } = usePublicEvent(slug);
+  const { data: publicEvent, isLoading, isError, error } = usePublicEvent(slug);
+
+  useEffect(() => {
+    if (!isError) return;
+
+    // The guest page is the one surface that must show exactly what a guest on
+    // another device sees. Reading a locally stored copy here used to hide a
+    // broken API from the host while every scanned QR code failed.
+    console.error(`[guest] could not load event "${slug}"`, error);
+  }, [isError, error, slug]);
 
   if (!mounted || isLoading) {
     return (
@@ -27,12 +36,6 @@ export function GuestPageClient({ slug }: GuestPageClientProps) {
   }
 
   if (isError || !publicEvent) {
-    const local = getStoredEvent(slug);
-
-    if (local) {
-      return <GuestEventView event={local} isTest={true} />;
-    }
-
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-6 text-center">
         <h1 className="text-xl font-semibold">

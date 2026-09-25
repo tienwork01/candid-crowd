@@ -6,6 +6,7 @@ import { Sparkle, ArrowRight } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { eventTypes, type EventType } from "../types/event";
 import { useCreateEvent } from "../hooks";
+import { getErrorMessage } from "@/lib/errors";
 import {
   Alert,
   AlertDescription,
@@ -23,6 +24,7 @@ import {
 
 export function CreateEventForm() {
   const t = useTranslations("event");
+  const tErrors = useTranslations("common.errors");
   const router = useRouter();
   const [, startTransition] = useTransition();
 
@@ -60,8 +62,8 @@ export function CreateEventForm() {
       startTransition(() => {
         router.push(`/events/${encodeURIComponent(created.id)}/ready`);
       });
-    } catch {
-      setError(t("create.nameRequired"));
+    } catch (err) {
+      setError(getErrorMessage(err, undefined, tErrors));
     }
   };
 

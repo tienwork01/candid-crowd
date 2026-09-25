@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { privateClient } from "@/lib/api-client";
+import { APIError, privateClient } from "@/lib/api-client";
 import { QUERY_KEYS } from "@/lib/cache-config";
 import type { CandidEvent, EventType } from "../types/event";
 import { createLocalEvent, saveStoredEvent } from "../lib/event-store";
@@ -15,8 +15,18 @@ export type CreateEventInput = {
 export type CreateEventResponse = CandidEvent;
 
 /**
- * Mutation hook to create an event. Tries remote backend API first,
- * with seamless local persistence fallback for resilience.
+ * A local-only event is a last resort: it exists in this browser alone, so the
+ * QR code 404s for every guest who scans it. Only a backend we could not reach
+ * at all justifies one. `normalizeAxiosError` maps that case — and only that
+ * case — to status 0; anything the API actually answered is a real failure.
+ */
+function isBackendUnreachable(error: unknown): boolean {
+  return error instanceof APIError && error.status === 0;
+}
+
+/**
+ * Mutation hook to create an event on the backend, with a local persistence
+ * fallback for the offline/no-backend case only.
  */
 export function useCreateEvent() {
   const queryClient = useQueryClient();
@@ -34,24 +44,40 @@ export function useCreateEvent() {
           },
         );
 
-        if (response.data && response.data.id) {
+        if (response.data?.id) {
           saveStoredEvent(response.data);
 
           return response.data;
         }
-      } catch {
-        // Fallback to local store when backend is unavailable or not yet configured
+      } catch (error) {
+        if (!isBackendUnreachable(error)) {
+          // Surface it. Swallowing this is how a misconfigured backend (an
+          // expired token, an unreachable JWKS URL) turns into an event that
+          // only ever works on the host's own machine.
+          console.error("[create-event] backend rejected the request", error);
+
+          throw error;
+        }
+
+        console.warn(
+          "[create-event] backend unreachable, creating a local-only event",
+          error,
+        );
+
+        return createLocalEvent({
+          name: input.name,
+          event_type: input.event_type,
+          event_date: input.event_date,
+          date_unknown: Boolean(input.date_unknown),
+          expected_guest_count: input.expected_guest_count,
+        });
       }
 
-      const localEvent = createLocalEvent({
-        name: input.name,
-        event_type: input.event_type,
-        event_date: input.event_date,
-        date_unknown: Boolean(input.date_unknown),
-        expected_guest_count: input.expected_guest_count,
-      });
-
-      return localEvent;
+      throw new APIError(
+        502,
+        "request_failed",
+        "Event was created but the API returned no event id.",
+      );
     },
     onSuccess: (data) => {
       if (data?.id) {
