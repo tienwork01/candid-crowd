@@ -11,7 +11,13 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui";
+import {
+  Button,
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui";
 import type { CandidEvent } from "../../types/event";
 import {
   DEFAULT_GUEST_THEME_CONFIG,
@@ -154,31 +160,30 @@ export function GuestThemeCustomizeModal({
 
           <div className="flex items-center gap-2">
             {/* Mobile View Toggle (Controls vs Phone Preview) */}
-            <div className="lg:hidden flex items-center bg-soft p-1 rounded-xl border border-line text-xs">
-              <button
-                type="button"
-                onClick={() => setMobileView("controls")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
-                  mobileView === "controls"
-                    ? "bg-surface shadow-xs text-ink font-semibold"
-                    : "text-muted-foreground"
-                }`}
-              >
-                {t("guestTheme.settingsTab")}
-              </button>
-              <button
-                type="button"
-                onClick={() => setMobileView("preview")}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 ${
-                  mobileView === "preview"
-                    ? "bg-surface shadow-xs text-ink font-semibold"
-                    : "text-muted-foreground"
-                }`}
-              >
-                <Eye size={12} />
-                <span>{t("guestTheme.previewTab")}</span>
-              </button>
-            </div>
+            <Tabs
+              value={mobileView}
+              onValueChange={(val) =>
+                setMobileView(val as "controls" | "preview")
+              }
+              className="lg:hidden"
+            >
+              <TabsList className="relative flex items-center bg-soft p-1 rounded-xl border border-line text-xs">
+                <TabsTrigger
+                  value="controls"
+                  className="relative z-1 px-2.5 py-1 rounded-lg font-medium text-muted-foreground data-[active]:text-ink data-[active]:font-semibold"
+                >
+                  {t("guestTheme.settingsTab")}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="preview"
+                  className="relative z-1 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1 text-muted-foreground data-[active]:text-ink data-[active]:font-semibold"
+                >
+                  <Eye size={12} />
+                  <span>{t("guestTheme.previewTab")}</span>
+                </TabsTrigger>
+                <TabsIndicator className="absolute top-1 bottom-1 rounded-lg bg-surface shadow-xs border border-line/40 pointer-events-none transition-[translate,width] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none" />
+              </TabsList>
+            </Tabs>
 
             <button
               type="button"
@@ -200,54 +205,84 @@ export function GuestThemeCustomizeModal({
             }`}
           >
             {/* Tab Navigation Strip */}
-            <div className="flex items-center gap-1 px-5 pt-3 border-b border-line shrink-0 overflow-x-auto">
-              {(
-                [
-                  { id: "presets", label: t("guestTheme.tabPresets") },
-                  { id: "branding", label: t("guestTheme.tabBranding") },
-                  { id: "content", label: t("guestTheme.tabContent") },
-                  { id: "experience", label: t("guestTheme.tabExperience") },
-                ] as const
-              ).map((tab) => {
-                const isActive = activeTab === tab.id;
-
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-3.5 py-2 text-xs font-semibold border-b-2 transition-all shrink-0 ${
-                      isActive
-                        ? "border-primary text-primary"
-                        : "border-transparent text-muted-foreground hover:text-ink"
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
+            <Tabs
+              value={activeTab}
+              onValueChange={(val) => setActiveTab(val as TabType)}
+              className="w-full shrink-0"
+            >
+              <TabsList
+                variant="underline"
+                className="relative flex items-center gap-1 px-5 pt-2 border-b border-line shrink-0 overflow-x-auto"
+              >
+                <TabsTrigger
+                  value="presets"
+                  variant="underline"
+                  className="px-3.5 py-2 text-xs font-semibold"
+                >
+                  {t("guestTheme.tabPresets")}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="branding"
+                  variant="underline"
+                  className="px-3.5 py-2 text-xs font-semibold"
+                >
+                  {t("guestTheme.tabBranding")}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="content"
+                  variant="underline"
+                  className="px-3.5 py-2 text-xs font-semibold"
+                >
+                  {t("guestTheme.tabContent")}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="experience"
+                  variant="underline"
+                  className="px-3.5 py-2 text-xs font-semibold"
+                >
+                  {t("guestTheme.tabExperience")}
+                </TabsTrigger>
+                <TabsIndicator
+                  variant="underline"
+                  className="absolute bottom-0 h-0.5 bg-primary pointer-events-none transition-[translate,width] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+                />
+              </TabsList>
+            </Tabs>
 
             {/* Scrollable Tab Panel Content */}
             <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
               {activeTab === "presets" && (
-                <GuestThemePresetsTab config={config} onChange={handleUpdate} />
+                <div className="guest-theme-modal__panel">
+                  <GuestThemePresetsTab
+                    config={config}
+                    onChange={handleUpdate}
+                  />
+                </div>
               )}
               {activeTab === "branding" && (
-                <GuestThemeBrandingTab
-                  event={event}
-                  config={config}
-                  onChange={handleUpdate}
-                />
+                <div className="guest-theme-modal__panel">
+                  <GuestThemeBrandingTab
+                    event={event}
+                    config={config}
+                    onChange={handleUpdate}
+                  />
+                </div>
               )}
               {activeTab === "content" && (
-                <GuestThemeContentTab config={config} onChange={handleUpdate} />
+                <div className="guest-theme-modal__panel">
+                  <GuestThemeContentTab
+                    config={config}
+                    onChange={handleUpdate}
+                  />
+                </div>
               )}
               {activeTab === "experience" && (
-                <GuestThemeExperienceTab
-                  config={config}
-                  onChange={handleUpdate}
-                />
+                <div className="guest-theme-modal__panel">
+                  <GuestThemeExperienceTab
+                    config={config}
+                    onChange={handleUpdate}
+                  />
+                </div>
               )}
             </div>
           </div>

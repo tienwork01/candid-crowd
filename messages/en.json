@@ -634,6 +634,7 @@
       "tabSettings": "Event Settings",
       "liveWallBtn": "Launch Live Wall",
       "editEventBtn": "Edit Event",
+      "printSignsBtn": "Print QR Signs",
       "shareBtn": "Share",
       "moreBtn": "More"
     },
@@ -660,12 +661,9 @@
       "downloadAll": "Download all ({count})",
       "emptyTitle": "Where your event’s candid memories will live",
       "emptyDesc": "Photos and videos shared by guests will appear here in real time — in original quality, with no app needed.",
-      "scanToTryPrompt": "Scan with your phone to upload the first photo",
       "downloadPrintCard": "Print table signs",
       "filterEmptyTitle": "No memories match this filter",
       "filterEmptyReset": "Show all memories",
-      "sampleMoment1": "Unfiltered laughter at cocktail hour",
-      "sampleMoment2": "Pure joy on the dance floor",
       "itemHide": "Hide from gallery",
       "itemShow": "Show in gallery",
       "itemDelete": "Delete memory",
@@ -731,11 +729,16 @@
       "scanPrompt": "Scan the QR code to add your photo to the screen"
     },
     "settings": {
+      "heading": "Event Settings",
+      "description": "Manage event details, expected guests, and gallery privacy.",
       "title": "Event Settings",
       "sub": "Manage event details, expected guests, and gallery privacy.",
       "galleryVisibilityLabel": "Guest Gallery Access",
       "galleryVisibilityDesc": "Allow guests to browse other guests' shared photos, or keep uploads private to the host.",
-      "saveSuccess": "Event settings saved successfully"
+      "saveSuccess": "Event settings saved successfully",
+      "guestPageCardTitle": "Guest Page Look & Branding",
+      "guestPageCardDesc": "Customize design preset, colors, cover photo, and welcome note.",
+      "customizeGuestPageBtn": "Customize Guest Page"
     },
     "share": {
       "title": "Share event",

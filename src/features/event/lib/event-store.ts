@@ -181,7 +181,7 @@ export function createDefaultSampleMedia(): EventMediaItem[] {
       created_at: new Date(Date.now() - 1000 * 60 * 50).toISOString(),
       qr_source: "bar",
       status: "ready",
-      is_video: false,
+      is_video: true,
       likes_count: 32,
     },
     {

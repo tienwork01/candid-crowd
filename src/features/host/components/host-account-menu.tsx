@@ -1,7 +1,8 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   CaretDown,
   Check,
@@ -68,7 +69,16 @@ export type HostAccountMenuProps = {
   plan?: UserPlan;
 };
 
+const emptySubscribe = () => () => {};
+
 export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
+  const pathname = usePathname();
+
   const {
     currentLocale,
     switchLocale,
@@ -79,6 +89,18 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
   const { user, isPending, clear: clearHostCache } = useHostProfile();
   const { canInstall, openInstallPrompt } = usePWA();
   const router = useRouter();
+
+  const currentActive =
+    active ||
+    (pathname.startsWith("/profile")
+      ? "profile"
+      : pathname.startsWith("/events/new") || pathname.startsWith("/create")
+        ? "new"
+        : pathname.startsWith("/billing")
+          ? "billing"
+          : pathname.startsWith("/events")
+            ? "events"
+            : undefined);
 
   const userPlan = (
     plan ||
@@ -94,7 +116,7 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
 
   const planLabel = planLabels[userPlan] || t("planFree");
 
-  if (isPending) {
+  if (!mounted || (isPending && !user)) {
     return (
       <div
         className="inline-flex min-h-[44px] items-center gap-2.5 rounded-xl px-2.5 py-1.5 select-none animate-pulse"
@@ -196,7 +218,7 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
             nativeButton={false}
             className={cn(
               "min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg",
-              active === "events" &&
+              currentActive === "events" &&
                 "bg-accent text-accent-foreground font-semibold",
             )}
           >
@@ -208,7 +230,7 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
             nativeButton={false}
             className={cn(
               "min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg",
-              active === "profile" &&
+              currentActive === "profile" &&
                 "bg-accent text-accent-foreground font-semibold",
             )}
           >
@@ -220,7 +242,7 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
             nativeButton={false}
             className={cn(
               "min-h-[38px] px-2.5 py-2 gap-3 text-[13px] font-medium cursor-pointer rounded-lg",
-              active === "billing" &&
+              currentActive === "billing" &&
                 "bg-accent text-accent-foreground font-semibold",
             )}
           >

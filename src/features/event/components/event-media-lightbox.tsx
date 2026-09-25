@@ -10,6 +10,7 @@ import {
   EyeSlash,
   Heart,
   QrCode,
+  Trash,
   User,
   VideoCamera,
   X,
@@ -29,6 +30,7 @@ type EventMediaLightboxProps = {
   hasNext?: boolean;
   onToggleStatus?: (id: string) => void;
   onToggleFavorite?: (id: string) => void;
+  onDeleteMedia?: (id: string) => void;
   currentIndex?: number;
   totalItems?: number;
   items?: EventMediaItem[];
@@ -45,6 +47,7 @@ export function EventMediaLightbox({
   hasNext = false,
   onToggleStatus,
   onToggleFavorite,
+  onDeleteMedia,
   currentIndex,
   totalItems,
   items,
@@ -253,6 +256,23 @@ export function EventMediaLightbox({
               <DownloadSimple size={18} aria-hidden="true" />
             </button>
 
+            {onDeleteMedia && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(t("gallery.deleteConfirm"))) {
+                    onDeleteMedia(item.id);
+                    onClose();
+                  }
+                }}
+                className="event-lightbox__hud-btn event-lightbox__hud-btn--delete"
+                title={t("gallery.itemDelete")}
+                aria-label={t("gallery.itemDelete")}
+              >
+                <Trash size={18} aria-hidden="true" />
+              </button>
+            )}
+
             <button
               ref={closeButtonRef}
               type="button"
@@ -334,7 +354,9 @@ export function EventMediaLightbox({
                 <span className="event-lightbox__tag">
                   <QrCode size={12} aria-hidden="true" />
                   <span>
-                    {t("gallery.scannedAt", { source: item.qr_source })}
+                    {t("gallery.scannedAt", {
+                      source: item.qr_source,
+                    })}
                   </span>
                 </span>
               )}

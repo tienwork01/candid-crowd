@@ -59,5 +59,7 @@ export const QUERY_KEYS = {
     list: (params?: unknown) => ["events", params] as const,
     detail: (idOrSlug: string) => ["event", idOrSlug] as const,
     public: (slug: string) => ["public-event", slug] as const,
+    media: (id: string, params?: unknown) =>
+      ["event", id, "media", params] as const,
   },
 } as const;

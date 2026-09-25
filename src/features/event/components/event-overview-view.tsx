@@ -32,10 +32,23 @@ import { EventHubHeader } from "./event-hub-header";
 import { EventLiveWallModal } from "./event-live-wall-modal";
 import { EventSharePopover } from "./event-share-popover";
 import { EventPrintModal } from "./print";
-import { useUpdateEvent } from "../hooks";
+import { QRCustomizeModal } from "./qr-customize";
+import {
+  useBatchDeleteMedia,
+  useBatchUpdateMediaStatus,
+  useDeleteMedia,
+  useUpdateEvent,
+  useUpdateMediaStatus,
+} from "../hooks";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
-import { Button } from "@/components/ui";
+import {
+  Button,
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui";
 
 type EventOverviewViewProps = {
   event: CandidEvent;
@@ -54,10 +67,19 @@ export function EventOverviewView({
   const [activeTab, setActiveTab] = useState<ActiveTab>("memories");
   const { mutateAsync: updateEvent } = useUpdateEvent();
 
+  const updateMediaStatusMutation = useUpdateMediaStatus(currentEvent.id);
+  const batchUpdateMediaStatusMutation = useBatchUpdateMediaStatus(
+    currentEvent.id,
+  );
+  const deleteMediaMutation = useDeleteMedia(currentEvent.id);
+  const batchDeleteMediaMutation = useBatchDeleteMedia(currentEvent.id);
+
   // Modals state
   const [isLiveWallOpen, setIsLiveWallOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
+  const [isCustomizeQrOpen, setIsCustomizeQrOpen] = useState(false);
+  const [qrConfigVersion, setQrConfigVersion] = useState(0);
   const [isCustomizeGuestPageOpen, setIsCustomizeGuestPageOpen] =
     useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -74,7 +96,6 @@ export function EventOverviewView({
     ? `/e/${currentEvent.slug}`
     : currentEvent.public_url || `/e/${publicCode}`;
   const fullGuestUrl = currentEvent.guest_url || `${origin}${publicPath}`;
-  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
 
   // Pre-generate QR code for instant modal & print responsiveness
   useEffect(() => {
@@ -118,35 +139,49 @@ export function EventOverviewView({
   };
 
   const handleToggleMediaStatus = (mediaId: string) => {
+    const target = currentEvent.media_items?.find((m) => m.id === mediaId);
+    const nextStatus = target?.status === "hidden" ? "ready" : "hidden";
     const updated = toggleStoredMediaStatus(currentEvent.id, mediaId);
 
     if (updated) {
       setCurrentEvent(updated);
 
-      const target = updated.media_items?.find((m) => m.id === mediaId);
-
-      if (target?.status === "hidden") {
+      if (nextStatus === "hidden") {
         toast.info(t("gallery.mediaHidden"));
       } else {
         toast.success(t("gallery.mediaVisible"));
       }
     }
+
+    void updateMediaStatusMutation
+      .mutateAsync({
+        mediaId,
+        status: nextStatus,
+      })
+      .catch(() => {});
   };
 
   const handleToggleMediaFavorite = (mediaId: string) => {
+    const target = currentEvent.media_items?.find((m) => m.id === mediaId);
+    const nextStatus = target?.status === "featured" ? "ready" : "featured";
     const updated = toggleStoredMediaFeatured(currentEvent.id, mediaId);
 
     if (updated) {
       setCurrentEvent(updated);
 
-      const target = updated.media_items?.find((m) => m.id === mediaId);
-
-      if (target?.status === "featured") {
+      if (nextStatus === "featured") {
         toast.success(t("gallery.mediaFavorited"));
       } else {
         toast.info(t("gallery.mediaUnfavorited"));
       }
     }
+
+    void updateMediaStatusMutation
+      .mutateAsync({
+        mediaId,
+        status: nextStatus,
+      })
+      .catch(() => {});
   };
 
   const handleBatchStatusChange = (
@@ -162,6 +197,13 @@ export function EventOverviewView({
     if (updated) {
       setCurrentEvent(updated);
     }
+
+    void batchUpdateMediaStatusMutation
+      .mutateAsync({
+        mediaIds,
+        status,
+      })
+      .catch(() => {});
   };
 
   const handleBatchDelete = (mediaIds: string[]) => {
@@ -170,6 +212,8 @@ export function EventOverviewView({
     if (updated) {
       setCurrentEvent(updated);
     }
+
+    void batchDeleteMediaMutation.mutateAsync(mediaIds).catch(() => {});
   };
 
   const handleDeleteMedia = (mediaId: string) => {
@@ -179,18 +223,14 @@ export function EventOverviewView({
       setCurrentEvent(updated);
       toast.success(t("gallery.mediaDeleted"));
     }
+
+    void deleteMediaMutation.mutateAsync(mediaId).catch(() => {});
   };
 
   const handleSaveSettings = (partial: Partial<CandidEvent>) => {
     const updated = updateStoredEvent(currentEvent.id, partial);
 
     if (updated) setCurrentEvent(updated);
-  };
-
-  const handleDownloadAll = () => {
-    if (mediaItems.length === 0) return;
-
-    toast.success(t("gallery.downloadAll", { count: mediaItems.length }));
   };
 
   const handleCopyReminder = async () => {
@@ -220,76 +260,50 @@ export function EventOverviewView({
         onOpenShare={() => setIsShareOpen(true)}
         onOpenEdit={() => setIsEditDialogOpen(true)}
         onLaunchLiveWall={() => setIsLiveWallOpen(true)}
-        onDownloadAll={mediaItems.length > 0 ? handleDownloadAll : undefined}
+        onOpenCustomizeQr={() => setIsCustomizeQrOpen(true)}
+        onOpenPrint={() => setIsPrintModalOpen(true)}
+        onOpenCustomizeTheme={() => setIsCustomizeGuestPageOpen(true)}
       />
 
       {/* Tab Navigation — Memories | Participation | Engage | Settings */}
-      <div
-        className="event-hub__tabs"
-        role="tablist"
-        aria-label={t("hub.tabMemories")}
+      <Tabs
+        value={activeTab}
+        onValueChange={(val) => setActiveTab(val as ActiveTab)}
+        className="w-full"
       >
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "memories"}
-          onClick={() => setActiveTab("memories")}
-          className={`event-hub__tab ${
-            activeTab === "memories" ? "event-hub__tab--active" : ""
-          }`}
-        >
-          <Images size={16} aria-hidden="true" />
-          <span>{t("hub.tabMemories")}</span>
-          {mediaItems.length > 0 && (
-            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[11px] bg-primary/10 text-primary font-semibold">
-              {mediaItems.length}
-            </span>
-          )}
-        </button>
+        <TabsList className="event-hub__tabs" aria-label={t("hub.tabMemories")}>
+          <TabsTrigger value="memories" className="event-hub__tab">
+            <Images size={16} aria-hidden="true" />
+            <span>{t("hub.tabMemories")}</span>
+            {mediaItems.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.2 rounded-full text-[11px] bg-primary/10 text-primary font-semibold">
+                {mediaItems.length}
+              </span>
+            )}
+          </TabsTrigger>
 
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "participation"}
-          onClick={() => setActiveTab("participation")}
-          className={`event-hub__tab ${
-            activeTab === "participation" ? "event-hub__tab--active" : ""
-          }`}
-        >
-          <ChartBar size={16} aria-hidden="true" />
-          <span>{t("hub.tabParticipation")}</span>
-        </button>
+          <TabsTrigger value="participation" className="event-hub__tab">
+            <ChartBar size={16} aria-hidden="true" />
+            <span>{t("hub.tabParticipation")}</span>
+          </TabsTrigger>
 
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "engage"}
-          onClick={() => setActiveTab("engage")}
-          className={`event-hub__tab ${
-            activeTab === "engage" ? "event-hub__tab--active" : ""
-          }`}
-        >
-          <Megaphone size={16} aria-hidden="true" />
-          <span>{t("hub.tabEngage")}</span>
-        </button>
+          <TabsTrigger value="engage" className="event-hub__tab">
+            <Megaphone size={16} aria-hidden="true" />
+            <span>{t("hub.tabEngage")}</span>
+          </TabsTrigger>
 
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeTab === "settings"}
-          onClick={() => setActiveTab("settings")}
-          className={`event-hub__tab ${
-            activeTab === "settings" ? "event-hub__tab--active" : ""
-          }`}
-        >
-          <Gear size={16} aria-hidden="true" />
-          <span>{t("hub.tabSettings")}</span>
-        </button>
-      </div>
+          <TabsTrigger value="settings" className="event-hub__tab">
+            <Gear size={16} aria-hidden="true" />
+            <span>{t("hub.tabSettings")}</span>
+          </TabsTrigger>
+
+          <TabsIndicator className="event-hub__indicator" />
+        </TabsList>
+      </Tabs>
 
       {/* ═══ TAB: MEMORIES ═══ */}
       {activeTab === "memories" && (
-        <>
+        <div className="event-hub__panel">
           {/* Compact participation summary (only when media exists) */}
           {memoriesCount > 0 && (
             <button
@@ -340,6 +354,7 @@ export function EventOverviewView({
 
           {/* Gallery View */}
           <EventGalleryView
+            eventId={currentEvent.id}
             items={mediaItems}
             eventName={currentEvent.name}
             publicCode={publicCode}
@@ -348,125 +363,135 @@ export function EventOverviewView({
             onBatchStatusChange={handleBatchStatusChange}
             onBatchDelete={handleBatchDelete}
             onDeleteMedia={handleDeleteMedia}
-            guestUrl={testGuestUrl}
+            guestUrl={fullGuestUrl}
             onOpenShare={() => setIsShareOpen(true)}
             onOpenPrint={() => setIsPrintModalOpen(true)}
           />
-        </>
+        </div>
       )}
 
       {/* ═══ TAB: PARTICIPATION ═══ */}
       {activeTab === "participation" && (
-        <EventAnalyticsView event={currentEvent} />
+        <div className="event-hub__panel">
+          <EventAnalyticsView event={currentEvent} />
+        </div>
       )}
 
       {/* ═══ TAB: ENGAGE ═══ */}
       {activeTab === "engage" && (
-        <EventEngageView
-          activeMode={activeMode}
-          onModeChange={handleModeChange}
-          onLaunchLiveWall={() => setIsLiveWallOpen(true)}
-        />
+        <div className="event-hub__panel">
+          <EventEngageView
+            activeMode={activeMode}
+            onModeChange={handleModeChange}
+            onLaunchLiveWall={() => setIsLiveWallOpen(true)}
+          />
+        </div>
       )}
 
       {/* ═══ TAB: SETTINGS ═══ */}
       {activeTab === "settings" && (
-        <div className="event-hub__settings">
-          <div className="flex items-center justify-between pb-4 border-b border-line">
-            <div>
-              <h3 className="font-heading text-base text-ink">
-                {t("settings.heading")}
-              </h3>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {t("settings.description")}
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => setIsEditDialogOpen(true)}
-              className="text-xs h-9"
-            >
-              {t("hub.editEventBtn")}
-            </Button>
-          </div>
-
-          <div className="mt-4 space-y-3 text-xs">
-            <div className="flex items-center justify-between py-2 border-b border-line/60">
-              <span className="text-muted-foreground">
-                {t("create.nameLabel")}
-              </span>
-              <span className="font-semibold text-ink">
-                {currentEvent.name}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between py-2 border-b border-line/60">
-              <span className="text-muted-foreground">
-                {t("create.typeLabel")}
-              </span>
-              <span className="font-semibold text-ink">
-                {t(`types.${currentEvent.event_type}`)}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between py-2 border-b border-line/60">
-              <span className="text-muted-foreground">
-                {t("create.dateLabel")}
-              </span>
-              <span className="font-semibold text-ink">{formattedDate}</span>
-            </div>
-
-            <div className="flex items-center justify-between py-2 border-b border-line/60">
-              <span className="text-muted-foreground">
-                {t("guestCount.heading")}
-              </span>
-              <span className="font-semibold text-ink">
-                {currentEvent.expected_guest_count || 100}
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between py-2">
-              <span className="text-muted-foreground">
-                {t("settings.galleryVisibilityLabel")}
-              </span>
-              <span className="font-semibold text-primary">
-                {currentEvent.gallery_enabled !== false
-                  ? t("checklist.completed")
-                  : t("checklist.optional")}
-              </span>
-            </div>
-          </div>
-
-          {/* Guest Page Customization Card */}
-          <div className="bg-surface border border-line rounded-2xl p-5 shadow-card mt-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                  <PaintBrush size={20} weight="bold" />
-                </div>
+        <div className="event-hub__panel">
+          <div className="event-hub__settings">
+            {/* Main Event Configuration Card */}
+            <div className="event-hub__settings-card">
+              <div className="event-hub__settings-card-header">
                 <div>
-                  <h3 className="font-heading text-sm font-semibold text-ink">
-                    Guest Page Look & Branding
+                  <h3 className="font-heading text-base font-semibold text-ink">
+                    {t("settings.heading")}
                   </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Customize design preset, colors, cover photo, and welcome
-                    note.
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {t("settings.description")}
                   </p>
                 </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsEditDialogOpen(true)}
+                  className="text-xs h-9 shrink-0"
+                >
+                  {t("hub.editEventBtn")}
+                </Button>
               </div>
 
-              <Button
-                type="button"
-                variant="default"
-                size="sm"
-                onClick={() => setIsCustomizeGuestPageOpen(true)}
-                className="text-xs h-9 gap-1.5 shadow-xs shrink-0"
-              >
-                <PaintBrush size={14} weight="bold" />
-                <span>Customize Guest Page</span>
-              </Button>
+              <div className="event-hub__settings-list">
+                <div className="event-hub__settings-row">
+                  <span className="text-muted-foreground">
+                    {t("create.nameLabel")}
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {currentEvent.name}
+                  </span>
+                </div>
+
+                <div className="event-hub__settings-row">
+                  <span className="text-muted-foreground">
+                    {t("create.typeLabel")}
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {t(`types.${currentEvent.event_type}`)}
+                  </span>
+                </div>
+
+                <div className="event-hub__settings-row">
+                  <span className="text-muted-foreground">
+                    {t("create.dateLabel")}
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {formattedDate}
+                  </span>
+                </div>
+
+                <div className="event-hub__settings-row">
+                  <span className="text-muted-foreground">
+                    {t("guestCount.heading")}
+                  </span>
+                  <span className="font-semibold text-ink">
+                    {currentEvent.expected_guest_count || 100}
+                  </span>
+                </div>
+
+                <div className="event-hub__settings-row">
+                  <span className="text-muted-foreground">
+                    {t("settings.galleryVisibilityLabel")}
+                  </span>
+                  <span className="font-semibold text-primary">
+                    {currentEvent.gallery_enabled !== false
+                      ? t("checklist.completed")
+                      : t("checklist.optional")}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Guest Page Customization Card */}
+            <div className="event-hub__settings-card">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <PaintBrush size={20} weight="bold" />
+                  </div>
+                  <div>
+                    <h3 className="font-heading text-sm font-semibold text-ink">
+                      {t("settings.guestPageCardTitle")}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {t("settings.guestPageCardDesc")}
+                    </p>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="default"
+                  size="sm"
+                  onClick={() => setIsCustomizeGuestPageOpen(true)}
+                  className="text-xs h-9 gap-1.5 shadow-xs shrink-0"
+                >
+                  <PaintBrush size={14} weight="bold" />
+                  <span>{t("settings.customizeGuestPageBtn")}</span>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -490,8 +515,30 @@ export function EventOverviewView({
       <EventPrintModal
         event={currentEvent}
         qrDataUrl={qrDataUrl}
+        configVersion={qrConfigVersion}
         isOpen={isPrintModalOpen}
         onClose={() => setIsPrintModalOpen(false)}
+      />
+
+      {/* QR Card Customizer Modal */}
+      <QRCustomizeModal
+        event={currentEvent}
+        guestUrl={fullGuestUrl}
+        formattedDate={currentEvent.event_date ? formattedDate : null}
+        isOpen={isCustomizeQrOpen}
+        onClose={() => setIsCustomizeQrOpen(false)}
+        onApplied={() => {
+          setQrConfigVersion((v) => v + 1);
+
+          if (currentEvent && !currentEvent.setup_checklist?.customizedQr) {
+            void updateEvent({
+              id: currentEvent.id,
+              setup_checklist: {
+                customizedQr: true,
+              },
+            });
+          }
+        }}
       />
 
       {/* Guest Page Theme Customizer Modal */}

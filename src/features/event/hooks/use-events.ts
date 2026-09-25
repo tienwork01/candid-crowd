@@ -83,6 +83,9 @@ export function useEvents(params: EventListParams = {}) {
     direction,
   } = params;
 
+  const normalizedQ = q?.trim() || undefined;
+  const normalizedType = type || undefined;
+
   const resolvedDirection =
     direction ||
     (sort === "oldest" || sort === "name" || sort === "upcoming"
@@ -93,8 +96,8 @@ export function useEvents(params: EventListParams = {}) {
     queryKey: QUERY_KEYS.event.list({
       page,
       per_page,
-      q,
-      type,
+      q: normalizedQ,
+      type: normalizedType,
       sort,
       direction: resolvedDirection,
     }),
@@ -106,8 +109,8 @@ export function useEvents(params: EventListParams = {}) {
             params: {
               page,
               per_page,
-              ...(q ? { q } : {}),
-              ...(type ? { type } : {}),
+              ...(normalizedQ ? { q: normalizedQ } : {}),
+              ...(normalizedType ? { type: normalizedType } : {}),
               sort,
               direction: resolvedDirection,
             },
@@ -141,12 +144,29 @@ export function useEvents(params: EventListParams = {}) {
       return paginateLocalEvents({
         page,
         per_page,
-        q,
-        type,
+        q: normalizedQ,
+        type: normalizedType,
         sort,
         direction: resolvedDirection,
       });
     },
+    initialData: () => {
+      const local = paginateLocalEvents({
+        page,
+        per_page,
+        q: normalizedQ,
+        type: normalizedType,
+        sort,
+        direction: resolvedDirection,
+      });
+
+      if (local.data.length > 0) {
+        return local;
+      }
+
+      return undefined;
+    },
+    initialDataUpdatedAt: () => 0,
     placeholderData: keepPreviousData,
     staleTime: CACHE_TIMES.STANDARD.staleTime,
     gcTime: CACHE_TIMES.STANDARD.gcTime,

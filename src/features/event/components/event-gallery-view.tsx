@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowsClockwise, Funnel } from "@phosphor-icons/react";
+import {
+  ArrowsClockwise,
+  Camera,
+  EyeSlash,
+  Funnel,
+  Heart,
+  VideoCamera,
+} from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import type { EventMediaItem, EventMediaStatus } from "../types/event";
@@ -10,13 +17,15 @@ import {
   EventGalleryEmptyState,
   EventGalleryToolbar,
   EventMediaCard,
+  EventMediaSkeletonGrid,
 } from "./gallery";
 import { EventMediaLightbox } from "./event-media-lightbox";
-import { useEventMediaGallery } from "../hooks/use-event-media-gallery";
+import { useEventMediaGallery } from "../hooks";
 import { Button } from "@/components/ui";
 
 type EventGalleryViewProps = {
-  items: EventMediaItem[];
+  eventId?: string;
+  items?: EventMediaItem[];
   onOpenLightbox?: (item: EventMediaItem) => void;
   onToggleStatus: (id: string) => void;
   onToggleFavorite?: (id: string) => void;
@@ -31,7 +40,8 @@ type EventGalleryViewProps = {
 };
 
 export function EventGalleryView({
-  items,
+  eventId,
+  items = [],
   onOpenLightbox,
   onToggleStatus,
   onToggleFavorite,
@@ -46,7 +56,7 @@ export function EventGalleryView({
 }: EventGalleryViewProps) {
   const t = useTranslations("event");
 
-  // Domain Hook orchestrating filters, sorts, layout mode, selection & lightbox
+  // Domain Hook orchestrating backend-driven filters, sorts, layout mode, selection & lightbox
   const {
     filter,
     setFilter,
@@ -70,7 +80,11 @@ export function EventGalleryView({
     handlePrevLightbox,
     handleNextLightbox,
     selectLightboxIndex,
-  } = useEventMediaGallery(items);
+    isLoading,
+    isFetching,
+  } = useEventMediaGallery(eventId || items, items, {
+    eventId,
+  });
 
   const [isInternalLightboxOpen, setIsInternalLightboxOpen] = useState(false);
 
@@ -89,8 +103,10 @@ export function EventGalleryView({
   };
 
   const handleDownloadAll = () => {
-    if (items.length === 0) return;
-    toast.success(t("gallery.downloadAll", { count: items.length }));
+    const totalCount = counts.all || items.length;
+
+    if (totalCount === 0) return;
+    toast.success(t("gallery.downloadAll", { count: totalCount }));
   };
 
   // ─── Batch Operations ───
@@ -177,6 +193,47 @@ export function EventGalleryView({
     }
   };
 
+  const isTotalEmpty = counts.all === 0 && items.length === 0 && !isLoading;
+
+  const renderFilterEmptyIcon = () => {
+    switch (filter) {
+      case "photos":
+        return (
+          <Camera
+            size={26}
+            weight="duotone"
+            className="text-muted-foreground"
+          />
+        );
+      case "videos":
+        return (
+          <VideoCamera
+            size={26}
+            weight="duotone"
+            className="text-muted-foreground"
+          />
+        );
+      case "favorites":
+        return <Heart size={26} weight="duotone" className="text-rose-500" />;
+      case "hidden":
+        return (
+          <EyeSlash
+            size={26}
+            weight="duotone"
+            className="text-muted-foreground"
+          />
+        );
+      default:
+        return (
+          <Funnel
+            size={26}
+            weight="duotone"
+            className="text-muted-foreground"
+          />
+        );
+    }
+  };
+
   return (
     <section className="event-gallery" aria-labelledby="gallery-heading">
       <h2 id="gallery-heading" className="sr-only">
@@ -184,22 +241,26 @@ export function EventGalleryView({
       </h2>
 
       {/* Gallery Filter, Layout & Batch Toolbar */}
-      <EventGalleryToolbar
-        filter={filter}
-        onFilterChange={setFilter}
-        counts={counts}
-        sort={sort}
-        onSortChange={setSort}
-        layoutMode={layoutMode}
-        onLayoutModeChange={setLayoutMode}
-        isSelectMode={isSelectMode}
-        onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}
-        totalItems={filteredItems.length}
-        onDownloadAll={handleDownloadAll}
-      />
+      {!isTotalEmpty && !isLoading && (
+        <EventGalleryToolbar
+          filter={filter}
+          onFilterChange={setFilter}
+          counts={counts}
+          sort={sort}
+          onSortChange={setSort}
+          layoutMode={layoutMode}
+          onLayoutModeChange={setLayoutMode}
+          isSelectMode={isSelectMode}
+          onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}
+          totalItems={filteredItems.length}
+          onDownloadAll={handleDownloadAll}
+        />
+      )}
 
-      {/* Media Grid or Empty State */}
-      {items.length === 0 ? (
+      {/* Media Grid, Loading Skeleton or Empty State */}
+      {isLoading ? (
+        <EventMediaSkeletonGrid count={8} layoutMode={layoutMode} />
+      ) : isTotalEmpty ? (
         <EventGalleryEmptyState
           eventName={eventName}
           publicCode={publicCode}
@@ -210,9 +271,9 @@ export function EventGalleryView({
       ) : filteredItems.length === 0 ? (
         <div className="event-gallery__filter-empty">
           <div className="event-gallery__filter-empty-icon" aria-hidden="true">
-            <Funnel size={26} className="text-muted-foreground" />
+            {renderFilterEmptyIcon()}
           </div>
-          <h3 className="font-heading text-base text-ink font-medium mt-2">
+          <h3 className="event-gallery__filter-empty-title font-heading">
             {t("gallery.filterEmptyTitle")}
           </h3>
           <Button
@@ -220,7 +281,7 @@ export function EventGalleryView({
             variant="outline"
             size="sm"
             onClick={() => setFilter("all")}
-            className="mt-3 gap-1.5"
+            className="mt-3 gap-1.5 cursor-pointer text-xs"
           >
             <ArrowsClockwise size={14} aria-hidden="true" />
             <span>{t("gallery.filterEmptyReset")}</span>
@@ -228,11 +289,11 @@ export function EventGalleryView({
         </div>
       ) : (
         <div
-          className={
+          className={`transition-opacity duration-150 ${isFetching ? "opacity-75" : "opacity-100"} ${
             layoutMode === "masonry"
               ? "event-gallery__masonry"
               : "event-gallery__grid event-gallery__grid--square"
-          }
+          }`}
         >
           {filteredItems.map((item) => (
             <EventMediaCard
@@ -274,6 +335,7 @@ export function EventGalleryView({
           hasNext={hasNext}
           onToggleStatus={onToggleStatus}
           onToggleFavorite={onToggleFavorite}
+          onDeleteMedia={onDeleteMedia}
           currentIndex={lightboxIndex}
           totalItems={filteredItems.length}
           items={filteredItems}

@@ -9,6 +9,7 @@ import {
   Sparkle,
   UploadSimple,
 } from "@phosphor-icons/react";
+import { Tabs, TabsIndicator, TabsList, TabsTrigger } from "@/components/ui";
 import type { CandidEvent } from "../../types/event";
 import type { GuestThemeConfig } from "./guest-theme-types";
 import { GUEST_THEME_PRESETS } from "./guest-theme-types";
@@ -252,55 +253,50 @@ export function GuestPhoneMockup({
             </div>
 
             {/* Navigation Tabs (Upload vs Memories) */}
-            <div
-              className="flex items-center p-1 rounded-xl border text-xs font-medium"
-              style={{
-                backgroundColor: config.surfaceColor,
-                borderColor,
-              }}
+            <Tabs
+              value={activeTab}
+              onValueChange={(val) => setActiveTab(val as "upload" | "gallery")}
+              className="w-full"
             >
-              <button
-                type="button"
-                onClick={() => setActiveTab("upload")}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-all ${
-                  activeTab === "upload"
-                    ? "shadow-xs font-semibold"
-                    : "opacity-60 hover:opacity-100"
-                }`}
-                style={
-                  activeTab === "upload"
-                    ? {
-                        backgroundColor: config.primaryColor,
-                        color: "#ffffff",
-                      }
-                    : { color: textColor }
-                }
+              <TabsList
+                className="relative flex items-center p-1 rounded-xl border text-xs font-medium w-full"
+                style={{
+                  backgroundColor: config.surfaceColor,
+                  borderColor,
+                }}
               >
-                <UploadSimple size={13} weight="bold" />
-                <span>Upload</span>
-              </button>
+                <TabsTrigger
+                  value="upload"
+                  className="relative z-1 flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-colors text-xs font-medium"
+                  style={{
+                    color: activeTab === "upload" ? "#ffffff" : textColor,
+                    fontWeight: activeTab === "upload" ? 600 : 500,
+                  }}
+                >
+                  <UploadSimple size={13} weight="bold" />
+                  <span>Upload</span>
+                </TabsTrigger>
 
-              <button
-                type="button"
-                onClick={() => setActiveTab("gallery")}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-all ${
-                  activeTab === "gallery"
-                    ? "shadow-xs font-semibold"
-                    : "opacity-60 hover:opacity-100"
-                }`}
-                style={
-                  activeTab === "gallery"
-                    ? {
-                        backgroundColor: config.primaryColor,
-                        color: "#ffffff",
-                      }
-                    : { color: textColor }
-                }
-              >
-                <Images size={13} weight="bold" />
-                <span>Gallery (4)</span>
-              </button>
-            </div>
+                <TabsTrigger
+                  value="gallery"
+                  className="relative z-1 flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg transition-colors text-xs font-medium"
+                  style={{
+                    color: activeTab === "gallery" ? "#ffffff" : textColor,
+                    fontWeight: activeTab === "gallery" ? 600 : 500,
+                  }}
+                >
+                  <Images size={13} weight="bold" />
+                  <span>Gallery (4)</span>
+                </TabsTrigger>
+
+                <TabsIndicator
+                  className="absolute top-1 bottom-1 left-0 z-0 rounded-lg shadow-xs pointer-events-none transition-[translate,width] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
+                  style={{
+                    backgroundColor: config.primaryColor,
+                  }}
+                />
+              </TabsList>
+            </Tabs>
 
             {/* Tab 1: Upload Experience Preview */}
             {activeTab === "upload" && (

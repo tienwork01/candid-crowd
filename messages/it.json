@@ -634,6 +634,7 @@
       "tabSettings": "Impostazioni Evento",
       "liveWallBtn": "Avvia Live Wall",
       "editEventBtn": "Modifica Evento",
+      "printSignsBtn": "Stampa cartelli QR",
       "shareBtn": "Condividi",
       "moreBtn": "Altro"
     },
@@ -660,12 +661,9 @@
       "downloadAll": "Scarica tutto ({count})",
       "emptyTitle": "Dove vivranno i ricordi più autentici del tuo evento",
       "emptyDesc": "Foto e video condivisi dagli ospiti appariranno qui in tempo reale, in qualità originale e senza bisogno di app.",
-      "scanToTryPrompt": "Scansiona con il telefono per caricare la prima foto",
       "downloadPrintCard": "Stampa segnaposto da tavolo",
       "filterEmptyTitle": "Nessun ricordo corrisponde a questo filtro",
       "filterEmptyReset": "Mostra tutti i ricordi",
-      "sampleMoment1": "Risate spontanee all'aperitivo",
-      "sampleMoment2": "Pura gioia sulla pista da ballo",
       "itemHide": "Nascondi da galleria",
       "itemShow": "Mostra in galleria",
       "itemDelete": "Elimina ricordo",
@@ -731,11 +729,16 @@
       "scanPrompt": "Scansiona il codice QR per inviare la tua foto sullo schermo"
     },
     "settings": {
+      "heading": "Impostazioni Evento",
+      "description": "Gestisci dettagli, ospiti previsti e privacy della galleria.",
       "title": "Impostazioni Evento",
       "sub": "Gestisci dettagli, ospiti previsti e privacy della galleria.",
       "galleryVisibilityLabel": "Accesso alla galleria per gli ospiti",
       "galleryVisibilityDesc": "Consenti agli ospiti di visualizzare le foto condivise o riserva la visione all'host.",
-      "saveSuccess": "Impostazioni evento salvate con successo"
+      "saveSuccess": "Impostazioni evento salvate con successo",
+      "guestPageCardTitle": "Design e identità della pagina ospiti",
+      "guestPageCardDesc": "Personalizza stile predefinito, colori, foto di copertina e messaggio di benvenuto.",
+      "customizeGuestPageBtn": "Personalizza pagina ospiti"
     },
     "share": {
       "title": "Condividi evento",

@@ -77,7 +77,7 @@ export function ProfileForm() {
     }
   }
 
-  if (sessionLoading) {
+  if (sessionLoading && !user) {
     return (
       <div className="profile-page__grid" aria-busy="true">
         <div className="profile-page__main space-y-6">

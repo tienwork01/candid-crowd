@@ -634,6 +634,7 @@
       "tabSettings": "Paramètres de l'événement",
       "liveWallBtn": "Lancer le Live Wall",
       "editEventBtn": "Modifier l'événement",
+      "printSignsBtn": "Imprimer les panneaux QR",
       "shareBtn": "Partager",
       "moreBtn": "Plus"
     },
@@ -660,12 +661,9 @@
       "downloadAll": "Tout télécharger ({count})",
       "emptyTitle": "L'écrin de vos souvenirs les plus sincères",
       "emptyDesc": "Les photos et vidéos partagées par vos invités apparaîtront ici en temps réel — en qualité d'origine, sans application.",
-      "scanToTryPrompt": "Scannez avec votre téléphone pour ajouter la première photo",
       "downloadPrintCard": "Imprimer les cartes de table",
       "filterEmptyTitle": "Aucun souvenir ne correspond à ce filtre",
       "filterEmptyReset": "Afficher tous les souvenirs",
-      "sampleMoment1": "Rires spontanés au cocktail",
-      "sampleMoment2": "Pure joie sur la piste de danse",
       "itemHide": "Masquer de la galerie",
       "itemShow": "Afficher dans la galerie",
       "itemDelete": "Supprimer le souvenir",
@@ -731,11 +729,16 @@
       "scanPrompt": "Scannez le QR code pour afficher votre photo sur l'écran"
     },
     "settings": {
+      "heading": "Paramètres de l'événement",
+      "description": "Gérez les détails, le nombre d'invités et la confidentialité.",
       "title": "Paramètres de l'événement",
       "sub": "Gérez les détails, le nombre d'invités et la confidentialité.",
       "galleryVisibilityLabel": "Accès galerie pour les invités",
       "galleryVisibilityDesc": "Permettre aux invités de voir les photos partagées ou restreindre à l'hôte.",
-      "saveSuccess": "Paramètres enregistrés avec succès"
+      "saveSuccess": "Paramètres enregistrés avec succès",
+      "guestPageCardTitle": "Design et identité de la page invité",
+      "guestPageCardDesc": "Personnalisez le style prédéfini, les couleurs, la photo de couverture et le mot d'accueil.",
+      "customizeGuestPageBtn": "Personnaliser la page invité"
     },
     "share": {
       "title": "Partager l'événement",

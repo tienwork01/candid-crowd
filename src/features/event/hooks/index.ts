@@ -7,3 +7,5 @@ export * from "./use-event-list-params";
 export * from "./use-mounted";
 export * from "./use-camera-stream";
 export * from "./use-camera-shutter-sound";
+export * from "./use-event-media";
+export * from "./use-event-media-gallery";

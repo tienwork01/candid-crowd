@@ -68,7 +68,7 @@ export function QRColorPresets({
               key={preset.id}
               type="button"
               onClick={() => handleSelectPreset(preset)}
-              className={`group relative flex flex-col items-center gap-1 p-1.5 rounded-xl border transition-all duration-150 ${
+              className={`group relative flex flex-col items-center gap-1 p-1.5 rounded-xl border transition-all duration-150 active:scale-95 cursor-pointer ${
                 isSelected
                   ? "border-primary ring-2 ring-primary/20 bg-primary/5"
                   : "border-line hover:border-line-hover bg-surface"

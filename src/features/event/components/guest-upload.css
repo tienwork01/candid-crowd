@@ -181,6 +181,7 @@
 
 /* ─── TAB NAVIGATION (Upload vs Gallery) ─────────────────────────────── */
 .guest-event__nav {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -194,6 +195,8 @@
 }
 
 .guest-event__tab {
+  position: relative;
+  z-index: 1;
   flex: 1;
   display: inline-flex;
   align-items: center;
@@ -209,13 +212,68 @@
   border: none;
   cursor: pointer;
   touch-action: manipulation;
-  transition: all 180ms ease;
+  user-select: none;
+  outline: none;
+  transition: color 180ms ease;
 }
 
-.guest-event__tab--active {
-  background-color: var(--surface);
+.guest-event__tab:hover {
   color: var(--ink);
+}
+
+.guest-event__tab[data-active],
+.guest-event__tab--active {
+  color: var(--ink);
+}
+
+.guest-event__tab:focus-visible {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+.guest-event__indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 0;
+  z-index: 0;
+  width: var(--active-tab-width);
+  translate: var(--active-tab-left) 0;
+  border-radius: 10px;
+  background-color: var(--surface);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border: 1px solid var(--line);
+  pointer-events: none;
+  transition:
+    translate 200ms cubic-bezier(0.16, 1, 0.3, 1),
+    width 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guest-event__indicator {
+    transition: none;
+  }
+}
+
+.guest-event__panel {
+  width: 100%;
+  animation: guest-panel-fade 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes guest-panel-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guest-event__panel {
+    animation: none;
+  }
 }
 
 /* ─── UPLOADER WORKSPACE ─────────────────────────────────────────────── */

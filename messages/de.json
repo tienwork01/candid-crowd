@@ -634,6 +634,7 @@
       "tabSettings": "Event-Einstellungen",
       "liveWallBtn": "Live Wall starten",
       "editEventBtn": "Event bearbeiten",
+      "printSignsBtn": "QR-Schilder drucken",
       "shareBtn": "Teilen",
       "moreBtn": "Mehr"
     },
@@ -660,12 +661,9 @@
       "downloadAll": "Alle herunterladen ({count})",
       "emptyTitle": "Der Ort für die echten Momente Ihrer Feier",
       "emptyDesc": "Von Gästen geteilte Fotos und Videos erscheinen hier in Echtzeit – in Originalqualität, ganz ohne App.",
-      "scanToTryPrompt": "Mit dem Handy scannen, um das erste Foto hochzuladen",
       "downloadPrintCard": "Tischaufsteller drucken",
       "filterEmptyTitle": "Keine Erinnerungen entsprechen diesem Filter",
       "filterEmptyReset": "Alle Erinnerungen anzeigen",
-      "sampleMoment1": "Ungefiltertes Lachen beim Empfang",
-      "sampleMoment2": "Pure Freude auf der Tanzfläche",
       "itemHide": "In Galerie ausblenden",
       "itemShow": "In Galerie anzeigen",
       "itemDelete": "Erinnerung löschen",
@@ -731,11 +729,16 @@
       "scanPrompt": "Scannen Sie den QR-Code, um Fotos auf die Leinwand zu bringen"
     },
     "settings": {
+      "heading": "Event-Einstellungen",
+      "description": "Verwalten Sie Details, Gästeanzahl und Galerie-Zugriff.",
       "title": "Event-Einstellungen",
       "sub": "Verwalten Sie Details, Gästeanzahl und Galerie-Zugriff.",
       "galleryVisibilityLabel": "Galerie-Zugriff für Gäste",
       "galleryVisibilityDesc": "Gästen erlauben, geteilte Fotos zu sehen, oder nur für den Host sichtbar lassen.",
-      "saveSuccess": "Event-Einstellungen erfolgreich gespeichert"
+      "saveSuccess": "Event-Einstellungen erfolgreich gespeichert",
+      "guestPageCardTitle": "Design & Branding der Gästeseite",
+      "guestPageCardDesc": "Passen Sie Designvorlage, Farben, Titelbild und Willkommensnachricht an.",
+      "customizeGuestPageBtn": "Gästeseite anpassen"
     },
     "share": {
       "title": "Veranstaltung teilen",

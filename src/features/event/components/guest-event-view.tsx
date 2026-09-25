@@ -34,7 +34,13 @@ import { toast } from "sonner";
 import type { CandidEvent, EventMediaItem } from "../types/event";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
-import { Spinner } from "@/components/ui";
+import {
+  Spinner,
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui";
 import { EventMediaLightbox } from "./event-media-lightbox";
 import { CandidCameraModal } from "./candid-camera-modal";
 import { trackEvent } from "@/lib/analytics";
@@ -948,39 +954,42 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
         {/* Tab Switcher (Share vs Memories) */}
         {galleryAllowed && (
-          <nav className="guest-event__nav" aria-label={t("guest.tabMemories")}>
-            <button
-              type="button"
-              onClick={() => setActiveTab("upload")}
-              className={`guest-event__tab ${
-                activeTab === "upload" ? "guest-event__tab--active" : ""
-              }`}
-            >
-              <UploadSimple size={15} weight="bold" />
-              <span>{t("guest.tabShare")}</span>
-            </button>
+          <Tabs
+            value={activeTab}
+            onValueChange={(val) => {
+              const next = val as "upload" | "gallery";
 
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("gallery");
+              if (next === "gallery" && activeTab !== "gallery") {
                 trackEvent("guest_gallery_opened", { from: activeTab });
-              }}
-              className={`guest-event__tab ${
-                activeTab === "gallery" ? "guest-event__tab--active" : ""
-              }`}
+              }
+
+              setActiveTab(next);
+            }}
+            className="w-full flex justify-center"
+          >
+            <TabsList
+              className="guest-event__nav"
+              aria-label={t("guest.tabMemories")}
             >
-              <Images size={15} weight="bold" />
-              <span>
-                {t("guest.tabMemoriesCount", { count: galleryMedia.length })}
-              </span>
-            </button>
-          </nav>
+              <TabsTrigger value="upload" className="guest-event__tab">
+                <UploadSimple size={15} weight="bold" />
+                <span>{t("guest.tabShare")}</span>
+              </TabsTrigger>
+
+              <TabsTrigger value="gallery" className="guest-event__tab">
+                <Images size={15} weight="bold" />
+                <span>
+                  {t("guest.tabMemoriesCount", { count: galleryMedia.length })}
+                </span>
+              </TabsTrigger>
+              <TabsIndicator className="guest-event__indicator" />
+            </TabsList>
+          </Tabs>
         )}
 
         {/* TAB 1: UPLOAD EXPERIENCE */}
         {activeTab === "upload" && (
-          <div className="guest-upload">
+          <div className="guest-upload guest-event__panel">
             {/* Case A: Initial Picker State (No files staged yet) */}
             {stagedFiles.length === 0 &&
               uploadPhase !== "uploading" &&
@@ -1384,7 +1393,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
         {/* TAB 2: SHARED MEMORIES GALLERY */}
         {activeTab === "gallery" && galleryAllowed && (
-          <div className="guest-gallery">
+          <div className="guest-gallery guest-event__panel">
             <div className="guest-gallery__header">
               <h2 className="guest-gallery__title">
                 <Images size={18} className="text-primary" />

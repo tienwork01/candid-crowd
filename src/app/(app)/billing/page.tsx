@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CreditCard } from "@phosphor-icons/react/dist/ssr";
 import { getTranslations } from "next-intl/server";
-import { HostShell, HostUserCard } from "@/features/host/components";
+import { HostUserCard } from "@/features/host/components";
 import { Card } from "@/components/ui";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -14,39 +14,37 @@ export default async function BillingPage() {
   const t = await getTranslations("host.pages");
 
   return (
-    <HostShell active="billing">
-      <section className="profile-page" aria-labelledby="billing-title">
-        <header className="profile-page__intro">
-          <div className="profile-page__context-bar">
-            <span className="profile-page__status-badge">
-              <span className="profile-page__status-dot" aria-hidden="true" />
-              <span>{t("accountEyebrow")}</span>
-            </span>
-          </div>
-          <div className="profile-page__heading">
-            <div className="profile-page__title-group">
-              <h1 id="billing-title">{t("billingTitle")}</h1>
-              <p className="profile-page__description">
-                {t("billingCardDescription")}
-              </p>
-            </div>
-          </div>
-        </header>
-
-        <div className="profile-page__grid">
-          <div className="profile-page__main">
-            <Card className="host-account-page__card">
-              <CreditCard size={22} aria-hidden="true" />
-              <div>
-                <h2>{t("billingCardTitle")}</h2>
-                <p>{t("billingCardDescription")}</p>
-              </div>
-            </Card>
-          </div>
-
-          <HostUserCard />
+    <section className="profile-page" aria-labelledby="billing-title">
+      <header className="profile-page__intro">
+        <div className="profile-page__context-bar">
+          <span className="profile-page__status-badge">
+            <span className="profile-page__status-dot" aria-hidden="true" />
+            <span>{t("accountEyebrow")}</span>
+          </span>
         </div>
-      </section>
-    </HostShell>
+        <div className="profile-page__heading">
+          <div className="profile-page__title-group">
+            <h1 id="billing-title">{t("billingTitle")}</h1>
+            <p className="profile-page__description">
+              {t("billingCardDescription")}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      <div className="profile-page__grid">
+        <div className="profile-page__main">
+          <Card className="host-account-page__card">
+            <CreditCard size={22} aria-hidden="true" />
+            <div>
+              <h2>{t("billingCardTitle")}</h2>
+              <p>{t("billingCardDescription")}</p>
+            </div>
+          </Card>
+        </div>
+
+        <HostUserCard />
+      </div>
+    </section>
   );
 }

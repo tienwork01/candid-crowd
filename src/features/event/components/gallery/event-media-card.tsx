@@ -3,17 +3,15 @@
 import Image from "next/image";
 import {
   Check,
-  Eye,
   EyeSlash,
   Heart,
-  MagnifyingGlassPlus,
-  QrCode,
-  Trash,
+  Play,
+  User,
   VideoCamera,
 } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import type { EventMediaItem } from "../../types/event";
-import type { GalleryLayoutMode } from "../../hooks/use-event-media-gallery";
+import type { GalleryLayoutMode } from "../../types/event-media";
 
 type EventMediaCardProps = {
   item: EventMediaItem;
@@ -22,9 +20,9 @@ type EventMediaCardProps = {
   isSelectMode: boolean;
   onToggleSelect: (id: string) => void;
   onOpenLightbox: (item: EventMediaItem) => void;
-  onToggleStatus: (id: string) => void;
+  onToggleStatus?: (id: string) => void;
   onToggleFavorite?: (id: string) => void;
-  onDeleteMedia: (id: string) => void;
+  onDeleteMedia?: (id: string) => void;
 };
 
 export function EventMediaCard({
@@ -34,9 +32,6 @@ export function EventMediaCard({
   isSelectMode,
   onToggleSelect,
   onOpenLightbox,
-  onToggleStatus,
-  onToggleFavorite,
-  onDeleteMedia,
 }: EventMediaCardProps) {
   const t = useTranslations("event");
 
@@ -50,31 +45,44 @@ export function EventMediaCard({
 
   const isFeatured = item.status === "featured";
   const isHidden = item.status === "hidden";
+  const isVideo = Boolean(item.is_video);
+  const hasMeta = Boolean(item.guest_name || item.likes_count);
 
   return (
     <article
       className={`event-media-card ${
         isHidden ? "event-media-card--hidden" : ""
-      } ${isSelected ? "event-media-card--selected" : ""}`}
+      } ${isFeatured ? "event-media-card--featured" : ""} ${
+        isSelected ? "event-media-card--selected" : ""
+      } ${isVideo ? "event-media-card--video" : ""}`}
+      onClick={handleCardClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleCardClick();
+        }
+      }}
+      aria-label={isVideo ? "Event video" : "Event photo"}
     >
       <div
         className={`event-media-card__media-box ${
           layoutMode === "grid" ? "event-media-card__media-box--square" : ""
         }`}
-        onClick={handleCardClick}
       >
-        {/* Media (Image or Video Thumbnail) */}
+        {/* Media Canvas (Image or Video Poster) */}
         {layoutMode === "grid" ? (
           <Image
-            src={item.url}
+            src={item.thumbnail_url || item.url}
             alt={item.caption || "Event memory"}
             fill
-            className="event-media-card__img object-cover"
+            className="event-media-card__img"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
           <Image
-            src={item.url}
+            src={item.thumbnail_url || item.url}
             alt={item.caption || "Event memory"}
             width={item.width || 600}
             height={item.height || 800}
@@ -83,49 +91,48 @@ export function EventMediaCard({
           />
         )}
 
-        {/* Video Badge */}
-        {item.is_video && (
-          <span className="event-media-card__video-badge">
-            <VideoCamera size={12} weight="fill" aria-hidden="true" />
-            <span>Video</span>
-          </span>
-        )}
-
-        {/* Scrim Overlay on Hover / Active */}
+        {/* Multi-stop Photographic Scrim Overlay on Hover */}
         <div className="event-media-card__scrim" aria-hidden="true" />
 
-        {/* Top Header Overlay: Favorite & Select Checkbox */}
-        <div
-          className="event-media-card__top-bar"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {onToggleFavorite && (
-            <button
-              type="button"
-              onClick={() => onToggleFavorite(item.id)}
-              className={`event-media-card__icon-btn ${
-                isFeatured ? "event-media-card__icon-btn--featured" : ""
-              }`}
-              title={
-                isFeatured
-                  ? t("gallery.itemUnfavorite")
-                  : t("gallery.itemFavorite")
-              }
-              aria-label={
-                isFeatured
-                  ? t("gallery.itemUnfavorite")
-                  : t("gallery.itemFavorite")
-              }
-            >
-              <Heart
-                size={16}
-                weight={isFeatured ? "fill" : "bold"}
-                className={isFeatured ? "text-rose-500" : "text-white"}
-              />
-            </button>
+        {/* Persistent Status Badges (Top-Left) */}
+        <div className="event-media-card__badges" aria-hidden="true">
+          {isVideo && (
+            <span className="event-media-card__badge event-media-card__badge--video">
+              <VideoCamera size={12} weight="fill" />
+              <span>Video</span>
+            </span>
           )}
 
-          {(isSelectMode || isSelected) && (
+          {isFeatured && (
+            <span className="event-media-card__badge event-media-card__badge--featured">
+              <Heart size={11} weight="fill" />
+              <span>{t("gallery.statusFeatured")}</span>
+            </span>
+          )}
+
+          {isHidden && (
+            <span className="event-media-card__badge event-media-card__badge--hidden">
+              <EyeSlash size={11} weight="bold" />
+              <span>{t("gallery.statusHidden")}</span>
+            </span>
+          )}
+        </div>
+
+        {/* Floating Center Play Affordance for Videos on Hover */}
+        {isVideo && (
+          <div className="event-media-card__play-center" aria-hidden="true">
+            <div className="event-media-card__play-btn">
+              <Play size={22} weight="fill" className="translate-x-0.5" />
+            </div>
+          </div>
+        )}
+
+        {/* Top-Right Selection Checkbox (Active only in Select Mode) */}
+        {(isSelectMode || isSelected) && (
+          <div
+            className="event-media-card__top-bar"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               type="button"
               onClick={() => onToggleSelect(item.id)}
@@ -141,88 +148,40 @@ export function EventMediaCard({
               aria-checked={isSelected}
               role="checkbox"
             >
-              {isSelected && <Check size={12} weight="bold" />}
+              {isSelected && <Check size={13} weight="bold" />}
             </button>
-          )}
-        </div>
-
-        {/* Bottom Metadata & Fast Actions Overlay */}
-        <div
-          className="event-media-card__bottom-bar"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="event-media-card__meta">
-            {item.guest_name && (
-              <span className="event-media-card__uploader truncate">
-                {item.guest_name}
-              </span>
-            )}
-            {item.qr_source && (
-              <span className="event-media-card__source truncate">
-                <QrCode size={11} aria-hidden="true" />
-                <span>{item.qr_source}</span>
-              </span>
-            )}
-            {Boolean(item.likes_count) && (
-              <span className="event-media-card__likes">
-                <Heart size={11} weight="fill" className="text-rose-400" />
-                <span>{item.likes_count}</span>
-              </span>
-            )}
           </div>
+        )}
 
-          <div className="event-media-card__actions">
-            <button
-              type="button"
-              onClick={() => onOpenLightbox(item)}
-              className="event-media-card__action-btn"
-              title={t("gallery.itemDownload")}
-              aria-label={t("gallery.itemDownload")}
-            >
-              <MagnifyingGlassPlus size={14} aria-hidden="true" />
-            </button>
-
-            <button
-              type="button"
-              onClick={() => onToggleStatus(item.id)}
-              className="event-media-card__action-btn"
-              title={isHidden ? t("gallery.itemShow") : t("gallery.itemHide")}
-              aria-label={
-                isHidden ? t("gallery.itemShow") : t("gallery.itemHide")
-              }
-            >
-              {isHidden ? (
-                <Eye size={14} aria-hidden="true" />
-              ) : (
-                <EyeSlash size={14} aria-hidden="true" />
+        {/* Minimal Contributor / Likes Layer on Hover */}
+        {hasMeta && (
+          <div className="event-media-card__bottom-bar" aria-hidden="true">
+            <div className="event-media-card__meta">
+              {item.guest_name && (
+                <span
+                  className="event-media-card__contributor truncate"
+                  title={t("gallery.uploadedBy", { name: item.guest_name })}
+                >
+                  <User size={11} weight="bold" aria-hidden="true" />
+                  <span className="truncate">{item.guest_name}</span>
+                </span>
               )}
-            </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                if (window.confirm(t("gallery.deleteConfirm"))) {
-                  onDeleteMedia(item.id);
-                }
-              }}
-              className="event-media-card__action-btn event-media-card__action-btn--delete"
-              title={t("gallery.itemDelete")}
-              aria-label={t("gallery.itemDelete")}
-            >
-              <Trash size={14} aria-hidden="true" />
-            </button>
+              {Boolean(item.likes_count) && (
+                <span className="event-media-card__likes">
+                  <Heart
+                    size={11}
+                    weight="fill"
+                    className="text-rose-400"
+                    aria-hidden="true"
+                  />
+                  <span>{item.likes_count}</span>
+                </span>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Caption if provided */}
-      {item.caption && (
-        <div className="event-media-card__caption-box">
-          <p className="event-media-card__caption" title={item.caption}>
-            {item.caption}
-          </p>
-        </div>
-      )}
     </article>
   );
 }

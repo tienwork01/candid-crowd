@@ -14,7 +14,13 @@ import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
-import { Button } from "@/components/ui";
+import {
+  Button,
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui";
 import type { CandidEvent } from "../../types/event";
 import { getEventPublicCode } from "../../types/event";
 import { loadQRConfig } from "../../lib/qr-customize-storage";
@@ -407,24 +413,27 @@ export function EventPrintModal({
               <label className="event-print-modal__control-label">
                 {t("printSign.selectSize")}
               </label>
-              <div className="event-print-modal__size-row">
-                {SIZE_OPTIONS.map(({ size: sz, labelKey }) => {
-                  const isSelected = size === sz;
-
-                  return (
-                    <button
+              <Tabs
+                value={size}
+                onValueChange={(val) => setSize(val as PrintSize)}
+                className="w-full"
+              >
+                <TabsList
+                  className="event-print-modal__size-row"
+                  aria-label={t("printSign.selectSize")}
+                >
+                  {SIZE_OPTIONS.map(({ size: sz, labelKey }) => (
+                    <TabsTrigger
                       key={sz}
-                      type="button"
-                      onClick={() => setSize(sz)}
-                      className={`event-print-modal__size-chip ${
-                        isSelected ? "event-print-modal__size-chip--active" : ""
-                      }`}
+                      value={sz}
+                      className="event-print-modal__size-chip"
                     >
                       <span>{t(labelKey)}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                    </TabsTrigger>
+                  ))}
+                  <TabsIndicator className="event-print-modal__segmented-indicator" />
+                </TabsList>
+              </Tabs>
             </div>
 
             {/* 3. Format Selector */}
@@ -432,20 +441,20 @@ export function EventPrintModal({
               <label className="event-print-modal__control-label">
                 {t("printSign.selectFormat")}
               </label>
-              <div className="event-print-modal__format-row">
-                {FORMAT_OPTIONS.map(({ format: fmt, labelKey }) => {
-                  const isSelected = format === fmt;
-
-                  return (
-                    <button
+              <Tabs
+                value={format}
+                onValueChange={(val) => setFormat(val as PrintFormat)}
+                className="w-full"
+              >
+                <TabsList
+                  className="event-print-modal__format-row"
+                  aria-label={t("printSign.selectFormat")}
+                >
+                  {FORMAT_OPTIONS.map(({ format: fmt, labelKey }) => (
+                    <TabsTrigger
                       key={fmt}
-                      type="button"
-                      onClick={() => setFormat(fmt)}
-                      className={`event-print-modal__format-chip ${
-                        isSelected
-                          ? "event-print-modal__format-chip--active"
-                          : ""
-                      }`}
+                      value={fmt}
+                      className="event-print-modal__format-chip"
                     >
                       {fmt === "pdf" ? (
                         <FilePdf size={16} weight="duotone" />
@@ -453,10 +462,11 @@ export function EventPrintModal({
                         <FilePng size={16} weight="duotone" />
                       )}
                       <span>{t(labelKey)}</span>
-                    </button>
-                  );
-                })}
-              </div>
+                    </TabsTrigger>
+                  ))}
+                  <TabsIndicator className="event-print-modal__segmented-indicator" />
+                </TabsList>
+              </Tabs>
             </div>
 
             {/* Primary Action Button */}

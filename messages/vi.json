@@ -634,6 +634,7 @@
       "tabSettings": "Cài đặt sự kiện",
       "liveWallBtn": "Trình chiếu Live Wall",
       "editEventBtn": "Chỉnh sửa sự kiện",
+      "printSignsBtn": "In biển bảng QR",
       "shareBtn": "Chia sẻ",
       "moreBtn": "Thêm"
     },
@@ -660,12 +661,9 @@
       "downloadAll": "Tải toàn bộ ({count})",
       "emptyTitle": "Nơi lưu giữ những khoảnh khắc chân thật nhất",
       "emptyDesc": "Ảnh và video khách mời chia sẻ sẽ xuất hiện tại đây theo thời gian thực — giữ nguyên chất lượng gốc, không cần cài ứng dụng.",
-      "scanToTryPrompt": "Giơ điện thoại quét thử để tải lên ảnh đầu tiên",
       "downloadPrintCard": "Tải mẫu in để bàn",
       "filterEmptyTitle": "Không có kỷ niệm nào phù hợp với bộ lọc",
       "filterEmptyReset": "Xem tất cả kỷ niệm",
-      "sampleMoment1": "Cười thả ga lúc tiệc bắt đầu",
-      "sampleMoment2": "Khoảnh khắc cháy hết mình trên sàn nhảy",
       "itemHide": "Ẩn khỏi thư viện",
       "itemShow": "Hiện lại thư viện",
       "itemDelete": "Xóa kỷ niệm",
@@ -731,11 +729,16 @@
       "scanPrompt": "Quét mã QR để đưa ảnh của bạn lên màn hình"
     },
     "settings": {
+      "heading": "Cài đặt Sự kiện",
+      "description": "Quản lý thông tin, lượng khách và quyền riêng tư thư viện ảnh.",
       "title": "Cài đặt Sự kiện",
       "sub": "Quản lý thông tin, lượng khách và quyền riêng tư thư viện ảnh.",
       "galleryVisibilityLabel": "Quyền xem thư viện của khách",
       "galleryVisibilityDesc": "Cho phép khách xem ảnh của người khác hoặc chỉ Host mới xem được.",
-      "saveSuccess": "Đã lưu cài đặt sự kiện thành công"
+      "saveSuccess": "Đã lưu cài đặt sự kiện thành công",
+      "guestPageCardTitle": "Nhận diện & Giao diện trang khách",
+      "guestPageCardDesc": "Tùy chỉnh phong cách mẫu, màu sắc, ảnh bìa và lời chào mừng.",
+      "customizeGuestPageBtn": "Tùy chỉnh trang khách"
     },
     "share": {
       "title": "Chia sẻ sự kiện",

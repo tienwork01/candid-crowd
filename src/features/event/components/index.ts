@@ -16,6 +16,8 @@ export {
   EventMediaCard,
   EventBatchActionBar,
   EventGalleryEmptyState,
+  EventMediaSkeleton,
+  EventMediaSkeletonGrid,
 } from "./gallery";
 export { EventMediaLightbox } from "./event-media-lightbox";
 export { EventAnalyticsView } from "./event-analytics-view";

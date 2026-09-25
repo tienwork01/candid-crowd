@@ -73,7 +73,7 @@ async function hasValidSession(request: NextRequest): Promise<boolean> {
     const { auth } = await import("@/lib/auth");
     const session = await auth.api.getSession({
       headers: request.headers,
-      query: { disableCookieCache: true, disableRefresh: true },
+      query: { disableCookieCache: false, disableRefresh: true },
     });
 
     const isDeleted = Boolean(

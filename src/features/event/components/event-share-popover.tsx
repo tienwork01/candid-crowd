@@ -43,7 +43,6 @@ export function EventSharePopover({
   const fullGuestUrl = event.guest_url || `${origin}${publicPath}`;
   const displayUrl = fullGuestUrl.replace(/^https?:\/\//, "");
   const publicGuestUrl = fullGuestUrl;
-  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
 
   // Close on Escape key
   useEffect(() => {
@@ -241,7 +240,7 @@ export function EventSharePopover({
         {/* 6. Quiet Footer Action: View as Guest */}
         <div className="event-share-popover__footer">
           <a
-            href={testGuestUrl}
+            href={fullGuestUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="event-share-popover__footer-link"

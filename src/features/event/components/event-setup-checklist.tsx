@@ -24,6 +24,10 @@ import {
   Button,
   Input,
   Label,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsIndicator,
 } from "@/components/ui";
 
 type EventSetupChecklistProps = {
@@ -136,9 +140,9 @@ export function EventSetupChecklist({
 
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const publicPath = event.public_url || `/e/${event.slug}`;
-    const testUrl = `${event.guest_url || `${origin}${publicPath}`}?is_test=true`;
+    const guestUrl = event.guest_url || `${origin}${publicPath}`;
 
-    window.open(testUrl, "_blank", "noopener,noreferrer");
+    window.open(guestUrl, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -424,23 +428,34 @@ export function EventSetupChecklist({
                     </p>
                   </div>
 
-                  {/* Preset chips */}
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {GUEST_PRESETS.map((preset) => (
-                      <button
-                        key={preset}
-                        type="button"
-                        onClick={() => setGuestCount(String(preset))}
-                        className={`px-2.5 py-1 text-xs rounded-md border transition-all ${
-                          guestCount === String(preset)
-                            ? "bg-primary text-on-primary border-primary font-medium shadow-xs"
-                            : "bg-surface border-line text-muted-foreground hover:text-ink hover:border-line-hover"
-                        }`}
-                      >
-                        {preset}
-                      </button>
-                    ))}
-                  </div>
+                  {/* Preset chips with animated sliding indicator */}
+                  <Tabs
+                    value={
+                      GUEST_PRESETS.map(String).includes(guestCount)
+                        ? guestCount
+                        : ""
+                    }
+                    onValueChange={(val) => {
+                      if (val) setGuestCount(val);
+                    }}
+                  >
+                    <TabsList
+                      variant="pill"
+                      className="p-1 bg-soft border border-line rounded-xl gap-1 inline-flex"
+                    >
+                      {GUEST_PRESETS.map((preset) => (
+                        <TabsTrigger
+                          key={preset}
+                          value={String(preset)}
+                          variant="pill"
+                          className="px-3 py-1 text-xs rounded-lg font-medium"
+                        >
+                          {preset}
+                        </TabsTrigger>
+                      ))}
+                      <TabsIndicator variant="pill" />
+                    </TabsList>
+                  </Tabs>
 
                   <div className="flex items-center gap-2 pt-1">
                     <Input

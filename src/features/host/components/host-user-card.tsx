@@ -79,7 +79,7 @@ export function HostUserCard({
 
   const planLabel = planLabels[userPlan] || tMenu("planFree");
 
-  if (sessionLoading) {
+  if (sessionLoading && !user) {
     return (
       <aside
         className={cn("host-user-card host-user-card--loading", className)}

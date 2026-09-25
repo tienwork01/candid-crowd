@@ -152,7 +152,14 @@ export const auth = betterAuth({
   },
   verification: { storeIdentifier: "hashed" },
   account: { encryptOAuthTokens: true },
-  session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
+  session: {
+    expiresIn: 60 * 60 * 24 * 7,
+    updateAge: 60 * 60 * 24,
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60,
+    },
+  },
   user: {
     additionalFields: {
       termsVersion: { type: "string", required: true, input: true },

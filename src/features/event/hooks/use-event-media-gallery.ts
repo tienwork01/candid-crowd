@@ -2,24 +2,65 @@
 
 import { useMemo, useState } from "react";
 import type { EventMediaItem } from "../types/event";
+import type {
+  GalleryFilterType,
+  GalleryLayoutMode,
+  GallerySortType,
+} from "../types/event-media";
+import { useEventMedia } from "./use-event-media";
 
-export type GalleryFilterType =
-  "all" | "photos" | "videos" | "favorites" | "hidden";
-
-export type GallerySortType = "newest" | "oldest";
-
-export type GalleryLayoutMode = "masonry" | "grid";
+export type {
+  GalleryFilterType,
+  GalleryLayoutMode,
+  GallerySortType,
+} from "../types/event-media";
 
 export type UseEventMediaGalleryOptions = {
+  eventId?: string;
   initialFilter?: GalleryFilterType;
   initialSort?: GallerySortType;
   initialLayout?: GalleryLayoutMode;
 };
 
+const EMPTY_FALLBACK_ITEMS: EventMediaItem[] = [];
+
 export function useEventMediaGallery(
-  items: EventMediaItem[],
-  options: UseEventMediaGalleryOptions = {},
+  itemsOrEventId: EventMediaItem[] | string,
+  optionsOrItems?: UseEventMediaGalleryOptions | EventMediaItem[],
+  legacyOptions?: UseEventMediaGalleryOptions,
 ) {
+  // Support flexible signatures:
+  // 1. useEventMediaGallery(eventId, options)
+  // 2. useEventMediaGallery(items, options)
+  // 3. useEventMediaGallery(eventId, items, options)
+  let eventId: string | undefined;
+  let options: UseEventMediaGalleryOptions = {};
+
+  if (typeof itemsOrEventId === "string") {
+    eventId = itemsOrEventId;
+
+    if (Array.isArray(optionsOrItems)) {
+      options = legacyOptions || {};
+    } else if (optionsOrItems) {
+      options = optionsOrItems;
+    }
+  } else if (optionsOrItems && !Array.isArray(optionsOrItems)) {
+    options = optionsOrItems;
+    eventId = options.eventId;
+  }
+
+  const fallbackItems = useMemo(() => {
+    if (typeof itemsOrEventId === "string") {
+      if (Array.isArray(optionsOrItems)) {
+        return optionsOrItems;
+      }
+
+      return EMPTY_FALLBACK_ITEMS;
+    }
+
+    return itemsOrEventId || EMPTY_FALLBACK_ITEMS;
+  }, [itemsOrEventId, optionsOrItems]);
+
   const [filter, setFilter] = useState<GalleryFilterType>(
     options.initialFilter || "all",
   );
@@ -33,15 +74,21 @@ export function useEventMediaGallery(
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [lightboxId, setLightboxId] = useState<string | null>(null);
 
-  // Category counts
-  const counts = useMemo(() => {
+  // Backend-driven query when eventId is present
+  const remoteQuery = useEventMedia(eventId, {
+    filter,
+    sort,
+  });
+
+  // Category counts: comes from Backend if eventId is active, otherwise computed locally
+  const localCounts = useMemo(() => {
     let all = 0;
     let photos = 0;
     let videos = 0;
     let favorites = 0;
     let hidden = 0;
 
-    for (const item of items) {
+    for (const item of fallbackItems) {
       if (item.status === "hidden") {
         hidden++;
       } else {
@@ -60,28 +107,32 @@ export function useEventMediaGallery(
     }
 
     return { all, photos, videos, favorites, hidden };
-  }, [items]);
+  }, [fallbackItems]);
 
-  // Filter & sort media items (Single Source of Truth)
-  const filteredItems = useMemo(() => {
+  // Local filtered items fallback (when eventId is not provided)
+  const localFilteredItems = useMemo(() => {
     let result: EventMediaItem[];
 
     switch (filter) {
       case "photos":
-        result = items.filter((i) => !i.is_video && i.status !== "hidden");
+        result = fallbackItems.filter(
+          (i) => !i.is_video && i.status !== "hidden",
+        );
         break;
       case "videos":
-        result = items.filter((i) => i.is_video && i.status !== "hidden");
+        result = fallbackItems.filter(
+          (i) => i.is_video && i.status !== "hidden",
+        );
         break;
       case "favorites":
-        result = items.filter((i) => i.status === "featured");
+        result = fallbackItems.filter((i) => i.status === "featured");
         break;
       case "hidden":
-        result = items.filter((i) => i.status === "hidden");
+        result = fallbackItems.filter((i) => i.status === "hidden");
         break;
       case "all":
       default:
-        result = items.filter((i) => i.status !== "hidden");
+        result = fallbackItems.filter((i) => i.status !== "hidden");
     }
 
     return [...result].sort((a, b) => {
@@ -90,7 +141,17 @@ export function useEventMediaGallery(
 
       return sort === "newest" ? dateB - dateA : dateA - dateB;
     });
-  }, [items, filter, sort]);
+  }, [fallbackItems, filter, sort]);
+
+  // Unified single source of truth:
+  // If eventId exists and remoteQuery has data, use Backend response
+  // Otherwise use local calculation
+  const counts =
+    eventId && remoteQuery.data ? remoteQuery.data.counts : localCounts;
+  const filteredItems =
+    eventId && remoteQuery.data ? remoteQuery.data.data : localFilteredItems;
+  const isLoading = eventId ? remoteQuery.isLoading : false;
+  const isFetching = eventId ? remoteQuery.isFetching : false;
 
   // Synchronized Lightbox Navigation
   const lightboxIndex = useMemo(() => {
@@ -180,5 +241,8 @@ export function useEventMediaGallery(
     handlePrevLightbox,
     handleNextLightbox,
     selectLightboxIndex,
+    isLoading,
+    isFetching,
+    refetch: remoteQuery.refetch,
   };
 }

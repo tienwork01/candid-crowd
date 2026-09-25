@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { AppLocaleProvider } from "@/components/providers";
+import { HostShell } from "@/features/host/components";
 
 export default async function AppLayout({
   children,
@@ -13,7 +14,7 @@ export default async function AppLayout({
       <a className="skip-link" href="#main">
         {t("skipToContent")}
       </a>
-      {children}
+      <HostShell>{children}</HostShell>
     </AppLocaleProvider>
   );
 }

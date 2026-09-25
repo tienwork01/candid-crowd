@@ -634,6 +634,7 @@
       "tabSettings": "Configurações do Evento",
       "liveWallBtn": "Abrir Live Wall",
       "editEventBtn": "Editar Evento",
+      "printSignsBtn": "Imprimir cartazes QR",
       "shareBtn": "Compartilhar",
       "moreBtn": "Mais"
     },
@@ -660,12 +661,9 @@
       "downloadAll": "Baixar tudo ({count})",
       "emptyTitle": "Onde as memórias mais espontâneas do seu evento vão viver",
       "emptyDesc": "Fotos e vídeos compartilhados pelos convidados aparecerão aqui em tempo real — em qualidade original, sem precisar de app.",
-      "scanToTryPrompt": "Escaneie com o celular para enviar a primeira foto",
       "downloadPrintCard": "Imprimir placas de mesa",
       "filterEmptyTitle": "Nenhuma memória corresponde a este filtro",
       "filterEmptyReset": "Mostrar todas as memórias",
-      "sampleMoment1": "Risadas espontâneas no coquetel",
-      "sampleMoment2": "Pura alegria na pista de dança",
       "itemHide": "Ocultar da galeria",
       "itemShow": "Exibir na galeria",
       "itemDelete": "Excluir memória",
@@ -731,11 +729,16 @@
       "scanPrompt": "Escaneie o código QR para exibir sua foto na tela"
     },
     "settings": {
+      "heading": "Configurações do Evento",
+      "description": "Gerencie dados do evento, convidados e privacidade da galeria.",
       "title": "Configurações do Evento",
       "sub": "Gerencie dados do evento, convidados e privacidade da galeria.",
       "galleryVisibilityLabel": "Acesso dos convidados à galeria",
       "galleryVisibilityDesc": "Permitir que convidados vejam as fotos uns dos outros ou manter privado para o anfitrião.",
-      "saveSuccess": "Configurações do evento salvas com sucesso"
+      "saveSuccess": "Configurações do evento salvas com sucesso",
+      "guestPageCardTitle": "Identidade e visual da página de convidados",
+      "guestPageCardDesc": "Personalize o estilo visual, cores, foto de capa e mensagem de boas-vindas.",
+      "customizeGuestPageBtn": "Personalizar página de convidados"
     },
     "share": {
       "title": "Compartilhar evento",

@@ -5,10 +5,12 @@ import {
   ArrowLeft,
   CalendarDots,
   DotsThree,
-  DownloadSimple,
   Eye,
   Gear,
+  PaintBrush,
   Presentation,
+  Printer,
+  QrCode,
   ShareNetwork,
   Sparkle,
 } from "@phosphor-icons/react";
@@ -31,7 +33,9 @@ type EventHubHeaderProps = {
   onOpenShare: () => void;
   onOpenEdit: () => void;
   onLaunchLiveWall: () => void;
-  onDownloadAll?: () => void;
+  onOpenPrint?: () => void;
+  onOpenCustomizeTheme?: () => void;
+  onOpenCustomizeQr?: () => void;
 };
 
 const lifecycleColors: Record<EventLifecycleStatus, string> = {
@@ -45,7 +49,9 @@ export function EventHubHeader({
   onOpenShare,
   onOpenEdit,
   onLaunchLiveWall,
-  onDownloadAll,
+  onOpenPrint,
+  onOpenCustomizeTheme,
+  onOpenCustomizeQr,
 }: EventHubHeaderProps) {
   const t = useTranslations("event");
   const locale = useLocale() as AppLocale;
@@ -53,7 +59,6 @@ export function EventHubHeader({
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const publicPath = event.public_url || `/e/${event.slug}`;
   const fullGuestUrl = event.guest_url || `${origin}${publicPath}`;
-  const testGuestUrl = `${fullGuestUrl}?is_test=true`;
 
   const status = getEventLifecycleStatus(event);
 
@@ -144,7 +149,7 @@ export function EventHubHeader({
 
         {/* View as Guest */}
         <a
-          href={testGuestUrl}
+          href={fullGuestUrl}
           target="_blank"
           rel="noopener noreferrer"
           className={buttonVariants({ variant: "outline", size: "sm" })}
@@ -154,27 +159,82 @@ export function EventHubHeader({
           <span className="hidden sm:inline">{t("ready.previewAsGuest")}</span>
         </a>
 
-        {/* More Menu */}
+        {/* More Menu — Host Quick Actions */}
         <DropdownMenu>
           <DropdownMenuTrigger
-            className="h-9 w-9 inline-flex items-center justify-center rounded-md text-muted-foreground hover:text-ink hover:bg-accent transition-colors"
+            className="h-9 w-9 inline-flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent/80 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 cursor-pointer"
             aria-label={t("hub.moreBtn")}
             title={t("hub.moreBtn")}
           >
             <DotsThree size={20} weight="bold" aria-hidden="true" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={onOpenEdit}>
-              <Gear size={15} aria-hidden="true" />
-              <span>{t("hub.editEventBtn")}</span>
+          <DropdownMenuContent
+            align="end"
+            sideOffset={6}
+            className="min-w-[210px] sm:min-w-[220px] w-auto p-1.5 shadow-xl"
+          >
+            {/* Quick Action 1: Edit Event */}
+            <DropdownMenuItem
+              onClick={onOpenEdit}
+              className="gap-2.5 px-3 py-2 cursor-pointer"
+            >
+              <Gear
+                size={16}
+                aria-hidden="true"
+                className="shrink-0 text-muted-foreground group-hover/dropdown-menu-item:text-foreground transition-colors"
+              />
+              <span className="font-medium text-foreground">
+                {t("hub.editEventBtn")}
+              </span>
             </DropdownMenuItem>
-            {onDownloadAll && (
-              <DropdownMenuItem onClick={onDownloadAll}>
-                <DownloadSimple size={15} aria-hidden="true" />
-                <span>
-                  {t("gallery.downloadAll", {
-                    count: event.media_items?.length || 0,
-                  })}
+
+            {/* Quick Action 2: Customize QR Card */}
+            {onOpenCustomizeQr && (
+              <DropdownMenuItem
+                onClick={onOpenCustomizeQr}
+                className="gap-2.5 px-3 py-2 cursor-pointer"
+              >
+                <QrCode
+                  size={16}
+                  aria-hidden="true"
+                  className="shrink-0 text-muted-foreground group-hover/dropdown-menu-item:text-foreground transition-colors"
+                />
+                <span className="font-medium text-foreground">
+                  {t("checklist.itemCustomizeQr")}
+                </span>
+              </DropdownMenuItem>
+            )}
+
+            {/* Quick Action 3: Customize Guest Page */}
+            {onOpenCustomizeTheme && (
+              <DropdownMenuItem
+                onClick={onOpenCustomizeTheme}
+                className="gap-2.5 px-3 py-2 cursor-pointer"
+              >
+                <PaintBrush
+                  size={16}
+                  aria-hidden="true"
+                  className="shrink-0 text-muted-foreground group-hover/dropdown-menu-item:text-foreground transition-colors"
+                />
+                <span className="font-medium text-foreground">
+                  {t("settings.customizeGuestPageBtn")}
+                </span>
+              </DropdownMenuItem>
+            )}
+
+            {/* Quick Action 4: Print QR Signs */}
+            {onOpenPrint && (
+              <DropdownMenuItem
+                onClick={onOpenPrint}
+                className="gap-2.5 px-3 py-2 cursor-pointer"
+              >
+                <Printer
+                  size={16}
+                  aria-hidden="true"
+                  className="shrink-0 text-muted-foreground group-hover/dropdown-menu-item:text-foreground transition-colors"
+                />
+                <span className="font-medium text-foreground">
+                  {t("hub.printSignsBtn")}
                 </span>
               </DropdownMenuItem>
             )}

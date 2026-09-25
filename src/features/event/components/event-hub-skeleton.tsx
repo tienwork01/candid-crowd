@@ -1,4 +1,4 @@
-import { EventCardSkeletonGrid } from "./event-card-skeleton";
+import { EventMediaSkeletonGrid } from "./gallery";
 
 export function EventHubSkeleton() {
   return (
@@ -39,7 +39,7 @@ export function EventHubSkeleton() {
 
       {/* Gallery Skeleton */}
       <div className="mt-4">
-        <EventCardSkeletonGrid count={8} />
+        <EventMediaSkeletonGrid count={8} layoutMode="masonry" />
       </div>
     </div>
   );

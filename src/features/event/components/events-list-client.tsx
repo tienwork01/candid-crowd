@@ -53,6 +53,11 @@ export function EventsListClient() {
 
   const events = data?.data ?? [];
   const pagination = data?.pagination;
+  const effectiveTotalEvents = Math.max(
+    totalEvents,
+    pagination?.total ?? 0,
+    events.length,
+  );
 
   const hasActiveSearch = Boolean(params.q?.trim()) || Boolean(params.type);
 
@@ -66,7 +71,7 @@ export function EventsListClient() {
   }
 
   // No events at all (no search active)
-  if (totalEvents === 0) {
+  if (!isLoading && effectiveTotalEvents === 0 && !hasActiveSearch) {
     return (
       <Card className="host-events__empty border-dashed">
         <CardContent className="flex flex-col items-center p-0">
@@ -92,7 +97,9 @@ export function EventsListClient() {
             <CalendarDots size={20} aria-hidden="true" />
           </div>
           <div className="host-events__metric-info">
-            <span className="host-events__metric-value">{totalEvents}</span>
+            <span className="host-events__metric-value">
+              {effectiveTotalEvents}
+            </span>
             <span className="host-events__metric-label">
               {t("metricEvents")}
             </span>

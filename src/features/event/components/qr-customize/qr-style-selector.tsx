@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Tabs, TabsList, TabsTrigger, TabsIndicator } from "@/components/ui";
 import type {
   QRCornerDotType,
   QRCornerSquareType,
@@ -37,39 +38,62 @@ export function QRStyleSelector({
   ];
 
   const cornerOptions: Array<{
+    key: string;
     square: QRCornerSquareType;
     dot: QRCornerDotType;
     labelKey: CornerLabelKey;
   }> = [
-    { square: "extra-rounded", dot: "dot", labelKey: "cornerRounded" },
-    { square: "square", dot: "square", labelKey: "cornerSquare" },
-    { square: "dot", dot: "dot", labelKey: "cornerDot" },
+    {
+      key: "extra-rounded:dot",
+      square: "extra-rounded",
+      dot: "dot",
+      labelKey: "cornerRounded",
+    },
+    {
+      key: "square:square",
+      square: "square",
+      dot: "square",
+      labelKey: "cornerSquare",
+    },
+    {
+      key: "dot:dot",
+      square: "dot",
+      dot: "dot",
+      labelKey: "cornerDot",
+    },
   ];
+
+  const activeCornerKey =
+    cornerOptions.find(
+      (opt) => opt.square === cornerSquareType && opt.dot === cornerDotType,
+    )?.key || cornerOptions[0].key;
 
   return (
     <div className="qr-style-selector space-y-4">
       {/* Dot Style Selection */}
-      <div>
-        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-2">
+      <div className="space-y-2">
+        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
           {t("dotStyle")}
         </label>
-        <div className="grid grid-cols-4 gap-2">
-          {dotOptions.map((opt) => {
-            const isSelected = dotType === opt.type;
-
-            return (
-              <button
+        <Tabs
+          value={dotType}
+          onValueChange={(val) => {
+            if (val) onChange({ dotType: val as QRDotType });
+          }}
+        >
+          <TabsList
+            variant="pill"
+            className="w-full grid grid-cols-4 gap-1 p-1 bg-soft border border-line rounded-xl"
+          >
+            {dotOptions.map((opt) => (
+              <TabsTrigger
                 key={opt.type}
-                type="button"
-                onClick={() => onChange({ dotType: opt.type })}
-                className={`py-2 px-2 rounded-xl text-xs font-medium border flex flex-col items-center gap-1.5 transition-all ${
-                  isSelected
-                    ? "border-primary bg-primary/10 text-primary font-semibold ring-1 ring-primary/20"
-                    : "border-line bg-surface text-muted-foreground hover:text-ink hover:border-line-hover"
-                }`}
+                value={opt.type}
+                variant="pill"
+                className="py-2 px-1 text-xs rounded-lg flex flex-col items-center gap-1.5"
               >
                 {/* Visual miniature dot preview */}
-                <div className="flex gap-1 items-center justify-center h-4">
+                <div className="flex gap-1 items-center justify-center h-4 text-current">
                   {opt.type === "square" && (
                     <>
                       <div className="w-2.5 h-2.5 bg-current" />
@@ -96,37 +120,41 @@ export function QRStyleSelector({
                   )}
                 </div>
                 <span>{t(opt.labelKey)}</span>
-              </button>
-            );
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+            <TabsIndicator variant="pill" />
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Corner Eye Style Selection */}
-      <div>
-        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-2">
+      <div className="space-y-2">
+        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block">
           {t("cornerStyle")}
         </label>
-        <div className="grid grid-cols-3 gap-2">
-          {cornerOptions.map((opt) => {
-            const isSelected =
-              cornerSquareType === opt.square && cornerDotType === opt.dot;
+        <Tabs
+          value={activeCornerKey}
+          onValueChange={(val) => {
+            const selected = cornerOptions.find((opt) => opt.key === val);
 
-            return (
-              <button
-                key={opt.labelKey}
-                type="button"
-                onClick={() =>
-                  onChange({
-                    cornerSquareType: opt.square,
-                    cornerDotType: opt.dot,
-                  })
-                }
-                className={`py-2 px-2 rounded-xl text-xs font-medium border flex items-center justify-center gap-2 transition-all ${
-                  isSelected
-                    ? "border-primary bg-primary/10 text-primary font-semibold ring-1 ring-primary/20"
-                    : "border-line bg-surface text-muted-foreground hover:text-ink hover:border-line-hover"
-                }`}
+            if (selected) {
+              onChange({
+                cornerSquareType: selected.square,
+                cornerDotType: selected.dot,
+              });
+            }
+          }}
+        >
+          <TabsList
+            variant="pill"
+            className="w-full grid grid-cols-3 gap-1 p-1 bg-soft border border-line rounded-xl"
+          >
+            {cornerOptions.map((opt) => (
+              <TabsTrigger
+                key={opt.key}
+                value={opt.key}
+                variant="pill"
+                className="py-2 px-2 text-xs rounded-lg flex items-center justify-center gap-2"
               >
                 {/* Visual miniature corner eye */}
                 <div
@@ -145,10 +173,11 @@ export function QRStyleSelector({
                   />
                 </div>
                 <span>{t(opt.labelKey)}</span>
-              </button>
-            );
-          })}
-        </div>
+              </TabsTrigger>
+            ))}
+            <TabsIndicator variant="pill" />
+          </TabsList>
+        </Tabs>
       </div>
     </div>
   );

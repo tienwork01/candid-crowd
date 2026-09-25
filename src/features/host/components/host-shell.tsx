@@ -5,7 +5,7 @@ import { HostAccountMenu, type UserPlan } from "./host-account-menu";
 import { siteConfig } from "@/lib/config";
 
 type HostShellProps = {
-  active: "events" | "new" | "profile" | "billing";
+  active?: "events" | "new" | "profile" | "billing";
   plan?: UserPlan;
   children: React.ReactNode;
 };

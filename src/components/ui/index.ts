@@ -82,3 +82,16 @@ export {
   AccordionTrigger,
   AccordionPanel,
 } from "./accordion";
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsIndicator,
+  TabsContent,
+} from "./tabs";
+export type {
+  TabsVariant,
+  TabsListProps,
+  TabsTriggerProps,
+  TabsIndicatorProps,
+} from "./tabs";
