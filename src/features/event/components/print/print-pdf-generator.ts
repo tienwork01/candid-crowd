@@ -1,4 +1,3 @@
-import { jsPDF } from "jspdf";
 import { PRINT_DIMENSIONS, type PrintSignConfig } from "./print-template-types";
 import { renderPrintTemplateCanvas } from "./print-template-renderer";
 
@@ -38,6 +37,10 @@ export async function downloadPrintableSign(
       : config.size === "a5"
         ? "a5"
         : "a4";
+
+  // jsPDF is ~400 kB and only ever runs when a host actually exports a PDF, so
+  // it is pulled in on demand instead of riding along in the event page bundle.
+  const { jsPDF } = await import("jspdf");
 
   const pdf = new jsPDF({
     orientation: "portrait",

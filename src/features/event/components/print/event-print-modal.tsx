@@ -35,7 +35,6 @@ import {
   type PrintTheme,
 } from "./print-template-types";
 import { renderPrintTemplateCanvas } from "./print-template-renderer";
-import { downloadPrintableSign } from "./print-pdf-generator";
 
 type EventPrintModalProps = {
   event: CandidEvent;
@@ -288,6 +287,11 @@ export function EventPrintModal({
 
     try {
       setIsDownloading(true);
+
+      // The generator drags in jsPDF (~400 kB). Loading it here keeps it out of
+      // the event page bundle, where the modal itself is always mounted.
+      const { downloadPrintableSign } = await import("./print-pdf-generator");
+
       await downloadPrintableSign(printConfig);
       toast.success(
         `${t("printSign.downloadAction")} (${format.toUpperCase()})`,
