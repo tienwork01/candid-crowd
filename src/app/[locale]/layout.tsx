@@ -13,6 +13,15 @@ export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
+/**
+ * Only the seven supported locales are valid first segments. Without this, a
+ * one-segment URL like `/whatever` still matched `/[locale]` and had to render
+ * this statically prerendered route on demand just to throw `notFound()`, which
+ * Next rejects as "changed from static to dynamic at runtime". Unknown segments
+ * now fall through to the global 404 instead.
+ */
+export const dynamicParams = false;
+
 const openGraphLocaleMap: Record<string, string> = {
   en: "en_US",
   vi: "vi_VN",

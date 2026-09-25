@@ -9,13 +9,21 @@ import { marketingHref } from "@/i18n/marketing";
 import { isAppLocale, type AppLocale } from "@/i18n/locales";
 import "./not-found.css";
 
-export async function NotFoundView() {
-  const [locale, t] = await Promise.all([
-    getLocale(),
-    getTranslations("notFound"),
-  ]);
+/**
+ * `locale` mirrors `Header`: passing it explicitly keeps this component off the
+ * ambient `getLocale()` path, which reads request headers and would force the
+ * rendering route to be dynamic.
+ */
+export async function NotFoundView({ locale }: { locale?: AppLocale } = {}) {
+  const resolvedLocale = locale ?? (await getLocale());
+  const activeLocale: AppLocale = isAppLocale(resolvedLocale)
+    ? resolvedLocale
+    : "en";
+  const t = await getTranslations({
+    locale: activeLocale,
+    namespace: "notFound",
+  });
 
-  const activeLocale: AppLocale = isAppLocale(locale) ? locale : "en";
   const prefix = marketingHref(activeLocale);
 
   return (
