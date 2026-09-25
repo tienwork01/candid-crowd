@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -71,6 +71,15 @@ export type HostAccountMenuProps = {
 
 const emptySubscribe = () => () => {};
 
+/**
+ * The workspace destinations live inside the dropdown popup, which is not in
+ * the DOM until the menu opens. Next's viewport-based `<Link>` prefetch can
+ * therefore never see them, so every click paid for a cold server round trip.
+ * Prefetching these routes by hand warms each one's `loading.tsx` shell and
+ * segment JS, which is what makes the transition feel instant.
+ */
+const navHrefs = ["/events", "/profile", "/billing"] as const;
+
 export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
   const mounted = useSyncExternalStore(
     emptySubscribe,
@@ -89,6 +98,24 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
   const { user, isPending, clear: clearHostCache } = useHostProfile();
   const { canInstall, openInstallPrompt } = usePWA();
   const router = useRouter();
+
+  const prefetchNav = useCallback(() => {
+    for (const href of navHrefs) router.prefetch(href);
+  }, [router]);
+
+  useEffect(() => {
+    // Wait for an idle moment so prefetching never competes with the initial
+    // render of the page the host is actually looking at.
+    if (typeof window.requestIdleCallback !== "function") {
+      const timeout = window.setTimeout(prefetchNav, 1500);
+
+      return () => window.clearTimeout(timeout);
+    }
+
+    const handle = window.requestIdleCallback(prefetchNav, { timeout: 3000 });
+
+    return () => window.cancelIdleCallback(handle);
+  }, [prefetchNav]);
 
   const currentActive =
     active ||
@@ -136,7 +163,13 @@ export function HostAccountMenu({ active, plan }: HostAccountMenuProps) {
   const email = user?.email || t("signInToManage");
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        // Refresh the prefetched entries whenever the menu is opened, so a
+        // long-lived session still navigates from a warm cache.
+        if (open) prefetchNav();
+      }}
+    >
       <DropdownMenuTrigger
         aria-label={t("openMenuAria")}
         className="group inline-flex min-h-[44px] items-center gap-2.5 rounded-xl px-2.5 py-1.5 text-foreground transition-colors duration-150 hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none cursor-pointer select-none"

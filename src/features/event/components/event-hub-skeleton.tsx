@@ -1,4 +1,6 @@
-import { EventMediaSkeletonGrid } from "./gallery";
+// Imported by path rather than through the gallery barrel so this skeleton can
+// be reused from a route `loading.tsx` without dragging in the whole gallery.
+import { EventMediaSkeletonGrid } from "./gallery/event-media-skeleton";
 
 export function EventHubSkeleton() {
   return (

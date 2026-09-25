@@ -1,4 +1,5 @@
 export { HostShell } from "./host-shell";
+export { HostAccountPageSkeleton } from "./host-account-page-skeleton";
 export { HostAccountMenu, type UserPlan } from "./host-account-menu";
 export {
   HostUserCard,

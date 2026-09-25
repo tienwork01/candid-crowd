@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   images: { qualities: [75, 85, 90] },
   experimental: {
+    // Every app route renders dynamically, so without these the client router
+    // throws away each prefetch and re-fetches the segment on every click.
+    // `dynamic` lets a visited route be reused for 30s (the data itself still
+    // revalidates through TanStack Query), and `dynamicOnHover` upgrades a
+    // hovered link from its loading shell to the real content before the click.
+    staleTimes: { dynamic: 30, static: 180 },
+    dynamicOnHover: true,
     ...(process.env.BUILD_CPUS
       ? { cpus: parseInt(process.env.BUILD_CPUS, 10) }
       : {}),
