@@ -25,6 +25,7 @@
       "SESSION_EXPIRED": "La tua sessione è scaduta. Accedi di nuovo.",
       "UNAUTHORIZED": "Non hai il permesso di eseguire questa azione.",
       "SOCIAL_ACCOUNT_ALREADY_LINKED": "Questo account social è già collegato a un altro utente.",
+      "DISPOSABLE_EMAIL_NOT_ALLOWED": "Usa un indirizzo email permanente.",
       "FAILED_TO_CREATE_USER": "Non è stato possibile creare il tuo account. Riprova.",
       "EVENT_NOT_FOUND": "L'evento richiesto non è stato trovato.",
       "EVENT_NAME_REQUIRED": "Inserisci il nome dell'evento.",

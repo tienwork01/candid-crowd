@@ -29,6 +29,7 @@ const RAW_ERROR_MESSAGES: Record<string, string> = {
   UNAUTHORIZED: "You do not have permission to perform this action.",
   SOCIAL_ACCOUNT_ALREADY_LINKED:
     "This social account is already linked to another user.",
+  DISPOSABLE_EMAIL_NOT_ALLOWED: "Please use a permanent email address.",
   FAILED_TO_CREATE_USER: "We couldn’t create your account. Please try again.",
 
   // Event & Domain

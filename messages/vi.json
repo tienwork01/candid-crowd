@@ -25,6 +25,7 @@
       "SESSION_EXPIRED": "Phiên làm việc của bạn đã hết hạn. Vui lòng đăng nhập lại.",
       "UNAUTHORIZED": "Bạn không có quyền thực hiện hành động này.",
       "SOCIAL_ACCOUNT_ALREADY_LINKED": "Tài khoản mạng xã hội này đã được liên kết với người dùng khác.",
+      "DISPOSABLE_EMAIL_NOT_ALLOWED": "Vui lòng sử dụng email chính thức thay vì email tạm thời.",
       "FAILED_TO_CREATE_USER": "Không thể tạo tài khoản của bạn. Vui lòng thử lại.",
       "EVENT_NOT_FOUND": "Không tìm thấy sự kiện được yêu cầu.",
       "EVENT_NAME_REQUIRED": "Vui lòng nhập tên sự kiện.",

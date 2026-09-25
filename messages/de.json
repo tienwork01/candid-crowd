@@ -25,6 +25,7 @@
       "SESSION_EXPIRED": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
       "UNAUTHORIZED": "Sie haben keine Berechtigung, diese Aktion auszuführen.",
       "SOCIAL_ACCOUNT_ALREADY_LINKED": "Dieses soziale Konto ist bereits mit einem anderen Benutzer verknüpft.",
+      "DISPOSABLE_EMAIL_NOT_ALLOWED": "Bitte verwende eine dauerhafte E-Mail-Adresse.",
       "FAILED_TO_CREATE_USER": "Ihr Konto konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
       "EVENT_NOT_FOUND": "Das angeforderte Event konnte nicht gefunden werden.",
       "EVENT_NAME_REQUIRED": "Bitte geben Sie einen Eventnamen ein.",

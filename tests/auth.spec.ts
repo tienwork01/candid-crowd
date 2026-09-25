@@ -160,3 +160,29 @@ test("protected routes reject an invalid Better Auth cookie", async ({
 
   await expect(page).toHaveURL(/\/login\?next=%2Fprofile$/);
 });
+
+test("registration displays error message when disposable email is rejected", async ({
+  page,
+}) => {
+  await page.route("**/api/auth/sign-up/email", async (route) => {
+    await route.fulfill({
+      status: 400,
+      contentType: "application/json",
+      body: JSON.stringify({
+        code: "DISPOSABLE_EMAIL_NOT_ALLOWED",
+        message: "Please use a permanent email address.",
+      }),
+    });
+  });
+
+  await page.goto("/register");
+  await page.getByLabel("Full name").fill("Test User");
+  await page.getByLabel("Email address").fill("spam@10minutemail.com");
+  await page.locator("#password").fill("sample-only-password");
+  await page.locator("#terms").check();
+  await page.getByRole("button", { name: "Create account" }).click();
+
+  await expect(
+    page.getByText("Please use a permanent email address."),
+  ).toBeVisible();
+});

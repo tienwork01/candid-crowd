@@ -25,6 +25,7 @@
       "SESSION_EXPIRED": "Su sesión ha caducado. Inicie sesión de nuevo.",
       "UNAUTHORIZED": "No tiene permiso para realizar esta acción.",
       "SOCIAL_ACCOUNT_ALREADY_LINKED": "Esta cuenta social ya está vinculada a otro usuario.",
+      "DISPOSABLE_EMAIL_NOT_ALLOWED": "Por favor, utiliza una dirección de correo permanente.",
       "FAILED_TO_CREATE_USER": "No pudimos crear su cuenta. Por favor, inténtelo de nuevo.",
       "EVENT_NOT_FOUND": "No se pudo encontrar el evento solicitado.",
       "EVENT_NAME_REQUIRED": "Por favor, ingrese un nombre para el evento.",

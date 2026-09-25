@@ -40,6 +40,9 @@ test.describe("Frontend Error Architecture", () => {
     expect(getErrorMessage("event_not_found")).toBe(
       ERROR_MESSAGES.event_not_found,
     );
+    expect(getErrorMessage("DISPOSABLE_EMAIL_NOT_ALLOWED")).toBe(
+      ERROR_MESSAGES.disposable_email_not_allowed,
+    );
   });
 
   test("falls back to DEFAULT_ERROR_MESSAGE when error code is unknown", () => {

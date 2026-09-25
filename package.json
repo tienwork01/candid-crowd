@@ -35,6 +35,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cn": "^0.3.0",
+    "disposable-email-domains": "^1.0.62",
     "input-otp": "^1.5.0",
     "jspdf": "^4.2.1",
     "motion": "^13.2.0",

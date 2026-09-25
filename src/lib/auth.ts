@@ -1,10 +1,12 @@
 import dns from "node:dns";
 import { betterAuth } from "better-auth";
+import { APIError } from "better-auth/api";
 import { jwt } from "better-auth/plugins";
 import { dash } from "@better-auth/infra";
 import { Pool } from "pg";
 import { sendAuthEmail } from "@/lib/auth-email";
 import { siteConfig } from "@/lib/config";
+import { isDisposableEmail } from "@/lib/disposable-email";
 
 if (typeof dns.setDefaultResultOrder === "function") {
   dns.setDefaultResultOrder("ipv4first");
@@ -165,6 +167,30 @@ export const auth = betterAuth({
       termsVersion: { type: "string", required: true, input: true },
       privacyVersion: { type: "string", required: true, input: true },
       deletedAt: { type: "date", required: false, input: false },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          if (isDisposableEmail(user.email)) {
+            throw new APIError("BAD_REQUEST", {
+              code: "DISPOSABLE_EMAIL_NOT_ALLOWED",
+              message: "Please use a permanent email address.",
+            });
+          }
+        },
+      },
+      update: {
+        before: async (data) => {
+          if (typeof data.email === "string" && isDisposableEmail(data.email)) {
+            throw new APIError("BAD_REQUEST", {
+              code: "DISPOSABLE_EMAIL_NOT_ALLOWED",
+              message: "Please use a permanent email address.",
+            });
+          }
+        },
+      },
     },
   },
   emailAndPassword: {
