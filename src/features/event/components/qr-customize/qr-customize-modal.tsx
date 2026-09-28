@@ -28,7 +28,7 @@ interface QRCustomizeModalProps {
   formattedDate?: string | null;
   isOpen: boolean;
   onClose: () => void;
-  onApplied?: (config: QRCustomizeState) => void;
+  onApplied?: (config: QRCustomizeState) => Promise<void> | void;
 }
 
 export function QRCustomizeModal({
@@ -43,8 +43,11 @@ export function QRCustomizeModal({
   const tCommon = useTranslations("common");
 
   const [config, setConfig] = useState<QRCustomizeState>(() => {
-    return loadQRConfig(event.id) || DEFAULT_QR_CUSTOMIZE_STATE;
+    return (
+      event.qr_config || loadQRConfig(event.id) || DEFAULT_QR_CUSTOMIZE_STATE
+    );
   });
+  const [isApplying, setIsApplying] = useState(false);
 
   // Keyboard close listener
   useEffect(() => {
@@ -68,15 +71,23 @@ export function QRCustomizeModal({
     toast.success(t("resetSuccess"));
   };
 
-  const handleApply = () => {
+  const handleApply = async () => {
     if (!config.logoDataUrl) {
       toast.warning(t("noLogoWarning"));
     }
 
-    saveQRConfig(event.id, config);
-    onApplied?.(config);
-    toast.success(t("applied"));
-    onClose();
+    setIsApplying(true);
+
+    try {
+      await onApplied?.(config);
+      saveQRConfig(event.id, config);
+      toast.success(t("applied"));
+      onClose();
+    } catch {
+      toast.error(tCommon("actions.retry"));
+    } finally {
+      setIsApplying(false);
+    }
   };
 
   return (
@@ -262,6 +273,7 @@ export function QRCustomizeModal({
               type="button"
               size="sm"
               onClick={handleApply}
+              disabled={isApplying}
               className="h-8 text-xs font-semibold px-4 gap-1.5 shadow-raised"
             >
               <Check size={14} weight="bold" />

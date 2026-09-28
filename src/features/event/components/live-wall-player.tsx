@@ -163,6 +163,8 @@ function LiveWallStage({
   onImageLoaded,
   isPortrait,
   retryAttempt,
+  qrBadgeUrl,
+  qrBadgeLabel,
 }: {
   item: PlayerMedia;
   eventName: string;
@@ -176,6 +178,8 @@ function LiveWallStage({
   ) => void;
   isPortrait: boolean;
   retryAttempt: number;
+  qrBadgeUrl?: string;
+  qrBadgeLabel?: string;
 }) {
   const showBackdrop = !item.is_video && isPortrait;
   const mediaURL = getMediaRequestURL(item.url, retryAttempt);
@@ -221,6 +225,24 @@ function LiveWallStage({
           />
         )}
       </div>
+      {qrBadgeUrl && (
+        <aside
+          className="live-wall-player__corner-badge"
+          aria-label={qrBadgeLabel || eventName}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={qrBadgeUrl}
+            alt=""
+            className="live-wall-player__corner-qr"
+          />
+          {qrBadgeLabel && (
+            <span className="live-wall-player__corner-label">
+              {qrBadgeLabel}
+            </span>
+          )}
+        </aside>
+      )}
     </div>
   );
 }
@@ -228,9 +250,13 @@ function LiveWallStage({
 function LiveWallMosaic({
   items,
   eventName,
+  qrBadgeUrl,
+  qrBadgeLabel,
 }: {
   items: PlayerMedia[];
   eventName: string;
+  qrBadgeUrl?: string;
+  qrBadgeLabel?: string;
 }) {
   return (
     <div
@@ -249,6 +275,24 @@ function LiveWallMosaic({
           />
         </div>
       ))}
+      {qrBadgeUrl && (
+        <aside
+          className="live-wall-player__corner-badge"
+          aria-label={qrBadgeLabel || eventName}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={qrBadgeUrl}
+            alt=""
+            className="live-wall-player__corner-qr"
+          />
+          {qrBadgeLabel && (
+            <span className="live-wall-player__corner-label">
+              {qrBadgeLabel}
+            </span>
+          )}
+        </aside>
+      )}
     </div>
   );
 }
@@ -299,17 +343,62 @@ export function LiveWallPlayer({ token }: { token: string }) {
         },
       }));
       setPlaylist((existing) => {
-        if (resetPlaylist || !hasSnapshotRef.current) {
+        // Initial load: populate playlist and initialize pagination cursor
+        if (!hasSnapshotRef.current) {
           const currentID = currentMediaIDRef.current;
           const currentIndex = currentID
             ? response.data.findIndex((item) => item.id === currentID)
             : -1;
 
-          // A moderation or policy refresh must remove ineligible media, but
-          // should not visibly jump away from a still-eligible current slide.
           setIndex(currentIndex >= 0 ? currentIndex : 0);
 
           return response.data;
+        }
+
+        // Moderation / Policy update (resetPlaylist = true)
+        if (resetPlaylist) {
+          const incomingMap = new Map(
+            response.data.map((item) => [item.id, item]),
+          );
+          const isFeaturedOnly =
+            response.presentation?.content_policy === "featured_only";
+
+          // Update existing media with incoming changes, while filtering out
+          // media that have become hidden or ineligible under the active policy.
+          const updated = existing
+            .map((item) => incomingMap.get(item.id) ?? item)
+            .filter((item) => {
+              if (item.status === "hidden") return false;
+              if (isFeaturedOnly && item.status !== "featured") return false;
+
+              return true;
+            });
+
+          // Also merge any new incoming media not already in the existing list
+          const existingIDs = new Set(updated.map((item) => item.id));
+          const newItems = response.data.filter(
+            (item) =>
+              !existingIDs.has(item.id) &&
+              item.status !== "hidden" &&
+              (!isFeaturedOnly || item.status === "featured"),
+          );
+
+          const merged = [...newItems, ...updated];
+
+          // Retain the current viewing position if the active item is still eligible.
+          // This prevents the screen from jumping back to slide 0 when moderating items past page 1.
+          const currentID = currentMediaIDRef.current;
+          const newCurrentIndex = currentID
+            ? merged.findIndex((item) => item.id === currentID)
+            : -1;
+
+          if (newCurrentIndex >= 0) {
+            setIndex(newCurrentIndex);
+          } else {
+            setIndex((prev) => Math.min(prev, Math.max(0, merged.length - 1)));
+          }
+
+          return merged;
         }
 
         const fresh = response.data.filter(
@@ -337,7 +426,7 @@ export function LiveWallPlayer({ token }: { token: string }) {
         return mergeMedia(existing, response.data);
       });
 
-      if (resetPlaylist || !hasSnapshotRef.current) {
+      if (!hasSnapshotRef.current) {
         hasSnapshotRef.current = true;
         nextCursorRef.current = response.page.next_cursor ?? null;
         hasMoreRef.current = Boolean(response.page.has_more);
@@ -497,7 +586,6 @@ export function LiveWallPlayer({ token }: { token: string }) {
     presentation.show_cta ||
     isFinalSlide ||
     !current ||
-    qrStrategy === "always" ||
     (qrStrategy === "interval" && isAutoCTAVisible);
 
   const advanceMedia = useCallback(() => setIndex((value) => value + 1), []);
@@ -611,11 +699,89 @@ export function LiveWallPlayer({ token }: { token: string }) {
     }
   }, [isInvitationVisible, presentation.is_blackout, presentation.is_playing]);
 
+  // Video Watchdog: If a video gets stuck buffering or fails to fire onEnded,
+  // automatically advance after a maximum timeout so the wall never hangs indefinitely.
+  useEffect(() => {
+    if (
+      !currentId ||
+      !isCurrentVideo ||
+      !presentation.is_playing ||
+      isInvitationVisible ||
+      isFinalSlide ||
+      presentation.is_blackout
+    ) {
+      return;
+    }
+
+    const MAX_VIDEO_STALL_MS = 45_000;
+    const timer = window.setTimeout(advanceMedia, MAX_VIDEO_STALL_MS);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    advanceMedia,
+    currentId,
+    isCurrentVideo,
+    isFinalSlide,
+    isInvitationVisible,
+    presentation.is_blackout,
+    presentation.is_playing,
+  ]);
+
+  // Operator keyboard shortcuts for fullscreen, play/pause, next and previous
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (
+        event.target instanceof HTMLElement &&
+        (event.target.isContentEditable ||
+          event.target.tagName === "INPUT" ||
+          event.target.tagName === "TEXTAREA" ||
+          event.target.tagName === "SELECT")
+      ) {
+        return;
+      }
+
+      if (event.code === "Space") {
+        event.preventDefault();
+        setPayload((curr) =>
+          curr
+            ? {
+                ...curr,
+                presentation: {
+                  ...defaultPresentation,
+                  ...curr.presentation,
+                  is_playing: !curr.presentation?.is_playing,
+                },
+              }
+            : curr,
+        );
+      } else if (event.code === "ArrowRight") {
+        event.preventDefault();
+        advanceMedia();
+      } else if (event.code === "ArrowLeft") {
+        event.preventDefault();
+        setIndex((curr) => Math.max(0, curr - 1));
+      } else if (event.key === "f" || event.key === "F") {
+        event.preventDefault();
+
+        if (!document.fullscreenElement) {
+          void document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          void document.exitFullscreen().catch(() => {});
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [advanceMedia]);
+
   useEffect(() => {
     let active = true;
 
-    if ((!isInvitationVisible && Boolean(current)) || !payload?.event.slug)
-      return;
+    const needsQr = isInvitationVisible || qrStrategy === "always" || !current;
+
+    if (!needsQr || !payload?.event.slug) return;
 
     void toDataURL(
       `${window.location.origin}/e/${encodeURIComponent(payload.event.slug)}?src=screen`,
@@ -636,7 +802,7 @@ export function LiveWallPlayer({ token }: { token: string }) {
     return () => {
       active = false;
     };
-  }, [current, isInvitationVisible, payload?.event.slug]);
+  }, [current, isInvitationVisible, payload?.event.slug, qrStrategy]);
 
   return (
     <main
@@ -682,7 +848,12 @@ export function LiveWallPlayer({ token }: { token: string }) {
             }
           />
         ) : presentation.layout_mode === "mosaic" && media.length ? (
-          <LiveWallMosaic items={media} eventName={presentationEventName} />
+          <LiveWallMosaic
+            items={media}
+            eventName={presentationEventName}
+            qrBadgeUrl={qrStrategy === "always" ? qrDataUrl : undefined}
+            qrBadgeLabel={t("liveWall.scanPrompt")}
+          />
         ) : current ? (
           <LiveWallStage
             item={current}
@@ -694,6 +865,8 @@ export function LiveWallPlayer({ token }: { token: string }) {
             onImageLoaded={handleImageLoaded}
             isPortrait={isPortrait}
             retryAttempt={mediaRetryAttempts.get(current.id) ?? 0}
+            qrBadgeUrl={qrStrategy === "always" ? qrDataUrl : undefined}
+            qrBadgeLabel={t("liveWall.scanPrompt")}
           />
         ) : null}
       </section>

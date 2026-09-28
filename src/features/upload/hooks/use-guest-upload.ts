@@ -38,6 +38,8 @@ export type RestoredGuestUpload = PendingUploadItem & { file: File };
 export type UploadStage = "preparing" | "reserving" | "uploading" | "verifying";
 type UploadFileOptions = {
   id: string;
+  guestName?: string;
+  caption?: string;
   onProgress?: (percent: number) => void;
   onStage?: (stage: UploadStage) => void;
 };
@@ -145,6 +147,8 @@ export function useGuestUpload(slug: string) {
       const persisted = (await getPendingUploads(slug)).find(
         (item) => item.id === queueID,
       );
+      const guestName = persisted?.guestName ?? options.guestName;
+      const guestNote = persisted?.guestNote ?? options.caption;
 
       if (!persisted) {
         try {
@@ -155,6 +159,8 @@ export function useGuestUpload(slug: string) {
             fileName: file.name,
             mimeType: file.type,
             size: file.size,
+            guestName,
+            guestNote,
           });
         } catch {
           // Private/embedded browsers can deny IndexedDB. Keep the foreground
@@ -190,6 +196,8 @@ export function useGuestUpload(slug: string) {
                 checksum_sha256: checksumSHA256,
                 client_upload_id: queueID,
                 guest_session_token: token,
+                guest_name: guestName,
+                caption: guestNote,
               },
             );
 

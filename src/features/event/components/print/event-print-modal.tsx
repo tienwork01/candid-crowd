@@ -165,7 +165,8 @@ export function EventPrintModal({
     if (!isOpen) return;
 
     let active = true;
-    const currentCustomConfig = propConfig ?? loadQRConfig(event.id);
+    const currentCustomConfig =
+      propConfig ?? event.qr_config ?? loadQRConfig(event.id);
 
     void generateHighResQRDataUrl(targetGuestUrl, currentCustomConfig, 1400)
       .then((url) => {
@@ -178,7 +179,14 @@ export function EventPrintModal({
     return () => {
       active = false;
     };
-  }, [isOpen, targetGuestUrl, propConfig, event.id, configVersion]);
+  }, [
+    isOpen,
+    targetGuestUrl,
+    propConfig,
+    event.id,
+    event.qr_config,
+    configVersion,
+  ]);
 
   // Theme-specific headline text
   const headlineText = useMemo(() => {

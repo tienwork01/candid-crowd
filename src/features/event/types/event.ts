@@ -90,6 +90,7 @@ export type CandidEvent = {
   candid_camera_enabled?: boolean;
   setup_checklist?: EventSetupChecklist;
   guest_theme?: import("../components/guest-theme/guest-theme-types").GuestThemeConfig;
+  qr_config?: import("../components/qr-customize/qr-customize-types").QRCustomizeState;
   media_items?: EventMediaItem[];
   qr_sources?: QRSourceMetric[];
   // Metrics summary for overview

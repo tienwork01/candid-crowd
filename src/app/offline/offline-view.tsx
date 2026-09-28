@@ -82,6 +82,18 @@ export function OfflineView() {
     }
   }, []);
 
+  const resumePendingUploads = useCallback(() => {
+    const slug = pendingUploads[0]?.slug;
+
+    if (slug) {
+      router.push(`/e/${encodeURIComponent(slug)}`);
+
+      return;
+    }
+
+    window.location.reload();
+  }, [pendingUploads, router]);
+
   const handleRetry = async () => {
     if (retryState === "checking" || retryState === "restored") return;
 
@@ -92,9 +104,7 @@ export function OfflineView() {
     if (isConnected) {
       setRetryState("restored");
       setTimeout(() => {
-        if (typeof window !== "undefined") {
-          window.location.reload();
-        }
+        resumePendingUploads();
       }, 600);
     } else {
       setRetryState("failed");
@@ -128,7 +138,7 @@ export function OfflineView() {
     return () => {
       window.removeEventListener("online", handleOnline);
     };
-  }, []);
+  }, [resumePendingUploads]);
 
   const isChecking = retryState === "checking";
   const isFailed = retryState === "failed";

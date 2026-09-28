@@ -26,6 +26,7 @@ type BackendEvent = {
   used_media_bytes: number;
   created_at: string;
   updated_at: string;
+  qr_config?: CandidEvent["qr_config"];
 };
 
 type BackendEventsResponse = {
@@ -58,6 +59,7 @@ function normalizeEvent(be: BackendEvent): CandidEvent {
     qr_destination: guestUrl,
     created_at: be.created_at,
     updated_at: be.updated_at,
+    qr_config: be.qr_config,
     lifecycle_phase: "before",
     setup_checklist: {
       eventCreated: true,

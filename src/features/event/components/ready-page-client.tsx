@@ -216,17 +216,16 @@ export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
         formattedDate={event.event_date ? formattedDate : null}
         isOpen={isCustomizeQrOpen}
         onClose={() => setIsCustomizeQrOpen(false)}
-        onApplied={() => {
-          setQrConfigVersion((v) => v + 1);
+        onApplied={async (config) => {
+          await updateEvent({
+            id: event.id,
+            qr_config: config,
+            setup_checklist: {
+              customizedQr: true,
+            },
+          });
 
-          if (event && !event.setup_checklist?.customizedQr) {
-            void updateEvent({
-              id: event.id,
-              setup_checklist: {
-                customizedQr: true,
-              },
-            });
-          }
+          setQrConfigVersion((v) => v + 1);
         }}
       />
 

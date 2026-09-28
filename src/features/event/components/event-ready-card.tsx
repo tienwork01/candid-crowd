@@ -42,7 +42,7 @@ export function EventReadyCard({
   );
   const [copied, setCopied] = useState(false);
   const [customConfig, setCustomConfig] = useState<QRCustomizeState | null>(
-    () => propConfig || loadQRConfig(event.id),
+    () => propConfig || event.qr_config || loadQRConfig(event.id),
   );
   const [prevEventKey, setPrevEventKey] = useState(
     () => `${event.id}-${configVersion ?? 0}`,
@@ -59,7 +59,7 @@ export function EventReadyCard({
     }
   } else if (currentEventKey !== prevEventKey) {
     setPrevEventKey(currentEventKey);
-    setCustomConfig(loadQRConfig(event.id));
+    setCustomConfig(event.qr_config || loadQRConfig(event.id));
   }
 
   const canShare =

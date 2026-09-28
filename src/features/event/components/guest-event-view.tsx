@@ -549,6 +549,8 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
       try {
         const uploaded = await uploadFile(currentTarget.file, {
           id: currentTarget.id,
+          guestName: guestName.trim() || undefined,
+          caption: guestNote.trim() || undefined,
           onStage: (stage) => setUploadStage(stage),
           onProgress: (percent) => {
             const overall = Math.round(

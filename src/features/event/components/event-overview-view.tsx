@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   ChartBar,
@@ -24,7 +24,6 @@ import { GuestThemeCustomizeModal } from "./guest-theme";
 import { EventEngageView } from "./event-engage-view";
 import { EventGalleryView } from "./event-gallery-view";
 import { EventHubHeader } from "./event-hub-header";
-import { EventLiveWallModal } from "./event-live-wall-modal";
 import { EventSharePopover } from "./event-share-popover";
 import { EventPrintModal } from "./print";
 import { QRCustomizeModal } from "./qr-customize";
@@ -70,6 +69,72 @@ type LiveWallContentPolicy = "featured_only" | "auto_approved";
 type LiveWallLayoutMode = "spotlight" | "mosaic" | "featured";
 type LiveWallQRStrategy = "interval" | "always" | "empty_only" | "hidden";
 type LiveWallArrivalBehavior = "queue" | "next";
+
+type LiveWallSessionState = {
+  id: string;
+  playerURL: string;
+  isPlaying: boolean;
+  isShowingCTA: boolean;
+  contentPolicy: LiveWallContentPolicy;
+  ctaEveryMedia: number;
+  layoutMode: LiveWallLayoutMode;
+  slideDuration: number;
+  qrStrategy: LiveWallQRStrategy;
+  arrivalBehavior: LiveWallArrivalBehavior;
+  revision: number;
+};
+
+const LIVE_WALL_SESSION_STORAGE_PREFIX = "candid_live_wall_session_";
+
+function getStoredLiveWallSession(
+  eventId: string,
+): LiveWallSessionState | null {
+  if (typeof window === "undefined" || !eventId) {
+    return null;
+  }
+
+  try {
+    const stored = sessionStorage.getItem(
+      `${LIVE_WALL_SESSION_STORAGE_PREFIX}${eventId}`,
+    );
+
+    if (!stored) {
+      return null;
+    }
+
+    const parsed = JSON.parse(stored) as LiveWallSessionState;
+
+    return parsed?.id && parsed?.playerURL ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveStoredLiveWallSession(
+  eventId: string,
+  session: LiveWallSessionState,
+) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(
+      `${LIVE_WALL_SESSION_STORAGE_PREFIX}${eventId}`,
+      JSON.stringify(session),
+    );
+  } catch {}
+}
+
+function clearStoredLiveWallSession(eventId: string) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    sessionStorage.removeItem(`${LIVE_WALL_SESSION_STORAGE_PREFIX}${eventId}`);
+  } catch {}
+}
 
 function getLiveWallPreset(mode: EventMode) {
   switch (mode) {
@@ -138,7 +203,6 @@ export function EventOverviewView({
   const batchDeleteMediaMutation = useBatchDeleteMedia(currentEvent.id);
 
   // Modals state
-  const [isLiveWallOpen, setIsLiveWallOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isCustomizeQrOpen, setIsCustomizeQrOpen] = useState(false);
@@ -148,19 +212,10 @@ export function EventOverviewView({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isRecoveryDismissed, setIsRecoveryDismissed] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
-  const [liveWallSession, setLiveWallSession] = useState<{
-    id: string;
-    playerURL: string;
-    isPlaying: boolean;
-    isShowingCTA: boolean;
-    contentPolicy: LiveWallContentPolicy;
-    ctaEveryMedia: number;
-    layoutMode: LiveWallLayoutMode;
-    slideDuration: number;
-    qrStrategy: LiveWallQRStrategy;
-    arrivalBehavior: LiveWallArrivalBehavior;
-    revision: number;
-  } | null>(null);
+  const [liveWallSession, setLiveWallSession] =
+    useState<LiveWallSessionState | null>(() =>
+      getStoredLiveWallSession(initialEvent.id),
+    );
   const [isLaunchingLiveWall, setIsLaunchingLiveWall] = useState(false);
   const [isEndingLiveWall, setIsEndingLiveWall] = useState(false);
   const [isControllingLiveWall, setIsControllingLiveWall] = useState(false);
@@ -170,6 +225,95 @@ export function EventOverviewView({
     useState(false);
   const [liveWallConfirmation, setLiveWallConfirmation] =
     useState<LiveWallConfirmation>(null);
+  const hasVerifiedLiveWallSessionRef = useRef(false);
+
+  // Restore & verify live wall session across page reloads in the same browser session
+  useEffect(() => {
+    if (
+      hasVerifiedLiveWallSessionRef.current ||
+      !currentEvent.id ||
+      !liveWallSession?.id
+    ) {
+      return;
+    }
+
+    hasVerifiedLiveWallSessionRef.current = true;
+
+    const sessionId = liveWallSession.id;
+    let isCancelled = false;
+
+    void privateClient
+      .get<{
+        id: string;
+        status?: string;
+        show_cta?: boolean;
+        content_policy?: LiveWallContentPolicy;
+        cta_every_media?: number;
+        layout_mode?: LiveWallLayoutMode;
+        slide_duration_seconds?: number;
+        qr_strategy?: LiveWallQRStrategy;
+        arrival_behavior?: LiveWallArrivalBehavior;
+        revision?: number;
+      }>(
+        `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(sessionId)}`,
+      )
+      .then((response) => {
+        if (isCancelled) {
+          return;
+        }
+
+        if (
+          response.data.status === "ended" ||
+          response.data.status === "revoked"
+        ) {
+          clearStoredLiveWallSession(currentEvent.id);
+          setLiveWallSession(null);
+        } else {
+          setLiveWallSession((current) => {
+            if (!current || current.id !== sessionId) {
+              return current;
+            }
+
+            const updated: LiveWallSessionState = {
+              ...current,
+              isShowingCTA: response.data.show_cta ?? current.isShowingCTA,
+              contentPolicy:
+                response.data.content_policy ?? current.contentPolicy,
+              ctaEveryMedia:
+                response.data.cta_every_media ?? current.ctaEveryMedia,
+              layoutMode: response.data.layout_mode ?? current.layoutMode,
+              slideDuration:
+                response.data.slide_duration_seconds ?? current.slideDuration,
+              qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
+              arrivalBehavior:
+                response.data.arrival_behavior ?? current.arrivalBehavior,
+              revision: response.data.revision ?? current.revision,
+            };
+
+            saveStoredLiveWallSession(currentEvent.id, updated);
+
+            return updated;
+          });
+        }
+      })
+      .catch((error) => {
+        if (isCancelled) {
+          return;
+        }
+
+        if (
+          error instanceof APIError &&
+          (error.status === 404 || error.status === 410)
+        ) {
+          clearStoredLiveWallSession(currentEvent.id);
+          setLiveWallSession(null);
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentEvent.id, liveWallSession?.id]);
 
   const handleLaunchLiveWall = async () => {
     if (liveWallSession) {
@@ -207,7 +351,7 @@ export function EventOverviewView({
       );
       const playerURL = `/live-wall/${encodeURIComponent(response.data.token)}`;
 
-      setLiveWallSession({
+      const newSession: LiveWallSessionState = {
         id: response.data.id,
         playerURL,
         isPlaying: true,
@@ -219,7 +363,10 @@ export function EventOverviewView({
         qrStrategy: response.data.qr_strategy ?? "interval",
         arrivalBehavior: response.data.arrival_behavior ?? "queue",
         revision: response.data.revision ?? 0,
-      });
+      };
+
+      setLiveWallSession(newSession);
+      saveStoredLiveWallSession(currentEvent.id, newSession);
 
       if (playerWindow) {
         playerWindow.location.replace(playerURL);
@@ -252,27 +399,31 @@ export function EventOverviewView({
         { command },
       );
 
-      setLiveWallSession((current) =>
-        current
-          ? {
-              ...current,
-              isPlaying:
-                response.data.is_playing ??
-                (command === "play"
-                  ? true
-                  : command === "pause"
-                    ? false
-                    : current.isPlaying),
-              isShowingCTA:
-                response.data.show_cta ??
-                (command === "show_cta"
-                  ? true
-                  : command === "hide_cta"
-                    ? false
-                    : current.isShowingCTA),
-            }
-          : null,
-      );
+      setLiveWallSession((current) => {
+        if (!current) return null;
+
+        const updated: LiveWallSessionState = {
+          ...current,
+          isPlaying:
+            response.data.is_playing ??
+            (command === "play"
+              ? true
+              : command === "pause"
+                ? false
+                : current.isPlaying),
+          isShowingCTA:
+            response.data.show_cta ??
+            (command === "show_cta"
+              ? true
+              : command === "hide_cta"
+                ? false
+                : current.isShowingCTA),
+        };
+
+        saveStoredLiveWallSession(currentEvent.id, updated);
+
+        return updated;
+      });
     } catch {
       toast.error(t("gallery.actionFailed"));
     } finally {
@@ -306,15 +457,19 @@ export function EventOverviewView({
         },
       );
 
-      setLiveWallSession((current) =>
-        current
-          ? {
-              ...current,
-              contentPolicy,
-              revision: response.data.revision ?? current.revision + 1,
-            }
-          : null,
-      );
+      setLiveWallSession((current) => {
+        if (!current) return null;
+
+        const updated: LiveWallSessionState = {
+          ...current,
+          contentPolicy,
+          revision: response.data.revision ?? current.revision + 1,
+        };
+
+        saveStoredLiveWallSession(currentEvent.id, updated);
+
+        return updated;
+      });
     } catch {
       toast.error(t("gallery.actionFailed"));
     } finally {
@@ -336,15 +491,19 @@ export function EventOverviewView({
         },
       );
 
-      setLiveWallSession((current) =>
-        current
-          ? {
-              ...current,
-              ctaEveryMedia,
-              revision: response.data.revision ?? current.revision + 1,
-            }
-          : null,
-      );
+      setLiveWallSession((current) => {
+        if (!current) return null;
+
+        const updated: LiveWallSessionState = {
+          ...current,
+          ctaEveryMedia,
+          revision: response.data.revision ?? current.revision + 1,
+        };
+
+        saveStoredLiveWallSession(currentEvent.id, updated);
+
+        return updated;
+      });
     } catch {
       toast.error(t("gallery.actionFailed"));
     } finally {
@@ -375,20 +534,24 @@ export function EventOverviewView({
         { ...patch, expected_revision: liveWallSession.revision },
       );
 
-      setLiveWallSession((current) =>
-        current
-          ? {
-              ...current,
-              layoutMode: response.data.layout_mode ?? current.layoutMode,
-              slideDuration:
-                response.data.slide_duration_seconds ?? current.slideDuration,
-              qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
-              arrivalBehavior:
-                response.data.arrival_behavior ?? current.arrivalBehavior,
-              revision: response.data.revision ?? current.revision + 1,
-            }
-          : null,
-      );
+      setLiveWallSession((current) => {
+        if (!current) return null;
+
+        const updated: LiveWallSessionState = {
+          ...current,
+          layoutMode: response.data.layout_mode ?? current.layoutMode,
+          slideDuration:
+            response.data.slide_duration_seconds ?? current.slideDuration,
+          qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
+          arrivalBehavior:
+            response.data.arrival_behavior ?? current.arrivalBehavior,
+          revision: response.data.revision ?? current.revision + 1,
+        };
+
+        saveStoredLiveWallSession(currentEvent.id, updated);
+
+        return updated;
+      });
     } catch {
       toast.error(t("gallery.actionFailed"));
     } finally {
@@ -404,6 +567,7 @@ export function EventOverviewView({
       await privateClient.post(
         `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(liveWallSession.id)}/end`,
       );
+      clearStoredLiveWallSession(currentEvent.id);
       setLiveWallSession(null);
     } catch {
       toast.error(t("gallery.actionFailed"));
@@ -516,22 +680,25 @@ export function EventOverviewView({
         { ...preset, expected_revision: liveWallSession.revision },
       );
 
-      setLiveWallSession((current) =>
-        current
-          ? {
-              ...current,
-              layoutMode: response.data.layout_mode ?? current.layoutMode,
-              slideDuration:
-                response.data.slide_duration_seconds ?? current.slideDuration,
-              qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
-              arrivalBehavior:
-                response.data.arrival_behavior ?? current.arrivalBehavior,
-              ctaEveryMedia:
-                response.data.cta_every_media ?? current.ctaEveryMedia,
-              revision: response.data.revision ?? current.revision + 1,
-            }
-          : null,
-      );
+      setLiveWallSession((current) => {
+        if (!current) return null;
+
+        const updated: LiveWallSessionState = {
+          ...current,
+          layoutMode: response.data.layout_mode ?? current.layoutMode,
+          slideDuration:
+            response.data.slide_duration_seconds ?? current.slideDuration,
+          qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
+          arrivalBehavior:
+            response.data.arrival_behavior ?? current.arrivalBehavior,
+          ctaEveryMedia: response.data.cta_every_media ?? current.ctaEveryMedia,
+          revision: response.data.revision ?? current.revision + 1,
+        };
+
+        saveStoredLiveWallSession(currentEvent.id, updated);
+
+        return updated;
+      });
     } catch {
       // The event mode has already been saved. Keep the running wall intact
       // and let the host retry its presentation settings separately.
@@ -949,14 +1116,6 @@ export function EventOverviewView({
         </DialogContent>
       </Dialog>
 
-      {/* Fullscreen Live Wall */}
-      <EventLiveWallModal
-        event={currentEvent}
-        isOpen={isLiveWallOpen}
-        onClose={() => setIsLiveWallOpen(false)}
-        isRealtimeLive={isLive}
-      />
-
       {/* Share Popover */}
       <EventSharePopover
         event={currentEvent}
@@ -980,17 +1139,17 @@ export function EventOverviewView({
         formattedDate={currentEvent.event_date ? formattedDate : null}
         isOpen={isCustomizeQrOpen}
         onClose={() => setIsCustomizeQrOpen(false)}
-        onApplied={() => {
-          setQrConfigVersion((v) => v + 1);
+        onApplied={async (config) => {
+          const updated = await updateEvent({
+            id: currentEvent.id,
+            qr_config: config,
+            setup_checklist: {
+              customizedQr: true,
+            },
+          });
 
-          if (currentEvent && !currentEvent.setup_checklist?.customizedQr) {
-            void updateEvent({
-              id: currentEvent.id,
-              setup_checklist: {
-                customizedQr: true,
-              },
-            });
-          }
+          setCurrentEvent(updated);
+          setQrConfigVersion((v) => v + 1);
         }}
       />
 

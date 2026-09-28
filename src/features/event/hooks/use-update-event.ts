@@ -14,6 +14,7 @@ export type UpdateEventInput = {
   gallery_enabled?: boolean;
   event_mode?: CandidEvent["event_mode"];
   guest_theme?: CandidEvent["guest_theme"];
+  qr_config?: CandidEvent["qr_config"];
   setup_checklist?: Partial<NonNullable<CandidEvent["setup_checklist"]>>;
   lifecycle_phase?: CandidEvent["lifecycle_phase"];
   candid_camera_enabled?: boolean;
