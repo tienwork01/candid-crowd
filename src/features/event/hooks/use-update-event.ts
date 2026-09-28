@@ -12,68 +12,37 @@ export type UpdateEventInput = {
   date_unknown?: boolean;
   expected_guest_count?: number | null;
   gallery_enabled?: boolean;
+  event_mode?: CandidEvent["event_mode"];
   guest_theme?: CandidEvent["guest_theme"];
   setup_checklist?: Partial<NonNullable<CandidEvent["setup_checklist"]>>;
   lifecycle_phase?: CandidEvent["lifecycle_phase"];
+  candid_camera_enabled?: boolean;
 };
 
 export function useUpdateEvent() {
   const queryClient = useQueryClient();
 
-  return useMutation<CandidEvent | null, Error, UpdateEventInput>({
+  return useMutation<CandidEvent, Error, UpdateEventInput>({
     mutationFn: async (input) => {
-      try {
-        const response = await privateClient.patch<CandidEvent>(
-          `/api/v1/events/${encodeURIComponent(input.id)}`,
-          input,
-        );
+      const { id, date_unknown, event_date, ...updates } = input;
+      const response = await privateClient.patch<CandidEvent>(
+        `/api/v1/events/${encodeURIComponent(id)}`,
+        {
+          ...updates,
+          ...(event_date !== undefined ? { event_date } : {}),
+          ...(date_unknown || event_date === null
+            ? { clear_event_date: true }
+            : {}),
+        },
+      );
 
-        if (response.data && response.data.id) {
-          updateStoredEvent(input.id, response.data);
-
-          return response.data;
-        }
-      } catch {
-        // Fallback to local store
+      if (!response.data?.id) {
+        throw new Error("event_update_invalid_response");
       }
 
-      const updated = updateStoredEvent(input.id, {
-        ...(input.name ? { name: input.name } : {}),
-        ...(input.event_type ? { event_type: input.event_type } : {}),
-        ...(input.event_date !== undefined
-          ? { event_date: input.event_date }
-          : {}),
-        ...(input.date_unknown !== undefined
-          ? { date_unknown: input.date_unknown }
-          : {}),
-        ...(input.expected_guest_count !== undefined
-          ? { expected_guest_count: input.expected_guest_count }
-          : {}),
-        ...(input.gallery_enabled !== undefined
-          ? { gallery_enabled: input.gallery_enabled }
-          : {}),
-        ...(input.guest_theme !== undefined
-          ? { guest_theme: input.guest_theme }
-          : {}),
-        ...(input.setup_checklist
-          ? {
-              setup_checklist: {
-                eventCreated: true,
-                qrReady: true,
-                testedGuestExperience: false,
-                addedGuestCount: false,
-                customizedQr: false,
-                customizedPage: false,
-                ...input.setup_checklist,
-              },
-            }
-          : {}),
-        ...(input.lifecycle_phase
-          ? { lifecycle_phase: input.lifecycle_phase }
-          : {}),
-      });
+      updateStoredEvent(id, response.data);
 
-      return updated;
+      return response.data;
     },
     onSuccess: (data, variables) => {
       if (data) {

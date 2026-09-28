@@ -35,7 +35,12 @@ async function sha256(file: Blob): Promise<string> {
 
 export type UploadedGuestMedia = { id: string; url: string; mimeType: string };
 export type RestoredGuestUpload = PendingUploadItem & { file: File };
-type UploadFileOptions = { id: string; onProgress?: (percent: number) => void };
+export type UploadStage = "preparing" | "reserving" | "uploading" | "verifying";
+type UploadFileOptions = {
+  id: string;
+  onProgress?: (percent: number) => void;
+  onStage?: (stage: UploadStage) => void;
+};
 
 function sessionStorageKey(slug: string): string {
   return `candidcrowd.guest-session.${slug}`;
@@ -96,8 +101,12 @@ export function useGuestUpload(slug: string) {
         return stored;
       }
 
+      const searchParams = new URLSearchParams(window.location.search);
+      const source = searchParams.get("source") || searchParams.get("src");
       const response = await publicClient.post<GuestSessionResponse>(
         `/api/v1/public/events/${encodeURIComponent(slug)}/sessions`,
+        undefined,
+        { params: source ? { source } : undefined },
       );
 
       tokenRef.current = response.data.guest_session_token;
@@ -154,8 +163,13 @@ export function useGuestUpload(slug: string) {
       }
 
       try {
+        options.onStage?.("preparing");
+
         const optimized = await optimizeImageForUpload(file);
         const checksumSHA256 = await sha256(optimized);
+
+        options.onStage?.("reserving");
+
         let token = await getSessionToken(persisted?.guestSessionToken);
 
         await updatePendingUpload(queueID, {
@@ -193,7 +207,10 @@ export function useGuestUpload(slug: string) {
         }
 
         if (!target) throw new Error("upload_target_unavailable");
+        options.onStage?.("uploading");
         await putToPresignedURL(target, optimized, options.onProgress);
+
+        options.onStage?.("verifying");
 
         let completeError: unknown;
 

@@ -8,11 +8,14 @@ import {
   MagnifyingGlass,
   Plus,
   QrCode,
+  Sparkle,
   TrendUp,
   Users,
+  WarningCircle,
 } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
 import { useEventListParams, useEvents, useEventsTotals } from "../hooks";
+import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
 import {
@@ -31,6 +34,8 @@ import { EventCardSkeletonGrid } from "./event-card-skeleton";
 export function EventsListClient() {
   const t = useTranslations("host.pages");
   const tEvent = useTranslations("event");
+  const tErrors = useTranslations("common.errors");
+  const tSteps = useTranslations("marketing.howItWorks");
   const locale = useLocale() as AppLocale;
 
   // URL-driven params
@@ -46,7 +51,7 @@ export function EventsListClient() {
   } = useEventListParams();
 
   // Paginated query
-  const { data, isLoading, isFetching } = useEvents(params);
+  const { data, isLoading, isFetching, isError, error } = useEvents(params);
 
   // Global totals (all events, independent of current filter/page)
   const { totalEvents, totalMemories, totalContributors } = useEventsTotals();
@@ -70,21 +75,72 @@ export function EventsListClient() {
     );
   }
 
+  // A failed request must not read as "you have no events yet" — that empty
+  // state invites the host to create an event they may already have.
+  if (isError) {
+    return (
+      <section className="host-events__empty host-events__empty--error">
+        <span className="host-events__empty-icon host-events__empty-icon--error">
+          <WarningCircle size={22} aria-hidden="true" />
+        </span>
+        <h2 className="host-events__empty-title">
+          {getErrorMessage(error, undefined, tErrors)}
+        </h2>
+      </section>
+    );
+  }
+
   // No events at all (no search active)
   if (!isLoading && effectiveTotalEvents === 0 && !hasActiveSearch) {
+    const steps = [
+      { icon: Sparkle, label: tSteps("step1Title") },
+      { icon: QrCode, label: tSteps("step2Title") },
+      { icon: Images, label: tSteps("step3Title") },
+    ];
+
     return (
-      <Card className="host-events__empty border-dashed">
-        <CardContent className="flex flex-col items-center p-0">
-          <span className="host-events__empty-icon">
-            <CalendarDots size={24} aria-hidden="true" />
-          </span>
-          <h2>{t("shelfWaiting")}</h2>
-          <p>{t("shelfDescription")}</p>
-          <Link className="text-button" href="/events/new">
-            {t("createFirstEvent")} <Plus size={16} aria-hidden="true" />
-          </Link>
-        </CardContent>
-      </Card>
+      <section
+        className="host-events__empty"
+        aria-labelledby="host-events-empty-title"
+      >
+        <div className="host-events__empty-visual" aria-hidden="true">
+          <div className="host-events__empty-qr">
+            <QrCode size={48} weight="light" />
+            <span className="host-events__empty-qr-dot" />
+          </div>
+        </div>
+
+        <span className="host-events__empty-kicker">
+          <CalendarDots size={15} aria-hidden="true" />
+          <span>{t("eventsEyebrow")}</span>
+        </span>
+
+        <h2 id="host-events-empty-title" className="host-events__empty-title">
+          {t("shelfWaiting")}
+        </h2>
+        <p className="host-events__empty-lede">{t("shelfDescription")}</p>
+
+        {/* The description promises a gallery and host controls the host cannot
+            see yet. Showing the three steps makes that promise concrete. */}
+        <ol className="host-events__empty-steps">
+          {steps.map(({ icon: Icon, label }, index) => (
+            <li key={label} className="host-events__empty-step">
+              <span className="host-events__empty-step-icon" aria-hidden="true">
+                <Icon size={18} aria-hidden="true" />
+              </span>
+              <span className="host-events__empty-step-num">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <span className="host-events__empty-step-label">{label}</span>
+            </li>
+          ))}
+        </ol>
+
+        <Link className="button host-events__empty-cta" href="/events/new">
+          <Plus size={16} aria-hidden="true" />
+          <span>{t("createFirstEvent")}</span>
+        </Link>
+      </section>
     );
   }
 
@@ -184,15 +240,18 @@ export function EventsListClient() {
                   })
                 : tEvent("ready.noDate");
 
-              const expectedGuests = ev.expected_guest_count || 100;
+              const expectedGuests = ev.expected_guest_count ?? 0;
               const contributors = ev.metrics?.contributors_count || 0;
               const mediaCount =
                 (ev.metrics?.photos_count || 0) +
                 (ev.metrics?.videos_count || 0);
-              const rate = Math.min(
-                100,
-                Math.round((contributors / expectedGuests) * 100),
-              );
+              const rate =
+                expectedGuests > 0
+                  ? Math.min(
+                      100,
+                      Math.round((contributors / expectedGuests) * 100),
+                    )
+                  : 0;
 
               return (
                 <Card

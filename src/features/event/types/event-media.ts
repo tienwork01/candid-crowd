@@ -21,10 +21,12 @@ export type EventMediaQueryParams = {
   sort?: GallerySortType;
   page?: number;
   per_page?: number;
+  cursor?: string;
 };
 
 export type EventMediaResponse = {
   data: EventMediaItem[];
   counts: EventMediaCounts;
   pagination?: PaginationMeta;
+  page?: { next_cursor: string; has_more: boolean };
 };

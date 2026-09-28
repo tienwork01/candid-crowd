@@ -21,7 +21,7 @@ type EventEditDialogProps = {
   event: CandidEvent;
   isOpen: boolean;
   onClose: () => void;
-  onSave: (updated: Partial<CandidEvent>) => void;
+  onSave: (updated: Partial<CandidEvent>) => Promise<void>;
 };
 
 function EventEditForm({
@@ -55,8 +55,9 @@ function EventEditForm({
   const [galleryEnabled, setGalleryEnabled] = useState(
     event.gallery_enabled !== false,
   );
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!name.trim()) {
@@ -67,17 +68,25 @@ function EventEditForm({
 
     const countNum = parseInt(guestCount.trim(), 10);
 
-    onSave({
-      name: name.trim(),
-      event_type: eventType,
-      event_date: date ? `${date}T00:00:00Z` : null,
-      date_unknown: !date,
-      expected_guest_count: Number.isNaN(countNum) ? null : countNum,
-      gallery_enabled: galleryEnabled,
-    });
+    setIsSaving(true);
 
-    toast.success(t("settings.saveSuccess"));
-    onClose();
+    try {
+      await onSave({
+        name: name.trim(),
+        event_type: eventType,
+        event_date: date ? `${date}T00:00:00Z` : null,
+        date_unknown: !date,
+        expected_guest_count: Number.isNaN(countNum) ? null : countNum,
+        gallery_enabled: galleryEnabled,
+      });
+
+      toast.success(t("settings.saveSuccess"));
+      onClose();
+    } catch {
+      toast.error(t("settings.saveError"));
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -229,6 +238,7 @@ function EventEditForm({
             <Button
               type="submit"
               size="sm"
+              disabled={isSaving}
               className="button button--primary text-xs h-10 px-5"
             >
               <Sparkle size={14} weight="fill" className="mr-1" />

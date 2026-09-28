@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Plus } from "@phosphor-icons/react";
 import { useTranslations } from "next-intl";
 import { useEvent, useMounted } from "../hooks";
+import { getErrorMessage } from "@/lib/errors";
 import { EventOverviewView } from "./event-overview-view";
 import { EventHubSkeleton } from "./event-hub-skeleton";
 
@@ -16,10 +17,23 @@ export function OverviewPageClient({ eventId }: OverviewPageClientProps) {
   const tCommon = useTranslations("common.errors");
   const mounted = useMounted();
 
-  const { data: event, isLoading } = useEvent(eventId);
+  const { data: event, isLoading, isError, error } = useEvent(eventId);
 
   if (!mounted || isLoading) {
     return <EventHubSkeleton />;
+  }
+
+  // A failed request is not the same as an event that does not exist. Showing
+  // "not found" for a 500 sends the host looking for the wrong problem.
+  if (isError) {
+    return (
+      <div className="max-w-md mx-auto py-16 text-center">
+        <h2 className="text-2xl font-heading text-ink mb-2">
+          {getErrorMessage(error, undefined, tCommon)}
+        </h2>
+        <p className="text-sm text-muted-foreground">{eventId}</p>
+      </div>
+    );
   }
 
   if (!event) {

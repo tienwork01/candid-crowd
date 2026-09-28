@@ -51,7 +51,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang="en" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className={`${sans.variable} ${serif.variable}`}>
         <QueryProvider>
           <PWAProvider>{children}</PWAProvider>

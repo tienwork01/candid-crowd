@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ChartBar,
   Gear,
@@ -10,19 +11,13 @@ import {
   X,
 } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { APIError, privateClient } from "@/lib/api-client";
 import "./event.css";
 import type { CandidEvent, EventMediaItem, EventMode } from "../types/event";
 import { getEventLifecycleStatus, getEventPublicCode } from "../types/event";
-import {
-  batchDeleteStoredMedia,
-  batchUpdateStoredMediaStatus,
-  deleteStoredMediaItem,
-  toggleStoredMediaFeatured,
-  toggleStoredMediaStatus,
-  updateStoredEvent,
-  updateStoredEventMode,
-} from "../lib/event-store";
+import { findCachedMediaItem } from "../lib/realtime-cache";
 import { EventAnalyticsView } from "./event-analytics-view";
 import { EventEditDialog } from "./event-edit-dialog";
 import { GuestThemeCustomizeModal } from "./guest-theme";
@@ -37,6 +32,8 @@ import {
   useBatchDeleteMedia,
   useBatchUpdateMediaStatus,
   useDeleteMedia,
+  useEventMedia,
+  useEventRealtime,
   useUpdateEvent,
   useUpdateMediaStatus,
 } from "../hooks";
@@ -44,6 +41,10 @@ import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
 import {
   Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
   Tabs,
   TabsIndicator,
   TabsList,
@@ -55,6 +56,65 @@ type EventOverviewViewProps = {
 };
 
 type ActiveTab = "memories" | "participation" | "engage" | "settings";
+type LiveWallCommand =
+  | "play"
+  | "pause"
+  | "next"
+  | "previous"
+  | "show_cta"
+  | "hide_cta"
+  | "blackout"
+  | "resume";
+type LiveWallConfirmation = "blackout" | "end" | null;
+type LiveWallContentPolicy = "featured_only" | "auto_approved";
+type LiveWallLayoutMode = "spotlight" | "mosaic" | "featured";
+type LiveWallQRStrategy = "interval" | "always" | "empty_only" | "hidden";
+type LiveWallArrivalBehavior = "queue" | "next";
+
+function getLiveWallPreset(mode: EventMode) {
+  switch (mode) {
+    case "silent":
+      return {
+        layout_mode: "spotlight" as const,
+        slide_duration_seconds: 12,
+        qr_strategy: "empty_only" as const,
+        arrival_behavior: "queue" as const,
+        cta_every_media: 12,
+      };
+    case "soft":
+      return {
+        layout_mode: "spotlight" as const,
+        slide_duration_seconds: 8,
+        qr_strategy: "interval" as const,
+        arrival_behavior: "queue" as const,
+        cta_every_media: 12,
+      };
+    case "party":
+      return {
+        layout_mode: "mosaic" as const,
+        slide_duration_seconds: 5,
+        qr_strategy: "interval" as const,
+        arrival_behavior: "next" as const,
+        cta_every_media: 5,
+      };
+    case "after":
+      return {
+        layout_mode: "spotlight" as const,
+        slide_duration_seconds: 12,
+        qr_strategy: "always" as const,
+        arrival_behavior: "queue" as const,
+        cta_every_media: 12,
+      };
+    default:
+      return {
+        layout_mode: "spotlight" as const,
+        slide_duration_seconds: 8,
+        qr_strategy: "interval" as const,
+        arrival_behavior: "queue" as const,
+        cta_every_media: 8,
+      };
+  }
+}
 
 export function EventOverviewView({
   event: initialEvent,
@@ -62,10 +122,13 @@ export function EventOverviewView({
   const t = useTranslations("event");
   const tCommon = useTranslations("common");
   const locale = useLocale() as AppLocale;
+  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [currentEvent, setCurrentEvent] = useState<CandidEvent>(initialEvent);
   const [activeTab, setActiveTab] = useState<ActiveTab>("memories");
-  const { mutateAsync: updateEvent } = useUpdateEvent();
+  const { mutateAsync: updateEvent, isPending: isUpdatingEvent } =
+    useUpdateEvent();
 
   const updateMediaStatusMutation = useUpdateMediaStatus(currentEvent.id);
   const batchUpdateMediaStatusMutation = useBatchUpdateMediaStatus(
@@ -85,8 +148,304 @@ export function EventOverviewView({
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isRecoveryDismissed, setIsRecoveryDismissed] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
+  const [liveWallSession, setLiveWallSession] = useState<{
+    id: string;
+    playerURL: string;
+    isPlaying: boolean;
+    isShowingCTA: boolean;
+    contentPolicy: LiveWallContentPolicy;
+    ctaEveryMedia: number;
+    layoutMode: LiveWallLayoutMode;
+    slideDuration: number;
+    qrStrategy: LiveWallQRStrategy;
+    arrivalBehavior: LiveWallArrivalBehavior;
+    revision: number;
+  } | null>(null);
+  const [isLaunchingLiveWall, setIsLaunchingLiveWall] = useState(false);
+  const [isEndingLiveWall, setIsEndingLiveWall] = useState(false);
+  const [isControllingLiveWall, setIsControllingLiveWall] = useState(false);
+  const [isUpdatingLiveWallPolicy, setIsUpdatingLiveWallPolicy] =
+    useState(false);
+  const [isUpdatingLiveWallCadence, setIsUpdatingLiveWallCadence] =
+    useState(false);
+  const [liveWallConfirmation, setLiveWallConfirmation] =
+    useState<LiveWallConfirmation>(null);
 
-  const mediaItems = currentEvent.media_items || [];
+  const handleLaunchLiveWall = async () => {
+    if (liveWallSession) {
+      window.open(liveWallSession.playerURL, "candid-live-wall");
+
+      return;
+    }
+
+    // Opening synchronously preserves the user's popup permission. The player
+    // only receives its opaque, expiring token after the authenticated request
+    // completes; the host JWT is never placed in the screen URL.
+    const playerWindow = window.open(
+      "/live-wall/launching",
+      "candid-live-wall",
+    );
+
+    setIsLaunchingLiveWall(true);
+
+    try {
+      const response = await privateClient.post<{
+        id: string;
+        token: string;
+        show_cta?: boolean;
+        content_policy?: LiveWallContentPolicy;
+        cta_every_media?: number;
+        layout_mode?: LiveWallLayoutMode;
+        slide_duration_seconds?: number;
+        qr_strategy?: LiveWallQRStrategy;
+        arrival_behavior?: LiveWallArrivalBehavior;
+        revision?: number;
+      }>(
+        `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions`,
+        undefined,
+        { timeout: 15_000 },
+      );
+      const playerURL = `/live-wall/${encodeURIComponent(response.data.token)}`;
+
+      setLiveWallSession({
+        id: response.data.id,
+        playerURL,
+        isPlaying: true,
+        isShowingCTA: response.data.show_cta ?? false,
+        contentPolicy: response.data.content_policy ?? "auto_approved",
+        ctaEveryMedia: response.data.cta_every_media ?? 8,
+        layoutMode: response.data.layout_mode ?? "spotlight",
+        slideDuration: response.data.slide_duration_seconds ?? 5,
+        qrStrategy: response.data.qr_strategy ?? "interval",
+        arrivalBehavior: response.data.arrival_behavior ?? "queue",
+        revision: response.data.revision ?? 0,
+      });
+
+      if (playerWindow) {
+        playerWindow.location.replace(playerURL);
+      } else {
+        router.push(playerURL);
+      }
+    } catch (error) {
+      const errorCode =
+        error instanceof APIError ? error.code : "request_failed";
+
+      playerWindow?.location.replace(
+        `/live-wall/launching?error=${encodeURIComponent(errorCode)}`,
+      );
+      toast.error(t("gallery.actionFailed"));
+    } finally {
+      setIsLaunchingLiveWall(false);
+    }
+  };
+
+  const runLiveWallCommand = async (command: LiveWallCommand) => {
+    if (!liveWallSession) return;
+    setIsControllingLiveWall(true);
+
+    try {
+      const response = await privateClient.post<{
+        is_playing?: boolean;
+        show_cta?: boolean;
+      }>(
+        `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(liveWallSession.id)}/commands`,
+        { command },
+      );
+
+      setLiveWallSession((current) =>
+        current
+          ? {
+              ...current,
+              isPlaying:
+                response.data.is_playing ??
+                (command === "play"
+                  ? true
+                  : command === "pause"
+                    ? false
+                    : current.isPlaying),
+              isShowingCTA:
+                response.data.show_cta ??
+                (command === "show_cta"
+                  ? true
+                  : command === "hide_cta"
+                    ? false
+                    : current.isShowingCTA),
+            }
+          : null,
+      );
+    } catch {
+      toast.error(t("gallery.actionFailed"));
+    } finally {
+      setIsControllingLiveWall(false);
+    }
+  };
+
+  const handleLiveWallCommand = (command: LiveWallCommand) => {
+    if (command === "blackout") {
+      setLiveWallConfirmation("blackout");
+
+      return;
+    }
+
+    void runLiveWallCommand(command);
+  };
+
+  const handleLiveWallContentPolicyChange = async (
+    contentPolicy: LiveWallContentPolicy,
+  ) => {
+    if (!liveWallSession || liveWallSession.contentPolicy === contentPolicy)
+      return;
+    setIsUpdatingLiveWallPolicy(true);
+
+    try {
+      const response = await privateClient.patch<{ revision?: number }>(
+        `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(liveWallSession.id)}`,
+        {
+          content_policy: contentPolicy,
+          expected_revision: liveWallSession.revision,
+        },
+      );
+
+      setLiveWallSession((current) =>
+        current
+          ? {
+              ...current,
+              contentPolicy,
+              revision: response.data.revision ?? current.revision + 1,
+            }
+          : null,
+      );
+    } catch {
+      toast.error(t("gallery.actionFailed"));
+    } finally {
+      setIsUpdatingLiveWallPolicy(false);
+    }
+  };
+
+  const handleLiveWallCTAEveryMediaChange = async (ctaEveryMedia: number) => {
+    if (!liveWallSession || liveWallSession.ctaEveryMedia === ctaEveryMedia)
+      return;
+    setIsUpdatingLiveWallCadence(true);
+
+    try {
+      const response = await privateClient.patch<{ revision?: number }>(
+        `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(liveWallSession.id)}`,
+        {
+          cta_every_media: ctaEveryMedia,
+          expected_revision: liveWallSession.revision,
+        },
+      );
+
+      setLiveWallSession((current) =>
+        current
+          ? {
+              ...current,
+              ctaEveryMedia,
+              revision: response.data.revision ?? current.revision + 1,
+            }
+          : null,
+      );
+    } catch {
+      toast.error(t("gallery.actionFailed"));
+    } finally {
+      setIsUpdatingLiveWallCadence(false);
+    }
+  };
+
+  const updateLiveWallPresentation = async (
+    patch: Partial<{
+      layout_mode: LiveWallLayoutMode;
+      slide_duration_seconds: number;
+      qr_strategy: LiveWallQRStrategy;
+      arrival_behavior: LiveWallArrivalBehavior;
+    }>,
+  ) => {
+    if (!liveWallSession) return;
+    setIsControllingLiveWall(true);
+
+    try {
+      const response = await privateClient.patch<{
+        layout_mode?: LiveWallLayoutMode;
+        slide_duration_seconds?: number;
+        qr_strategy?: LiveWallQRStrategy;
+        arrival_behavior?: LiveWallArrivalBehavior;
+        revision?: number;
+      }>(
+        `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(liveWallSession.id)}`,
+        { ...patch, expected_revision: liveWallSession.revision },
+      );
+
+      setLiveWallSession((current) =>
+        current
+          ? {
+              ...current,
+              layoutMode: response.data.layout_mode ?? current.layoutMode,
+              slideDuration:
+                response.data.slide_duration_seconds ?? current.slideDuration,
+              qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
+              arrivalBehavior:
+                response.data.arrival_behavior ?? current.arrivalBehavior,
+              revision: response.data.revision ?? current.revision + 1,
+            }
+          : null,
+      );
+    } catch {
+      toast.error(t("gallery.actionFailed"));
+    } finally {
+      setIsControllingLiveWall(false);
+    }
+  };
+
+  const endLiveWall = async () => {
+    if (!liveWallSession) return;
+    setIsEndingLiveWall(true);
+
+    try {
+      await privateClient.post(
+        `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(liveWallSession.id)}/end`,
+      );
+      setLiveWallSession(null);
+    } catch {
+      toast.error(t("gallery.actionFailed"));
+    } finally {
+      setIsEndingLiveWall(false);
+    }
+  };
+
+  const handleEndLiveWall = () => setLiveWallConfirmation("end");
+
+  const confirmLiveWallAction = () => {
+    if (liveWallConfirmation === "blackout") {
+      setLiveWallConfirmation(null);
+      void runLiveWallCommand("blackout");
+
+      return;
+    }
+
+    if (liveWallConfirmation === "end") {
+      setLiveWallConfirmation(null);
+      void endLiveWall();
+    }
+  };
+
+  // One stream per event, mounted here. Every child reads the same query
+  // cache, so the gallery and the live wall stay current without opening
+  // connections of their own.
+  const { isLive } = useEventRealtime(currentEvent.id);
+
+  // Counters come from the gallery query, which the realtime cache keeps
+  // current. They used to be read from a locally stored copy of the event,
+  // which drifted from the server the moment anything changed elsewhere.
+  const { data: mediaPages } = useEventMedia(currentEvent.id, {
+    filter: "all",
+    sort: "newest",
+  });
+  const mediaCount = mediaPages?.pages[0]?.counts?.all ?? 0;
+  const liveWallEligibleMediaCount =
+    liveWallSession?.contentPolicy === "featured_only"
+      ? (mediaPages?.pages[0]?.counts?.favorites ?? 0)
+      : mediaCount;
+
   const activeMode = currentEvent.event_mode || "social";
   const lifecycleStatus = getEventLifecycleStatus(currentEvent);
   const publicCode = getEventPublicCode(currentEvent);
@@ -121,7 +480,7 @@ export function EventOverviewView({
   }, [fullGuestUrl]);
 
   // --- Participation summary data ---
-  const expectedGuests = currentEvent.expected_guest_count || 100;
+  const expectedGuests = currentEvent.expected_guest_count ?? 0;
   const contributors = currentEvent.metrics?.contributors_count || 0;
   const memoriesCount =
     (currentEvent.metrics?.photos_count || 0) +
@@ -132,105 +491,139 @@ export function EventOverviewView({
       : 0;
 
   // --- Handlers ---
-  const handleModeChange = (newMode: EventMode) => {
-    const updated = updateStoredEventMode(currentEvent.id, newMode);
+  const handleModeChange = async (newMode: EventMode) => {
+    const updated = await updateEvent({
+      id: currentEvent.id,
+      event_mode: newMode,
+    });
 
-    if (updated) setCurrentEvent(updated);
+    setCurrentEvent((previous) => ({ ...previous, ...updated }));
+
+    if (!liveWallSession) return;
+
+    const preset = getLiveWallPreset(newMode);
+
+    try {
+      const response = await privateClient.patch<{
+        layout_mode?: LiveWallLayoutMode;
+        slide_duration_seconds?: number;
+        qr_strategy?: LiveWallQRStrategy;
+        arrival_behavior?: LiveWallArrivalBehavior;
+        cta_every_media?: number;
+        revision?: number;
+      }>(
+        `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(liveWallSession.id)}`,
+        { ...preset, expected_revision: liveWallSession.revision },
+      );
+
+      setLiveWallSession((current) =>
+        current
+          ? {
+              ...current,
+              layoutMode: response.data.layout_mode ?? current.layoutMode,
+              slideDuration:
+                response.data.slide_duration_seconds ?? current.slideDuration,
+              qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
+              arrivalBehavior:
+                response.data.arrival_behavior ?? current.arrivalBehavior,
+              ctaEveryMedia:
+                response.data.cta_every_media ?? current.ctaEveryMedia,
+              revision: response.data.revision ?? current.revision + 1,
+            }
+          : null,
+      );
+    } catch {
+      // The event mode has already been saved. Keep the running wall intact
+      // and let the host retry its presentation settings separately.
+    }
   };
 
-  const handleToggleMediaStatus = (mediaId: string) => {
-    const target = currentEvent.media_items?.find((m) => m.id === mediaId);
-    const nextStatus = target?.status === "hidden" ? "ready" : "hidden";
-    const updated = toggleStoredMediaStatus(currentEvent.id, mediaId);
+  // Media state lives in the query cache, which the mutation and the realtime
+  // stream both keep current. Writing a second copy to local storage here used
+  // to fight both of them.
+  //
+  // The lookup spans every cached filter rather than just "all": that filter
+  // excludes hidden media, so searching it alone would report a hidden item
+  // as missing and turn "show again" back into "hide".
+  const findMedia = (mediaId: string) =>
+    findCachedMediaItem(queryClient, currentEvent.id, mediaId);
 
-    if (updated) {
-      setCurrentEvent(updated);
+  const handleToggleMediaStatus = async (mediaId: string) => {
+    const target = findMedia(mediaId);
+    const nextStatus = target?.status === "hidden" ? "ready" : "hidden";
+
+    try {
+      await updateMediaStatusMutation.mutateAsync({
+        mediaId,
+        status: nextStatus,
+      });
 
       if (nextStatus === "hidden") {
         toast.info(t("gallery.mediaHidden"));
       } else {
         toast.success(t("gallery.mediaVisible"));
       }
+    } catch {
+      toast.error(t("gallery.actionFailed"));
     }
-
-    void updateMediaStatusMutation
-      .mutateAsync({
-        mediaId,
-        status: nextStatus,
-      })
-      .catch(() => {});
   };
 
-  const handleToggleMediaFavorite = (mediaId: string) => {
-    const target = currentEvent.media_items?.find((m) => m.id === mediaId);
+  const handleToggleMediaFavorite = async (mediaId: string) => {
+    const target = findMedia(mediaId);
     const nextStatus = target?.status === "featured" ? "ready" : "featured";
-    const updated = toggleStoredMediaFeatured(currentEvent.id, mediaId);
 
-    if (updated) {
-      setCurrentEvent(updated);
+    try {
+      await updateMediaStatusMutation.mutateAsync({
+        mediaId,
+        status: nextStatus,
+      });
 
       if (nextStatus === "featured") {
         toast.success(t("gallery.mediaFavorited"));
       } else {
         toast.info(t("gallery.mediaUnfavorited"));
       }
+    } catch {
+      toast.error(t("gallery.actionFailed"));
     }
-
-    void updateMediaStatusMutation
-      .mutateAsync({
-        mediaId,
-        status: nextStatus,
-      })
-      .catch(() => {});
   };
 
   const handleBatchStatusChange = (
     mediaIds: string[],
     status: EventMediaItem["status"],
   ) => {
-    const updated = batchUpdateStoredMediaStatus(
-      currentEvent.id,
-      mediaIds,
-      status,
-    );
-
-    if (updated) {
-      setCurrentEvent(updated);
-    }
-
     void batchUpdateMediaStatusMutation
-      .mutateAsync({
-        mediaIds,
-        status,
-      })
-      .catch(() => {});
+      .mutateAsync({ mediaIds, status })
+      .catch(() => toast.error(t("gallery.actionFailed")));
   };
 
   const handleBatchDelete = (mediaIds: string[]) => {
-    const updated = batchDeleteStoredMedia(currentEvent.id, mediaIds);
-
-    if (updated) {
-      setCurrentEvent(updated);
-    }
-
-    void batchDeleteMediaMutation.mutateAsync(mediaIds).catch(() => {});
+    void batchDeleteMediaMutation
+      .mutateAsync(mediaIds)
+      .catch(() => toast.error(t("gallery.actionFailed")));
   };
 
-  const handleDeleteMedia = (mediaId: string) => {
-    const updated = deleteStoredMediaItem(currentEvent.id, mediaId);
-
-    if (updated) {
-      setCurrentEvent(updated);
+  const handleDeleteMedia = async (mediaId: string) => {
+    try {
+      await deleteMediaMutation.mutateAsync(mediaId);
       toast.success(t("gallery.mediaDeleted"));
+    } catch {
+      toast.error(t("gallery.actionFailed"));
     }
-
-    void deleteMediaMutation.mutateAsync(mediaId).catch(() => {});
   };
 
-  const handleSaveSettings = (partial: Partial<CandidEvent>) => {
-    const updated = updateStoredEvent(currentEvent.id, partial);
+  const handleSaveSettings = async (partial: Partial<CandidEvent>) => {
+    const updated = await updateEvent({
+      id: currentEvent.id,
+      name: partial.name,
+      event_type: partial.event_type,
+      event_date: partial.event_date,
+      date_unknown: partial.date_unknown,
+      expected_guest_count: partial.expected_guest_count,
+      gallery_enabled: partial.gallery_enabled,
+    });
 
-    if (updated) setCurrentEvent(updated);
+    setCurrentEvent((previous) => ({ ...previous, ...updated, ...partial }));
   };
 
   const handleCopyReminder = async () => {
@@ -259,7 +652,7 @@ export function EventOverviewView({
         event={currentEvent}
         onOpenShare={() => setIsShareOpen(true)}
         onOpenEdit={() => setIsEditDialogOpen(true)}
-        onLaunchLiveWall={() => setIsLiveWallOpen(true)}
+        onLaunchLiveWall={handleLaunchLiveWall}
         onOpenCustomizeQr={() => setIsCustomizeQrOpen(true)}
         onOpenPrint={() => setIsPrintModalOpen(true)}
         onOpenCustomizeTheme={() => setIsCustomizeGuestPageOpen(true)}
@@ -275,9 +668,9 @@ export function EventOverviewView({
           <TabsTrigger value="memories" className="event-hub__tab">
             <Images size={16} aria-hidden="true" />
             <span>{t("hub.tabMemories")}</span>
-            {mediaItems.length > 0 && (
+            {mediaCount > 0 && (
               <span className="ml-1 px-1.5 py-0.2 rounded-full text-[11px] bg-primary/10 text-primary font-semibold">
-                {mediaItems.length}
+                {mediaCount}
               </span>
             )}
           </TabsTrigger>
@@ -323,7 +716,7 @@ export function EventOverviewView({
           )}
 
           {/* Lifecycle-aware banners */}
-          {lifecycleStatus === "upcoming" && mediaItems.length === 0 && (
+          {lifecycleStatus === "upcoming" && mediaCount === 0 && (
             <div className="event-hub__readiness-banner">
               <span>{t("overview.readinessBanner")}</span>
             </div>
@@ -355,7 +748,7 @@ export function EventOverviewView({
           {/* Gallery View */}
           <EventGalleryView
             eventId={currentEvent.id}
-            items={mediaItems}
+            isLive={isLive}
             eventName={currentEvent.name}
             publicCode={publicCode}
             onToggleStatus={handleToggleMediaStatus}
@@ -383,7 +776,28 @@ export function EventOverviewView({
           <EventEngageView
             activeMode={activeMode}
             onModeChange={handleModeChange}
-            onLaunchLiveWall={() => setIsLiveWallOpen(true)}
+            isChangingMode={isUpdatingEvent}
+            onLaunchLiveWall={handleLaunchLiveWall}
+            isLaunchingLiveWall={isLaunchingLiveWall}
+            isLiveWallActive={Boolean(liveWallSession)}
+            onEndLiveWall={handleEndLiveWall}
+            isEndingLiveWall={isEndingLiveWall}
+            isLiveWallPlaying={liveWallSession?.isPlaying}
+            isLiveWallShowingCTA={liveWallSession?.isShowingCTA}
+            eligibleMediaCount={liveWallEligibleMediaCount}
+            onLiveWallCommand={handleLiveWallCommand}
+            isControllingLiveWall={isControllingLiveWall}
+            liveWallCTAEveryMedia={liveWallSession?.ctaEveryMedia}
+            onLiveWallCTAEveryMediaChange={handleLiveWallCTAEveryMediaChange}
+            isUpdatingLiveWallCadence={isUpdatingLiveWallCadence}
+            liveWallContentPolicy={liveWallSession?.contentPolicy}
+            onLiveWallContentPolicyChange={handleLiveWallContentPolicyChange}
+            isUpdatingLiveWallPolicy={isUpdatingLiveWallPolicy}
+            liveWallLayoutMode={liveWallSession?.layoutMode}
+            liveWallSlideDuration={liveWallSession?.slideDuration}
+            liveWallQRStrategy={liveWallSession?.qrStrategy}
+            liveWallArrivalBehavior={liveWallSession?.arrivalBehavior}
+            onLiveWallPresentationChange={updateLiveWallPresentation}
           />
         </div>
       )}
@@ -497,11 +911,50 @@ export function EventOverviewView({
         </div>
       )}
 
+      <Dialog
+        open={liveWallConfirmation !== null}
+        onOpenChange={(open) => {
+          if (!open) setLiveWallConfirmation(null);
+        }}
+      >
+        <DialogContent className="max-w-md">
+          <DialogTitle className="mb-1 text-lg font-semibold text-ink">
+            {liveWallConfirmation === "end"
+              ? t("liveWall.endSessionTitle")
+              : t("liveWall.blackoutTitle")}
+          </DialogTitle>
+          <DialogDescription className="mb-6 text-sm text-muted-foreground">
+            {liveWallConfirmation === "end"
+              ? t("liveWall.endSessionDescription")
+              : t("liveWall.blackoutDescription")}
+          </DialogDescription>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setLiveWallConfirmation(null)}
+            >
+              {tCommon("actions.cancel")}
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmLiveWallAction}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {liveWallConfirmation === "end"
+                ? t("liveWall.endSessionAction")
+                : t("liveWall.blackoutAction")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Fullscreen Live Wall */}
       <EventLiveWallModal
         event={currentEvent}
         isOpen={isLiveWallOpen}
         onClose={() => setIsLiveWallOpen(false)}
+        isRealtimeLive={isLive}
       />
 
       {/* Share Popover */}

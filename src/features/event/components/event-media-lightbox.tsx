@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useId, useRef } from "react";
-import Image from "next/image";
 import {
   CaretLeft,
   CaretRight,
@@ -298,14 +297,12 @@ export function EventMediaLightbox({
             />
           ) : (
             <div className="event-lightbox__media-wrap">
-              <Image
+              {/* Signed private R2 URLs must bypass Next's image optimizer. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={item.url}
                 alt={item.caption || "Event memory"}
-                fill
-                unoptimized
-                className="object-contain"
-                sizes="(max-width: 1200px) 100vw, 1200px"
-                priority
+                className="event-lightbox__image"
               />
             </div>
           )}
@@ -388,12 +385,13 @@ export function EventMediaLightbox({
                     title={thumb.caption || `Photo ${idx + 1}`}
                     aria-label={`Photo ${idx + 1}`}
                   >
-                    <Image
-                      src={thumb.url}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={thumb.thumbnail_url || thumb.url}
                       alt={thumb.caption || ""}
-                      fill
-                      className="object-cover"
-                      sizes="48px"
+                      loading="lazy"
+                      decoding="async"
+                      className="event-lightbox__filmstrip-img"
                     />
                     {thumb.is_video && (
                       <span className="event-lightbox__filmstrip-video-icon">

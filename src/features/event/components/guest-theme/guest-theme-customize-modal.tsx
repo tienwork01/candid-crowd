@@ -58,7 +58,7 @@ export function GuestThemeCustomizeModal({
   );
 
   const [config, setConfig] = useState<GuestThemeConfig>(() => {
-    const loaded = loadGuestThemeConfig(event.id);
+    const loaded = event.guest_theme || loadGuestThemeConfig(event.id);
 
     if (loaded) {
       return {

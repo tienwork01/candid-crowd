@@ -139,13 +139,13 @@ export function AccountRecovery({
     <section className="recovery-form" aria-labelledby="recovery-heading">
       <div className="recovery-form__top">
         <Brand />
-        <Link
+        <a
           href={withAuthRedirect("/login", safeNextPath)}
           className="recovery-form__back"
         >
           <ArrowLeft size={15} aria-hidden="true" />
           {t("ui.submitLogIn")}
-        </Link>
+        </a>
       </div>
 
       {complete ? (

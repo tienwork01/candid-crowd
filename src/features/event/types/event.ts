@@ -53,6 +53,7 @@ export type EventMediaItem = {
     | "direct";
   status: EventMediaStatus;
   is_video?: boolean;
+  has_event_frame?: boolean;
   likes_count?: number;
   width?: number;
   height?: number;

@@ -12,6 +12,7 @@ export function usePublicMedia(slug: string) {
           url: string;
           created_at: string;
           is_video: boolean;
+          has_event_frame?: boolean;
         }>;
       }>(`/api/v1/public/events/${encodeURIComponent(slug)}/media`);
 
@@ -21,6 +22,7 @@ export function usePublicMedia(slug: string) {
         created_at: x.created_at,
         status: "ready",
         is_video: x.is_video,
+        has_event_frame: Boolean(x.has_event_frame),
       }));
     },
     enabled: !!slug,

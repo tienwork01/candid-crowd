@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowsClockwise,
   Camera,
+  CircleNotch,
   EyeSlash,
   Funnel,
   Heart,
@@ -20,11 +21,13 @@ import {
   EventMediaSkeletonGrid,
 } from "./gallery";
 import { EventMediaLightbox } from "./event-media-lightbox";
-import { useEventMediaGallery } from "../hooks";
+import { useEventExport, useEventMediaGallery } from "../hooks";
 import { Button } from "@/components/ui";
 
 type EventGalleryViewProps = {
   eventId?: string;
+  /** The realtime stream is connected, so the grid updates on its own. */
+  isLive?: boolean;
   items?: EventMediaItem[];
   onOpenLightbox?: (item: EventMediaItem) => void;
   onToggleStatus: (id: string) => void;
@@ -41,6 +44,7 @@ type EventGalleryViewProps = {
 
 export function EventGalleryView({
   eventId,
+  isLive = false,
   items = [],
   onOpenLightbox,
   onToggleStatus,
@@ -55,6 +59,8 @@ export function EventGalleryView({
   publicCode,
 }: EventGalleryViewProps) {
   const t = useTranslations("event");
+  const { createExport, isExporting } = useEventExport(eventId);
+  const loadMoreSentinelRef = useRef<HTMLDivElement>(null);
 
   // Domain Hook orchestrating backend-driven filters, sorts, layout mode, selection & lightbox
   const {
@@ -82,11 +88,33 @@ export function EventGalleryView({
     selectLightboxIndex,
     isLoading,
     isFetching,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
   } = useEventMediaGallery(eventId || items, items, {
     eventId,
   });
 
   const [isInternalLightboxOpen, setIsInternalLightboxOpen] = useState(false);
+
+  useEffect(() => {
+    const sentinel = loadMoreSentinelRef.current;
+
+    if (!sentinel || !hasNextPage || isFetchingNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          void fetchNextPage();
+        }
+      },
+      { rootMargin: "600px 0px" },
+    );
+
+    observer.observe(sentinel);
+
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   const handleItemClick = (item: EventMediaItem) => {
     openLightbox(item);
@@ -102,11 +130,31 @@ export function EventGalleryView({
     setIsInternalLightboxOpen(false);
   };
 
-  const handleDownloadAll = () => {
-    const totalCount = counts.all || items.length;
+  const handleDownloadAll = async () => {
+    const totalCount = counts.all + counts.hidden || items.length;
 
     if (totalCount === 0) return;
-    toast.success(t("gallery.downloadAll", { count: totalCount }));
+
+    if (!eventId) {
+      toast.error(t("gallery.exportUnavailable"));
+
+      return;
+    }
+
+    toast.info(t("gallery.exportQueued"));
+
+    try {
+      const url = await createExport();
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = `${eventName || "candidcrowd"}-memories.zip`;
+      link.click();
+      toast.success(t("gallery.exportReady"));
+    } catch {
+      toast.error(t("gallery.exportFailed"));
+    }
   };
 
   // ─── Batch Operations ───
@@ -253,7 +301,10 @@ export function EventGalleryView({
           isSelectMode={isSelectMode}
           onToggleSelectMode={() => setIsSelectMode(!isSelectMode)}
           totalItems={filteredItems.length}
+          downloadCount={counts.all + counts.hidden}
           onDownloadAll={handleDownloadAll}
+          isExporting={isExporting}
+          isLive={isLive}
         />
       )}
 
@@ -288,28 +339,52 @@ export function EventGalleryView({
           </Button>
         </div>
       ) : (
-        <div
-          className={`transition-opacity duration-150 ${isFetching ? "opacity-75" : "opacity-100"} ${
-            layoutMode === "masonry"
-              ? "event-gallery__masonry"
-              : "event-gallery__grid event-gallery__grid--square"
-          }`}
-        >
-          {filteredItems.map((item) => (
-            <EventMediaCard
-              key={item.id}
-              item={item}
-              layoutMode={layoutMode}
-              isSelected={selectedIds.has(item.id)}
-              isSelectMode={isSelectMode}
-              onToggleSelect={toggleSelect}
-              onOpenLightbox={handleItemClick}
-              onToggleStatus={onToggleStatus}
-              onToggleFavorite={onToggleFavorite}
-              onDeleteMedia={onDeleteMedia}
-            />
-          ))}
-        </div>
+        <>
+          <div
+            className={`transition-opacity duration-150 ${isFetching ? "opacity-75" : "opacity-100"} ${
+              layoutMode === "masonry"
+                ? "event-gallery__masonry"
+                : "event-gallery__grid event-gallery__grid--square"
+            }`}
+          >
+            {filteredItems.map((item) => (
+              <EventMediaCard
+                key={item.id}
+                item={item}
+                layoutMode={layoutMode}
+                isSelected={selectedIds.has(item.id)}
+                isSelectMode={isSelectMode}
+                onToggleSelect={toggleSelect}
+                onOpenLightbox={handleItemClick}
+                onToggleStatus={onToggleStatus}
+                onToggleFavorite={onToggleFavorite}
+                onDeleteMedia={onDeleteMedia}
+              />
+            ))}
+          </div>
+
+          {hasNextPage && (
+            <div
+              ref={loadMoreSentinelRef}
+              className="event-gallery__load-more"
+              role="status"
+              aria-live="polite"
+              aria-label={
+                isFetchingNextPage
+                  ? t("gallery.loadingMore")
+                  : t("gallery.loadMore")
+              }
+            >
+              {isFetchingNextPage && (
+                <CircleNotch
+                  size={20}
+                  className="event-gallery__load-more-spinner"
+                  aria-hidden="true"
+                />
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {/* Floating Batch Action Bar */}

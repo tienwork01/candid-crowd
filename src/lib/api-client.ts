@@ -58,6 +58,16 @@ function normalizeAxiosError(
 }
 
 /**
+ * True only when the request never reached the API. `normalizeAxiosError`
+ * maps that case — and only that case — to status 0, so it is the one signal
+ * that justifies falling back to locally stored data. Anything the API
+ * actually answered is a real failure and belongs in front of the user.
+ */
+export function isBackendUnreachable(error: unknown): boolean {
+  return error instanceof APIError && error.status === 0;
+}
+
+/**
  * Retrieves the current session's JWT token via Better Auth.
  * Returns null if not authenticated.
  * Caches token in-memory for up to 5 minutes to avoid repeated roundtrips.

@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import {
   ArrowCounterClockwise,
+  CaretRight,
   Camera,
   ChatCircleText,
   CheckCircle,
@@ -45,11 +46,15 @@ import { EventMediaLightbox } from "./event-media-lightbox";
 import { CandidCameraModal } from "./candid-camera-modal";
 import { trackEvent } from "@/lib/analytics";
 import { APIError } from "@/lib/api-client";
-import { useGuestUpload } from "@/features/upload/hooks";
+import { useGuestUpload, type UploadStage } from "@/features/upload/hooks";
 import { usePWA } from "@/features/pwa/components";
-import { usePublicMedia } from "../hooks/use-public-media";
+import { usePublicEventRealtime, usePublicMedia } from "../hooks";
 import { loadGuestThemeConfig } from "../lib/guest-theme-storage";
 import type { GuestThemeConfig } from "./guest-theme";
+import {
+  getGuestThemeStyles,
+  isGuestThemeDark,
+} from "./guest-theme/guest-theme-styles";
 import "./guest-upload.css";
 
 type GuestEventViewProps = {
@@ -179,6 +184,19 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     [],
   );
   const { data: remoteMedia = [] } = usePublicMedia(event.slug);
+
+  // Photos other guests share appear here on their own, and anything the host
+  // hides or deletes disappears. The locally kept copy of this guest's own
+  // uploads wins the merge below, so it has to be pruned too or a moderated
+  // photo would come straight back.
+  const { isLive } = usePublicEventRealtime(event.slug, {
+    enabled: event.gallery_enabled !== false,
+    onMediaRemoved: (ids) =>
+      setLocalGalleryMedia((previous) =>
+        previous.filter((item) => !ids.includes(item.id)),
+      ),
+  });
+
   const galleryMedia = useMemo(() => {
     const baseMedia =
       remoteMedia.length > 0
@@ -209,6 +227,8 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   >("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadCurrentIndex, setUploadCurrentIndex] = useState(0);
+  const [uploadCompletedCount, setUploadCompletedCount] = useState(0);
+  const [uploadStage, setUploadStage] = useState<UploadStage>("preparing");
   const [lastUploadedCount, setLastUploadedCount] = useState(0);
   const [restoredQueueReady, setRestoredQueueReady] = useState(false);
 
@@ -222,14 +242,9 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
   const displayTitle = guestTheme?.eventTitleOverride?.trim() || event.name;
 
-  const fontHeadingFamily =
-    guestTheme?.fontHeading === "serif"
-      ? "var(--font-serif), Georgia, serif"
-      : guestTheme?.fontHeading === "classic"
-        ? "Georgia, 'Times New Roman', serif"
-        : guestTheme?.fontHeading === "mono"
-          ? "ui-monospace, SFMono-Regular, monospace"
-          : "var(--font-sans), sans-serif";
+  const fontHeadingFamily = getGuestThemeStyles(guestTheme)?.[
+    "--font-heading" as keyof React.CSSProperties
+  ] as string | undefined;
 
   const mode = event.event_mode || "social";
   const galleryAllowed = event.gallery_enabled !== false;
@@ -340,6 +355,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
       const newFiles: StagedFile[] = [];
       const supportedTypes = new Set([
         "image/jpeg",
+        "image/heic",
         "image/png",
         "image/webp",
         "video/mp4",
@@ -383,7 +399,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
       }
 
       if (hasUnsupported) {
-        toast.error("Please choose a JPEG, PNG, WebP, MP4, or MOV file.");
+        toast.error("Please choose a JPEG, HEIC, PNG, WebP, MP4, or MOV file.");
       }
 
       if (newFiles.length > 0) {
@@ -466,6 +482,8 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     setStagedFiles([]);
     setUploadPhase("idle");
     setUploadProgress(0);
+    setUploadCompletedCount(0);
+    setUploadStage("preparing");
     void clearPendingItems();
   };
 
@@ -503,13 +521,16 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     }
 
     setUploadPhase("preparing");
-    setUploadProgress(15);
+    setUploadProgress(0);
     setUploadCurrentIndex(1);
+    setUploadCompletedCount(0);
+    setUploadStage("preparing");
 
     const total = targetFiles.length;
     const successfulUploadedItems: EventMediaItem[] = [];
     const failedIds: string[] = [];
     const duplicateIDs: string[] = [];
+    let completedCount = 0;
 
     // Progressive upload steps per file
     for (let i = 0; i < total; i++) {
@@ -525,17 +546,16 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
         ),
       );
 
-      const currentPercent = Math.round(15 + ((i + 1) / total) * 80);
-
-      setUploadProgress(currentPercent);
-
       try {
         const uploaded = await uploadFile(currentTarget.file, {
           id: currentTarget.id,
+          onStage: (stage) => setUploadStage(stage),
           onProgress: (percent) => {
-            const overall = Math.round(15 + ((i + percent / 100) / total) * 80);
+            const overall = Math.round(
+              ((completedCount + percent / 100) / total) * 95,
+            );
 
-            setUploadProgress(overall);
+            setUploadProgress((previous) => Math.max(previous, overall));
           },
         });
         const mediaItem: EventMediaItem = {
@@ -552,6 +572,11 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
         };
 
         successfulUploadedItems.push(mediaItem);
+        completedCount += 1;
+        setUploadCompletedCount(completedCount);
+        setUploadProgress((previous) =>
+          Math.max(previous, Math.round((completedCount / total) * 95)),
+        );
         setStagedFiles((prev) =>
           prev.map((f) =>
             f.id === currentTarget.id ? { ...f, status: "success" } : f,
@@ -563,6 +588,11 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
 
         if (isDuplicate) {
           duplicateIDs.push(currentTarget.id);
+          completedCount += 1;
+          setUploadCompletedCount(completedCount);
+          setUploadProgress((previous) =>
+            Math.max(previous, Math.round((completedCount / total) * 95)),
+          );
         } else {
           failedIds.push(currentTarget.id);
         }
@@ -578,6 +608,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
     }
 
     setUploadProgress(100);
+    setUploadStage("verifying");
 
     if (failedIds.length === 0) {
       if (duplicateIDs.length > 0) {
@@ -743,23 +774,12 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   const isCandidCameraEnabled =
     !isAfterMode && event.candid_camera_enabled !== false;
 
-  const isDarkTheme =
-    guestTheme?.bgColor === "#09090b" ||
-    guestTheme?.bgColor?.toLowerCase().includes("09090b");
+  const isDarkTheme = isGuestThemeDark(guestTheme);
 
   return (
     <div
       className={`guest-event-page ${isDarkTheme ? "guest-event-page--dark" : ""}`}
-      style={
-        guestTheme
-          ? {
-              ["--background" as string]: guestTheme.bgColor,
-              ["--surface" as string]: guestTheme.surfaceColor,
-              ["--primary" as string]: guestTheme.primaryColor,
-              ["--font-heading" as string]: fontHeadingFamily,
-            }
-          : undefined
-      }
+      style={getGuestThemeStyles(guestTheme)}
     >
       {/* Hidden file inputs: Multi-file library vs Direct camera */}
       <input
@@ -835,16 +855,28 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
         {/* Compact Event Header */}
         <header className="guest-event__header">
           {/* Customized Hero Presentation */}
-          {guestTheme?.heroStyle === "banner" && guestTheme.coverUrl && (
+          {guestTheme?.heroStyle === "banner" && (
             <div className="guest-event__hero-banner">
-              <Image
-                src={guestTheme.coverUrl}
-                alt={displayTitle}
-                fill
-                unoptimized
-                className="object-cover"
-                priority
-              />
+              {guestTheme.coverUrl ? (
+                <Image
+                  src={guestTheme.coverUrl}
+                  alt={displayTitle}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  priority
+                />
+              ) : (
+                <span className="guest-event__hero-monogram">
+                  {guestTheme.monogram ||
+                    displayTitle.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+              <span className="guest-event__hero-scrim" aria-hidden="true" />
+              <div className="guest-event__badge guest-event__badge--overlay">
+                <Sparkle size={12} weight="fill" aria-hidden="true" />
+                <span>{t(`types.${event.event_type}`)}</span>
+              </div>
             </div>
           )}
 
@@ -881,10 +913,12 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
             </div>
           )}
 
-          <div className="guest-event__badge">
-            <Sparkle size={12} weight="fill" className="text-primary" />
-            <span>{t(`types.${event.event_type}`)}</span>
-          </div>
+          {guestTheme?.heroStyle !== "banner" && (
+            <div className="guest-event__badge">
+              <Sparkle size={12} weight="fill" className="text-primary" />
+              <span>{t(`types.${event.event_type}`)}</span>
+            </div>
+          )}
 
           <h1 className="guest-event__title">{displayTitle}</h1>
           <time className="guest-event__date">{formattedDate}</time>
@@ -900,7 +934,8 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
           {guestTheme?.photoPrompts && guestTheme.photoPrompts.length > 0 && (
             <div className="guest-prompts">
               <span className="guest-prompts__title">
-                ✨ {t("guestTheme.photoMissionsTitle")}
+                <Sparkle size={12} weight="fill" aria-hidden="true" />
+                {t("guestTheme.photoMissionsTitle")}
               </span>
               <div className="guest-prompts__list">
                 {guestTheme.photoPrompts.map((prompt, i) => (
@@ -1003,17 +1038,7 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
-                  <div className="guest-upload__icon-halo">
-                    <Images size={32} weight="duotone" aria-hidden="true" />
-                  </div>
-
-                  <h2 className="guest-upload__heading">
-                    {t("guest.welcomeCta")}
-                  </h2>
-
-                  {/* Dual Action Buttons (Mobile-First Hierarchy) */}
                   <div className="guest-upload__actions-grid">
-                    {/* PRIMARY: Choose from library / camera roll */}
                     <button
                       type="button"
                       onClick={() => {
@@ -1031,7 +1056,6 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                       </span>
                     </button>
 
-                    {/* SECONDARY: Candid Camera (De-emphasized/hidden in after mode or if disabled by host) */}
                     {isCandidCameraEnabled && (
                       <button
                         type="button"
@@ -1044,15 +1068,38 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                         }}
                         className="guest-upload__btn guest-upload__btn--secondary guest-upload__btn--camera"
                       >
-                        <Camera size={18} weight="bold" aria-hidden="true" />
-                        <span>{t("camera.candidCameraBtn")}</span>
+                        <span className="guest-upload__camera-icon">
+                          <Camera size={17} weight="bold" aria-hidden="true" />
+                        </span>
+                        <span className="guest-upload__camera-copy">
+                          <span>{t("camera.candidCameraBtn")}</span>
+                          <span>{guestTheme?.cameraFrame || "minimal"}</span>
+                        </span>
+                        <CaretRight
+                          size={16}
+                          weight="bold"
+                          className="guest-upload__camera-arrow"
+                          aria-hidden="true"
+                        />
                       </button>
                     )}
                   </div>
 
-                  <span className="guest-upload__drag-hint">
-                    {t("guest.dragDropHint")}
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackEvent("guest_upload_cta_clicked", {
+                        source: "dropzone",
+                        mode,
+                      });
+                      libraryInputRef.current?.click();
+                    }}
+                    className="guest-upload__dropzone-note"
+                  >
+                    <UploadSimple size={21} weight="bold" aria-hidden="true" />
+                    <span>{t("guest.dragDropHint")}</span>
+                    <small>{t("guest.noSignInNeeded")}</small>
+                  </button>
                 </div>
               )}
 
@@ -1301,26 +1348,39 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                   {uploadPhase === "preparing"
                     ? t("guest.uploadingStagePreparing")
                     : t("guest.uploadingFraction", {
-                        completed: uploadCurrentIndex,
+                        completed: uploadCompletedCount,
                         total: stagedFiles.length,
                       })}
                 </p>
 
-                <div className="guest-upload__progress-bar">
+                <div
+                  className="guest-upload__progress-bar"
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={uploadProgress}
+                >
                   <div
                     className="guest-upload__progress-fill"
-                    style={{ width: `${uploadProgress}%` }}
+                    style={{ transform: `scaleX(${uploadProgress / 100})` }}
                   />
                 </div>
 
                 <p className="guest-upload__progress-sub">
                   {uploadPhase === "preparing"
                     ? t("guest.uploading")
-                    : t("guest.uploadingStageProgress", {
-                        current: uploadCurrentIndex,
-                        total: stagedFiles.length,
-                        percent: uploadProgress,
-                      })}
+                    : uploadStage === "preparing" || uploadStage === "reserving"
+                      ? t("guest.uploadingStagePreparing")
+                      : uploadStage === "verifying"
+                        ? t("guest.uploadingStageVerifying", {
+                            current: uploadCurrentIndex,
+                            total: stagedFiles.length,
+                          })
+                        : t("guest.uploadingStageProgress", {
+                            current: uploadCurrentIndex,
+                            total: stagedFiles.length,
+                            percent: uploadProgress,
+                          })}
                 </p>
               </div>
             )}
@@ -1400,6 +1460,15 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
                 <span>
                   {t("guest.tabMemoriesCount", { count: galleryMedia.length })}
                 </span>
+                {isLive && (
+                  <span className="guest-gallery__live" role="status">
+                    <span
+                      className="guest-gallery__live-dot"
+                      aria-hidden="true"
+                    />
+                    <span className="sr-only">{t("gallery.liveHint")}</span>
+                  </span>
+                )}
               </h2>
 
               <button

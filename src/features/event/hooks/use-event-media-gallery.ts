@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { EventMediaItem } from "../types/event";
 import type {
   GalleryFilterType,
@@ -73,12 +73,24 @@ export function useEventMediaGallery(
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [lightboxId, setLightboxId] = useState<string | null>(null);
+  const pendingLightboxAdvance = useRef(false);
 
   // Backend-driven query when eventId is present
   const remoteQuery = useEventMedia(eventId, {
     filter,
     sort,
   });
+
+  const remoteMedia = useMemo(() => {
+    if (!remoteQuery.data) return undefined;
+
+    const pages = remoteQuery.data.pages;
+
+    return {
+      data: pages.flatMap((page) => page.data),
+      counts: pages[0]?.counts,
+    };
+  }, [remoteQuery.data]);
 
   // Category counts: comes from Backend if eventId is active, otherwise computed locally
   const localCounts = useMemo(() => {
@@ -147,9 +159,9 @@ export function useEventMediaGallery(
   // If eventId exists and remoteQuery has data, use Backend response
   // Otherwise use local calculation
   const counts =
-    eventId && remoteQuery.data ? remoteQuery.data.counts : localCounts;
+    eventId && remoteMedia?.counts ? remoteMedia.counts : localCounts;
   const filteredItems =
-    eventId && remoteQuery.data ? remoteQuery.data.data : localFilteredItems;
+    eventId && remoteMedia ? remoteMedia.data : localFilteredItems;
   const isLoading = eventId ? remoteQuery.isLoading : false;
   const isFetching = eventId ? remoteQuery.isFetching : false;
 
@@ -165,7 +177,19 @@ export function useEventMediaGallery(
 
   const hasPrev = lightboxIndex > 0;
   const hasNext =
-    lightboxIndex >= 0 && lightboxIndex < filteredItems.length - 1;
+    lightboxIndex >= 0 &&
+    (lightboxIndex < filteredItems.length - 1 || remoteQuery.hasNextPage);
+
+  useEffect(() => {
+    if (
+      pendingLightboxAdvance.current &&
+      lightboxIndex >= 0 &&
+      lightboxIndex < filteredItems.length - 1
+    ) {
+      pendingLightboxAdvance.current = false;
+      setLightboxId(filteredItems[lightboxIndex + 1].id);
+    }
+  }, [filteredItems, lightboxIndex]);
 
   const handlePrevLightbox = () => {
     if (hasPrev) {
@@ -174,8 +198,11 @@ export function useEventMediaGallery(
   };
 
   const handleNextLightbox = () => {
-    if (hasNext) {
+    if (lightboxIndex >= 0 && lightboxIndex < filteredItems.length - 1) {
       setLightboxId(filteredItems[lightboxIndex + 1].id);
+    } else if (remoteQuery.hasNextPage && !remoteQuery.isFetchingNextPage) {
+      pendingLightboxAdvance.current = true;
+      void remoteQuery.fetchNextPage();
     }
   };
 
@@ -184,6 +211,7 @@ export function useEventMediaGallery(
   };
 
   const closeLightbox = () => {
+    pendingLightboxAdvance.current = false;
     setLightboxId(null);
   };
 
@@ -243,6 +271,9 @@ export function useEventMediaGallery(
     selectLightboxIndex,
     isLoading,
     isFetching,
+    hasNextPage: eventId ? remoteQuery.hasNextPage : false,
+    isFetchingNextPage: eventId ? remoteQuery.isFetchingNextPage : false,
+    fetchNextPage: remoteQuery.fetchNextPage,
     refetch: remoteQuery.refetch,
   };
 }

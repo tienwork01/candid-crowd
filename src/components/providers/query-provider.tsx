@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import {
   isServer,
   QueryClient,
@@ -42,12 +43,18 @@ function getQueryClient(): QueryClient {
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
+  const pathname = usePathname();
+  const isPresentationRoute = pathname.startsWith("/live-wall/");
 
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <Toaster position="bottom-right" />
-      <ReactQueryDevtools initialIsOpen={false} />
+      {!isPresentationRoute && (
+        <>
+          <Toaster position="bottom-right" />
+          <ReactQueryDevtools initialIsOpen={false} />
+        </>
+      )}
     </QueryClientProvider>
   );
 }

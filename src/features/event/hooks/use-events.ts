@@ -1,5 +1,9 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import { privateClient } from "@/lib/api-client";
+import {
+  APIError,
+  isBackendUnreachable,
+  privateClient,
+} from "@/lib/api-client";
 import { CACHE_TIMES, QUERY_KEYS } from "@/lib/cache-config";
 import { siteConfig } from "@/lib/config";
 import type { CandidEvent } from "../types/event";
@@ -70,7 +74,8 @@ function normalizeEvent(be: BackendEvent): CandidEvent {
  * Fetches a paginated, searchable, filterable list of events.
  *
  * - Tries the backend API first (`/api/v1/events` with query params).
- * - Falls back to client-side pagination of localStorage data when the backend is unavailable.
+ * - Falls back to client-side pagination of localStorage data only when the
+ *   backend cannot be reached; anything the API answered is surfaced as an error.
  * - Uses `keepPreviousData` so the UI doesn't flash blank between page transitions.
  */
 export function useEvents(params: EventListParams = {}) {
@@ -137,18 +142,33 @@ export function useEvents(params: EventListParams = {}) {
             },
           };
         }
-      } catch {
-        // Fallback: paginate localStorage data client-side
-      }
 
-      return paginateLocalEvents({
-        page,
-        per_page,
-        q: normalizedQ,
-        type: normalizedType,
-        sort,
-        direction: resolvedDirection,
-      });
+        throw new APIError(
+          502,
+          "request_failed",
+          "The events API returned no list.",
+        );
+      } catch (error) {
+        if (!isBackendUnreachable(error)) {
+          console.error("[events] backend rejected the request", error);
+
+          throw error;
+        }
+
+        console.warn(
+          "[events] backend unreachable, listing locally stored events",
+          error,
+        );
+
+        return paginateLocalEvents({
+          page,
+          per_page,
+          q: normalizedQ,
+          type: normalizedType,
+          sort,
+          direction: resolvedDirection,
+        });
+      }
     },
     initialData: () => {
       const local = paginateLocalEvents({

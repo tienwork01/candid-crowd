@@ -1,12 +1,11 @@
 "use client";
 
 import {
-  keepPreviousData,
   useMutation,
-  useQuery,
+  useInfiniteQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { CACHE_TIMES, QUERY_KEYS } from "@/lib/cache-config";
+import { QUERY_KEYS } from "@/lib/cache-config";
 import type { EventMediaStatus } from "../types/event";
 import type {
   EventMediaQueryParams,
@@ -25,13 +24,12 @@ export function useEventMedia(
   const queryParams: EventMediaQueryParams = {
     filter: params.filter || "all",
     sort: params.sort || "newest",
-    page: params.page,
-    per_page: params.per_page,
+    per_page: params.per_page || 24,
   };
 
-  return useQuery<EventMediaResponse>({
+  return useInfiniteQuery<EventMediaResponse>({
     queryKey: QUERY_KEYS.event.media(eventId || "", queryParams),
-    queryFn: async () => {
+    queryFn: async ({ pageParam }) => {
       if (!eventId) {
         return {
           data: [],
@@ -39,12 +37,20 @@ export function useEventMedia(
         };
       }
 
-      return eventMediaRepository.getMedia(eventId, queryParams);
+      return eventMediaRepository.getMedia(eventId, {
+        ...queryParams,
+        cursor:
+          typeof pageParam === "string" && pageParam ? pageParam : undefined,
+      });
     },
+    initialPageParam: "",
+    getNextPageParam: (lastPage) =>
+      lastPage.page?.has_more ? lastPage.page.next_cursor : undefined,
     enabled: Boolean(eventId),
-    placeholderData: keepPreviousData,
-    staleTime: CACHE_TIMES.FREQUENT.staleTime,
-    gcTime: CACHE_TIMES.FREQUENT.gcTime,
+    // Keep the same signed URLs during normal host navigation so images can
+    // be served from the browser cache instead of downloading again.
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
   });
 }
 

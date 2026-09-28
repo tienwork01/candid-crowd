@@ -622,7 +622,10 @@ export function CandidCameraModal({
 
             {/* Live Frame Preview Overlay */}
             {isFrameEnabled && (
-              <div className="candid-camera__frame" aria-hidden="true">
+              <div
+                className={`candid-camera__frame candid-camera__frame--${cameraFrameStyle ?? "minimal"}`}
+                aria-hidden="true"
+              >
                 <span className="candid-camera__frame-ornament">
                   <span className="candid-camera__frame-ornament-line candid-camera__frame-ornament-line--left" />
                   <span className="candid-camera__frame-ornament-line candid-camera__frame-ornament-line--right" />

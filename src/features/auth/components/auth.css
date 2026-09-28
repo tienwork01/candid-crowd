@@ -391,6 +391,13 @@
   display: grid;
   gap: 18px;
 }
+
+.auth-form__controls {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
 .auth-form__field {
   display: grid;
   gap: 7px;

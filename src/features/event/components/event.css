@@ -579,6 +579,38 @@
   gap: 8px;
 }
 
+/* Quiet confirmation that the grid is updating itself. It sits beside the
+   controls rather than over the photographs. */
+.event-gallery__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 9px;
+  height: 28px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.event-gallery__live-label {
+  text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  /* The icon alone carries the meaning once space is tight. */
+  .event-gallery__live-label {
+    display: none;
+  }
+
+  .event-gallery__live {
+    padding: 0 7px;
+  }
+}
+
 .event-gallery__layout-toggle {
   position: relative;
   display: inline-flex;
@@ -705,6 +737,31 @@
   aspect-ratio: 1 / 1;
 }
 
+.event-gallery__load-more {
+  display: flex;
+  min-height: 48px;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 0 8px;
+}
+
+.event-gallery__load-more-spinner {
+  color: var(--muted);
+  animation: event-gallery-spin 0.8s linear infinite;
+}
+
+@keyframes event-gallery-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-gallery__load-more-spinner {
+    animation: none;
+  }
+}
+
 /* ─── EDITORIAL MEDIA CARD ─── */
 .event-media-card {
   break-inside: avoid;
@@ -771,6 +828,24 @@
     transform 0.65s cubic-bezier(0.16, 1, 0.3, 1),
     filter 0.4s ease;
   will-change: transform;
+}
+
+.event-media-card__img--fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.event-media-card__img-natural {
+  width: 100%;
+  height: auto;
+}
+
+/* Candid Camera composes the frame into the JPEG. Never crop its outer edge. */
+.event-media-card--framed .event-media-card__img--fill {
+  object-fit: contain;
+  background: var(--soft);
 }
 
 .event-media-card:hover .event-media-card__img,
@@ -1682,6 +1757,79 @@
   color: var(--muted);
 }
 
+.event-engage__operator-status {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--soft);
+}
+
+.event-engage__operator-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.event-engage__operator-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.event-engage__operator-metric {
+  min-width: 0;
+}
+
+.event-engage__operator-metric dt {
+  color: var(--muted);
+  font-size: 0.6875rem;
+  line-height: 1.3;
+}
+
+.event-engage__operator-metric dd {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.event-engage__operator-metric dd > span {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.event-engage__operator-metric dd[data-active] > span {
+  background: #15803d;
+  box-shadow: 0 0 0 3px rgb(21 128 61 / 12%);
+}
+
+.event-engage__presentation-settings {
+  display: grid;
+  gap: 10px;
+  padding-top: 2px;
+}
+
+@media (max-width: 480px) {
+  .event-engage__operator-metrics {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
+
 /* ─── SHARE POPOVER ──────────────────────────────────────────────────── */
 .event-share-popover {
   position: fixed;
@@ -2244,6 +2392,20 @@
   justify-content: center;
 }
 
+.event-lightbox__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.event-lightbox__filmstrip-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .event-lightbox__video {
   max-width: 100%;
   max-height: min(78dvh, 900px);
@@ -2378,6 +2540,7 @@
   color: #fff;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .event-live-wall__top {
@@ -2386,15 +2549,38 @@
   justify-content: space-between;
   padding: 20px 28px;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  flex: 0 0 auto;
 }
 
 .event-live-wall__stage {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   padding: 20px;
+  /* The image itself is bounded by the media frame. Do not clip this layer:
+     projector aspect ratios can otherwise trim a contained image at the edge. */
+  overflow: visible;
+}
+
+.event-live-wall__image {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  /* A grid item defaults to its intrinsic minimum. Without resetting it, a
+     tall source image can grow beyond the presentation frame. */
+  min-inline-size: 0;
+  min-block-size: 0;
+  object-fit: contain;
+  object-position: center;
+  filter: drop-shadow(0 25px 25px rgba(0, 0, 0, 0.25));
+  border-radius: 0.75rem;
+  transition: opacity 700ms;
 }
 
 .event-live-wall__bottom {
@@ -2403,6 +2589,7 @@
   justify-content: space-between;
   padding: 20px 28px;
   background: linear-gradient(0deg, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  flex: 0 0 auto;
 }
 
 .event-live-wall__qr-card {
@@ -2414,6 +2601,793 @@
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-lg);
+}
+
+.live-wall-player {
+  height: 100dvh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: #fff;
+  background: #121811;
+}
+
+.live-wall-launch {
+  display: grid;
+  min-height: 100dvh;
+  place-items: center;
+  padding: 24px;
+  color: var(--foreground);
+  background: var(--background);
+}
+
+.live-wall-launch__content {
+  display: grid;
+  justify-items: center;
+  max-width: 28rem;
+  text-align: center;
+}
+
+.live-wall-launch__spinner {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 1.25rem;
+  color: var(--primary);
+  animation: live-wall-launch-spin 900ms linear infinite;
+}
+
+.live-wall-launch__error-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 1.25rem;
+  color: var(--destructive);
+}
+
+.live-wall-launch__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.875rem, 5vw, 3rem);
+  line-height: 1.1;
+}
+
+.live-wall-launch__description {
+  margin: 0.75rem 0 0;
+  color: var(--muted-foreground);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+@keyframes live-wall-launch-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-wall-launch__spinner {
+    animation: none;
+  }
+}
+.live-wall-player__header {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 28px;
+  font-size: 0.875rem;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent);
+}
+.live-wall-player__stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5vh 5vw;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 4.5rem);
+}
+.live-wall-player__media {
+  width: 100%;
+  height: 100%;
+  max-width: 1600px;
+  max-height: 82vh;
+  object-fit: contain;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 25px rgba(0, 0, 0, 0.25);
+}
+
+/* New memories arrive with a restrained, projector-safe reveal. The animation
+   only touches composited properties so it remains smooth on venue hardware. */
+.live-wall-player__media--enter {
+  animation: live-wall-media-enter 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+
+@keyframes live-wall-media-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.live-wall-player[data-blackout] {
+  background: #000;
+}
+
+.live-wall-player__cta {
+  display: grid;
+  justify-items: center;
+  gap: 1.5rem;
+  max-width: 44rem;
+}
+
+.live-wall-player__cta p {
+  margin: 0;
+}
+
+.live-wall-player__cta h1 {
+  margin: 0;
+  font: inherit;
+  font-size: clamp(2.5rem, 5vw, 5.5rem);
+  line-height: 1.05;
+}
+
+.live-wall-player__qr {
+  width: min(48vh, 28rem);
+  aspect-ratio: 1;
+  padding: 1rem;
+  border-radius: 1.5rem;
+  background: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-wall-player__media--enter {
+    animation: none;
+  }
+}
+
+/* ─── LIVE WALL PRESENTATION STAGE ───────────────────────────────────── */
+
+.live-wall-player {
+  --live-wall-canvas: #0c0d0c;
+  --live-wall-surface: rgba(12, 13, 12, 0.74);
+  --live-wall-text: #fffaf0;
+  --live-wall-muted: rgba(255, 250, 240, 0.74);
+  --live-wall-accent: #d6b46a;
+  --live-wall-shadow: rgba(0, 0, 0, 0.56);
+  color: var(--live-wall-text);
+  background:
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(214, 180, 106, 0.1),
+      transparent 42%
+    ),
+    var(--live-wall-canvas);
+}
+
+.live-wall-player__header {
+  position: relative;
+  z-index: 2;
+  align-items: center;
+  min-height: 72px;
+  padding: 20px clamp(20px, 3vw, 56px);
+  color: var(--live-wall-text);
+  font-size: clamp(0.75rem, 1vw, 0.9375rem);
+  background: linear-gradient(180deg, var(--live-wall-surface), transparent);
+  transition:
+    opacity 400ms ease,
+    transform 400ms ease;
+  flex: 0 0 auto;
+}
+
+.live-wall-player[data-has-media] .live-wall-player__header {
+  animation: live-wall-chrome-fade 400ms ease 5s forwards;
+}
+
+.live-wall-player__event-name {
+  max-width: min(62vw, 56rem);
+  overflow: visible;
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 1.3vw, 1.375rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.live-wall-player__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--live-wall-muted);
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.live-wall-player__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--live-wall-accent);
+  box-shadow: 0 0 0 4px rgba(214, 180, 106, 0.14);
+}
+
+.live-wall-player__status[data-state="reconnecting"]
+  .live-wall-player__status-dot {
+  background: var(--live-wall-muted);
+  box-shadow: none;
+}
+
+.live-wall-player__stage {
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  /* The decorative backdrop is clipped locally. Keeping the stage open makes
+     the foreground safe when a projector reports an unusual viewport ratio. */
+  overflow: visible;
+  padding: clamp(20px, 4vh, 56px) clamp(16px, 4vw, 72px) clamp(28px, 5vh, 72px);
+  font-family: var(--font-sans);
+}
+
+.live-wall-player__media-stage {
+  position: relative;
+  display: grid;
+  width: min(100%, 1720px);
+  height: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  min-width: 0;
+  place-items: center;
+  /* A modest overscan-safe inset preserves all four edges on TVs/projectors
+     that crop a few pixels beyond the browser's reported viewport. */
+  padding: clamp(6px, 0.8vw, 14px);
+  overflow: visible;
+  border-radius: clamp(18px, 2vw, 32px);
+  background: rgba(255, 250, 240, 0.035);
+  box-shadow: 0 32px 96px var(--live-wall-shadow);
+}
+
+.live-wall-player__media-stage[data-portrait] {
+  background: #090a09;
+}
+
+.live-wall-player__backdrop-frame {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.live-wall-player__backdrop {
+  width: calc(100% + 12vw);
+  height: calc(100% + 12vw);
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  opacity: 0.44;
+  filter: blur(42px) saturate(0.82) brightness(0.48);
+  transform: scale(1.08);
+}
+
+.live-wall-player__media-shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  place-items: center;
+  animation: live-wall-media-reveal 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.live-wall-player__media-shell--video {
+  animation-name: live-wall-video-reveal;
+}
+
+.live-wall-player__media {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: 100%;
+  max-block-size: 100%;
+  /* Do not let the image's natural height become the grid track minimum.
+     This is what guarantees that portraits fit inside a landscape projector. */
+  min-inline-size: 0;
+  min-block-size: 0;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Photos are always fully contained. The blurred duplicate is presentation
+   ambience only; it must never become the image the audience relies on. */
+.live-wall-player__media--image {
+  object-fit: contain;
+}
+
+.live-wall-player__media--video {
+  background: #050505;
+}
+
+.live-wall-player__media-stage[data-portrait] .live-wall-player__media {
+  filter: drop-shadow(0 24px 42px rgba(0, 0, 0, 0.46));
+}
+
+.live-wall-player__mosaic {
+  display: grid;
+  width: min(100%, 1720px);
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  gap: clamp(6px, 0.8vw, 14px);
+  padding: clamp(6px, 0.8vw, 14px);
+}
+
+/* A wall is often opened before the room has contributed many photos. Match
+   the grid geometry to small batches instead of leaving a sparse final row. */
+.live-wall-player__mosaic[data-count="1"] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.live-wall-player__mosaic[data-count="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.live-wall-player__mosaic[data-count="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.live-wall-player__mosaic[data-count="4"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.live-wall-player__mosaic[data-count="6"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.live-wall-player__mosaic-tile {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: clamp(10px, 1vw, 18px);
+  background: rgba(255, 250, 240, 0.08);
+  animation: live-wall-mosaic-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.live-wall-player__mosaic-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #090a09;
+}
+
+@keyframes live-wall-mosaic-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.live-wall-player__invitation {
+  display: grid;
+  justify-items: center;
+  width: min(100%, 760px);
+  max-height: 100%;
+  min-height: 0;
+  gap: clamp(16px, 2vh, 28px);
+  text-align: center;
+}
+
+.live-wall-player__eyebrow {
+  margin: 0;
+  color: var(--live-wall-accent);
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 1.5vw, 1.4rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.live-wall-player__qr-frame {
+  display: grid;
+  width: min(100%, clamp(196px, 28vw, 360px));
+  max-height: 44dvh;
+  aspect-ratio: 1;
+  place-items: center;
+  padding: clamp(14px, 1.4vw, 22px);
+  border: 1px solid rgba(255, 250, 240, 0.7);
+  border-radius: clamp(20px, 2vw, 30px);
+  background: #fffdf8;
+  box-shadow: 0 24px 72px var(--live-wall-shadow);
+}
+
+.live-wall-player__qr {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.live-wall-player__qr-loading {
+  width: 34%;
+  aspect-ratio: 1;
+  border: 3px solid rgba(12, 13, 12, 0.15);
+  border-top-color: var(--live-wall-accent);
+  border-radius: 50%;
+  animation: live-wall-qr-spin 900ms linear infinite;
+}
+
+.live-wall-player__invitation-copy {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 26ch;
+}
+
+.live-wall-player__invitation-copy h1,
+.live-wall-player__invitation-copy p {
+  margin: 0;
+}
+
+.live-wall-player__invitation-copy h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(2.25rem, 4.5vw, 5.5rem);
+  font-weight: 500;
+  line-height: 0.98;
+  text-wrap: balance;
+}
+
+.live-wall-player__invitation-copy p {
+  color: var(--live-wall-muted);
+  font-size: clamp(1rem, 1.6vw, 1.5rem);
+  line-height: 1.45;
+  text-wrap: balance;
+}
+
+@keyframes live-wall-media-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes live-wall-chrome-fade {
+  to {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes live-wall-video-reveal {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes live-wall-qr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .live-wall-player__header {
+    min-height: 58px;
+    padding: 16px 20px;
+  }
+
+  .live-wall-player__event-name {
+    max-width: 64vw;
+  }
+
+  .live-wall-player__stage {
+    padding: 16px;
+  }
+
+  .live-wall-player__media-stage {
+    height: min(100%, 82dvh);
+    border-radius: 18px;
+  }
+
+  .live-wall-player__mosaic {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+  }
+
+  .live-wall-player__mosaic[data-count="1"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .live-wall-player__mosaic[data-count="2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .live-wall-player__mosaic[data-count="3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .live-wall-player__mosaic[data-count="4"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+
+  .live-wall-player__mosaic[data-count="6"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-wall-player__header,
+  .live-wall-player__media-shell,
+  .live-wall-player__mosaic-tile,
+  .live-wall-player__qr-loading {
+    animation: none;
+    transition: none;
+  }
+}
+
+.event-live-wall__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.event-live-wall__control {
+  width: 44px;
+  height: 44px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.event-live-wall__control:hover,
+.event-live-wall__control:focus-visible,
+.event-live-wall__control--active {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.65);
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.event-live-wall__control:focus-visible,
+.event-live-wall__policy-button:focus-visible,
+.event-live-wall__cta-resume:focus-visible {
+  outline-color: #fcd34d;
+}
+
+.event-live-wall__policy {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.24);
+}
+
+.event-live-wall__policy-button {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.event-live-wall__policy-button--active {
+  background: #fff;
+  color: #121811;
+}
+
+.event-live-wall__connection {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.event-live-wall__connection-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fbbf24;
+}
+
+.event-live-wall__connection-dot--live {
+  background: #86efac;
+  box-shadow: 0 0 0 3px rgba(134, 239, 172, 0.12);
+}
+
+.event-live-wall__media-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-width: min(90vw, 1600px);
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-live-wall__media {
+  width: 100%;
+  height: 100%;
+}
+
+.event-live-wall__media--enter {
+  animation: event-live-wall-fade-in 420ms ease-out both;
+}
+
+.event-live-wall__image {
+  display: block;
+}
+
+.event-live-wall__image--image {
+  object-fit: contain;
+  object-position: center;
+}
+
+.event-live-wall__image--video {
+  background: #050505;
+}
+
+.event-live-wall__cta-slide {
+  width: min(90vw, 700px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.event-live-wall__cta-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  color: #fcd34d;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.event-live-wall__cta-eyebrow {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 600;
+}
+
+.event-live-wall__cta-heading {
+  max-width: 18ch;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 4.5rem);
+  font-weight: 500;
+  line-height: 1.06;
+  text-wrap: balance;
+}
+
+.event-live-wall__cta-qr {
+  width: clamp(220px, 24vw, 320px);
+  height: clamp(220px, 24vw, 320px);
+  padding: 12px;
+  border-radius: 1.25rem;
+  color: #181e17;
+  background: #fff;
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.28);
+}
+
+.event-live-wall__cta-note,
+.event-live-wall__shortcut-hint {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.875rem;
+}
+
+.event-live-wall__cta-resume {
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  color: #fff;
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.event-live-wall--blackout {
+  background: #000;
+}
+
+.event-live-wall--blackout .event-live-wall__top,
+.event-live-wall--blackout .event-live-wall__bottom {
+  visibility: hidden;
+}
+
+@keyframes event-live-wall-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-live-wall__media--enter {
+    animation: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .event-live-wall__top,
+  .event-live-wall__bottom {
+    padding: 14px 16px;
+  }
+
+  .event-live-wall__policy {
+    display: none;
+  }
+
+  .event-live-wall__shortcut-hint {
+    display: none;
+  }
 }
 
 /* ─── PRINT SIGN STUDIO MODAL ────────────────────────────────────────── */

@@ -180,6 +180,7 @@ type BackendMediaListPayload = {
     qr_source?: EventMediaItem["qr_source"];
     status: EventMediaStatus;
     is_video?: boolean;
+    has_event_frame?: boolean;
     likes_count?: number;
     width?: number;
     height?: number;
@@ -193,6 +194,7 @@ type BackendMediaListPayload = {
     has_next: boolean;
     has_prev: boolean;
   };
+  page?: { next_cursor: string; has_more: boolean };
 };
 
 /**
@@ -212,6 +214,8 @@ export class HttpEventMediaRepository implements EventMediaRepository {
           sort: params.sort || "newest",
           ...(params.page ? { page: params.page } : {}),
           ...(params.per_page ? { per_page: params.per_page } : {}),
+          limit: params.per_page || 24,
+          ...(params.cursor ? { cursor: params.cursor } : {}),
         },
       },
     );
@@ -226,6 +230,7 @@ export class HttpEventMediaRepository implements EventMediaRepository {
       qr_source: item.qr_source,
       status: item.status,
       is_video: Boolean(item.is_video),
+      has_event_frame: Boolean(item.has_event_frame),
       likes_count: item.likes_count,
       width: item.width,
       height: item.height,
@@ -268,6 +273,7 @@ export class HttpEventMediaRepository implements EventMediaRepository {
       data,
       counts,
       pagination: response.data.pagination,
+      page: response.data.page,
     };
   }
 

@@ -1,5 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { APIError, privateClient } from "@/lib/api-client";
+import {
+  APIError,
+  isBackendUnreachable,
+  privateClient,
+} from "@/lib/api-client";
 import { QUERY_KEYS } from "@/lib/cache-config";
 import type { CandidEvent, EventType } from "../types/event";
 import { createLocalEvent, saveStoredEvent } from "../lib/event-store";
@@ -13,16 +17,6 @@ export type CreateEventInput = {
 };
 
 export type CreateEventResponse = CandidEvent;
-
-/**
- * A local-only event is a last resort: it exists in this browser alone, so the
- * QR code 404s for every guest who scans it. Only a backend we could not reach
- * at all justifies one. `normalizeAxiosError` maps that case — and only that
- * case — to status 0; anything the API actually answered is a real failure.
- */
-function isBackendUnreachable(error: unknown): boolean {
-  return error instanceof APIError && error.status === 0;
-}
 
 /**
  * Mutation hook to create an event on the backend, with a local persistence

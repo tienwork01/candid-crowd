@@ -1,18 +1,25 @@
 "use client";
 
+import { useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
 import { CACHE_TIMES, QUERY_KEYS } from "@/lib/cache-config";
 
 const PROFILE_CACHE_KEY = "candidcrowd_host_profile_cache";
 
-function getCachedProfile() {
+type HostProfile = Awaited<
+  ReturnType<typeof authClient.getSession>
+>["data"] extends infer Data
+  ? Exclude<Data, undefined> | null
+  : never;
+
+function getCachedProfile(): HostProfile | undefined {
   if (typeof window === "undefined") return undefined;
 
   try {
     const raw = sessionStorage.getItem(PROFILE_CACHE_KEY);
 
-    return raw ? JSON.parse(raw) : undefined;
+    return raw ? (JSON.parse(raw) as HostProfile) : undefined;
   } catch {
     return undefined;
   }
@@ -42,7 +49,7 @@ export function useHostProfile() {
         throw response.error;
       }
 
-      const result = response.data ?? null;
+      const result = (response.data ?? null) as HostProfile;
 
       if (result) {
         setCachedProfile(result);
@@ -50,12 +57,26 @@ export function useHostProfile() {
 
       return result;
     },
-    initialData: () => getCachedProfile(),
-    initialDataUpdatedAt: () => 0,
     staleTime: CACHE_TIMES.STATIC.staleTime,
     gcTime: CACHE_TIMES.STATIC.gcTime,
     refetchOnWindowFocus: false,
   });
+
+  // The sessionStorage snapshot is only readable in the browser, so seeding it
+  // during render would make the first client render disagree with the server
+  // HTML. Restore it after hydration instead; the query cache keeps it for the
+  // rest of the session, so client-side navigations still skip the skeleton.
+  useEffect(() => {
+    if (queryClient.getQueryData(QUERY_KEYS.host.profile) !== undefined) return;
+
+    const cached = getCachedProfile();
+
+    if (cached) {
+      queryClient.setQueryData(QUERY_KEYS.host.profile, cached, {
+        updatedAt: 0,
+      });
+    }
+  }, [queryClient]);
 
   return {
     ...query,

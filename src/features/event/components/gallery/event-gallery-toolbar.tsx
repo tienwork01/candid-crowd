@@ -2,6 +2,7 @@
 
 import {
   ArrowsDownUp,
+  Broadcast,
   CheckSquareOffset,
   Columns,
   DownloadSimple,
@@ -43,7 +44,10 @@ type EventGalleryToolbarProps = {
   isSelectMode: boolean;
   onToggleSelectMode: () => void;
   totalItems: number;
+  downloadCount: number;
   onDownloadAll: () => void;
+  isExporting?: boolean;
+  isLive?: boolean;
 };
 
 export function EventGalleryToolbar({
@@ -57,7 +61,10 @@ export function EventGalleryToolbar({
   isSelectMode,
   onToggleSelectMode,
   totalItems,
+  downloadCount,
   onDownloadAll,
+  isExporting = false,
+  isLive = false,
 }: EventGalleryToolbarProps) {
   const t = useTranslations("event");
 
@@ -110,6 +117,19 @@ export function EventGalleryToolbar({
 
       {/* Toolbar Controls */}
       <div className="event-gallery__actions">
+        {isLive && (
+          <span
+            className="event-gallery__live"
+            title={t("gallery.liveHint")}
+            role="status"
+          >
+            <Broadcast size={13} weight="fill" aria-hidden="true" />
+            <span className="event-gallery__live-label">
+              {t("gallery.live")}
+            </span>
+          </span>
+        )}
+
         {/* Layout Switcher (Masonry vs Grid) */}
         <Tabs
           value={layoutMode}
@@ -185,10 +205,15 @@ export function EventGalleryToolbar({
           size="sm"
           onClick={onDownloadAll}
           className="text-xs h-9 gap-1.5"
-          disabled={totalItems === 0}
+          disabled={downloadCount === 0 || isExporting}
+          aria-busy={isExporting}
         >
           <DownloadSimple size={15} aria-hidden="true" />
-          <span>{t("gallery.downloadAll", { count: totalItems })}</span>
+          <span>
+            {isExporting
+              ? t("gallery.exportPreparing")
+              : t("gallery.downloadAll", { count: downloadCount })}
+          </span>
         </Button>
       </div>
     </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   Check,
   EyeSlash,
@@ -46,6 +45,7 @@ export function EventMediaCard({
   const isFeatured = item.status === "featured";
   const isHidden = item.status === "hidden";
   const isVideo = Boolean(item.is_video);
+  const hasEventFrame = Boolean(item.has_event_frame);
   const hasMeta = Boolean(item.guest_name || item.likes_count);
 
   return (
@@ -54,7 +54,9 @@ export function EventMediaCard({
         isHidden ? "event-media-card--hidden" : ""
       } ${isFeatured ? "event-media-card--featured" : ""} ${
         isSelected ? "event-media-card--selected" : ""
-      } ${isVideo ? "event-media-card--video" : ""}`}
+      } ${isVideo ? "event-media-card--video" : ""} ${
+        hasEventFrame ? "event-media-card--framed" : ""
+      }`}
       onClick={handleCardClick}
       role="button"
       tabIndex={0}
@@ -73,21 +75,25 @@ export function EventMediaCard({
       >
         {/* Media Canvas (Image or Video Poster) */}
         {layoutMode === "grid" ? (
-          <Image
+          // Signed private R2 URLs must bypass Next's image optimizer.
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={item.thumbnail_url || item.url}
             alt={item.caption || "Event memory"}
-            fill
-            className="event-media-card__img"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            loading="lazy"
+            decoding="async"
+            className="event-media-card__img event-media-card__img--fill"
           />
         ) : (
-          <Image
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
             src={item.thumbnail_url || item.url}
             alt={item.caption || "Event memory"}
             width={item.width || 600}
             height={item.height || 800}
-            className="event-media-card__img-natural w-full h-auto"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            loading="lazy"
+            decoding="async"
+            className="event-media-card__img-natural"
           />
         )}
 

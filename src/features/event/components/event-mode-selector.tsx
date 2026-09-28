@@ -14,12 +14,14 @@ import { eventModes, type EventMode } from "../types/event";
 
 type EventModeSelectorProps = {
   activeMode: EventMode;
-  onModeChange: (mode: EventMode) => void;
+  onModeChange: (mode: EventMode) => Promise<void>;
+  isChanging?: boolean;
 };
 
 export function EventModeSelector({
   activeMode,
   onModeChange,
+  isChanging = false,
 }: EventModeSelectorProps) {
   const t = useTranslations("event");
 
@@ -59,13 +61,17 @@ export function EventModeSelector({
     },
   };
 
-  const handleSelect = (mode: EventMode) => {
-    if (mode === activeMode) return;
-    onModeChange(mode);
+  const handleSelect = async (mode: EventMode) => {
+    if (mode === activeMode || isChanging) return;
 
     const label = t(`modes.${modeConfigs[mode].labelKey}`);
 
-    toast.success(t("modes.modeChanged", { mode: label }));
+    try {
+      await onModeChange(mode);
+      toast.success(t("modes.modeChanged", { mode: label }));
+    } catch {
+      toast.error(t("modes.modeChangeFailed"));
+    }
   };
 
   return (
@@ -99,6 +105,7 @@ export function EventModeSelector({
               type="button"
               role="radio"
               aria-checked={isActive}
+              disabled={isChanging}
               onClick={() => handleSelect(mode)}
               className={`event-mode-bar__btn ${
                 isActive ? "event-mode-bar__btn--active" : ""
