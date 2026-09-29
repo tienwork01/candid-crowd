@@ -78,6 +78,23 @@ function renderTemplate(
   });
 }
 
+function createVerificationRedirectUrl(
+  verificationUrl: string,
+  appUrl: string,
+): string {
+  const authUrl = new URL(verificationUrl);
+  const completionUrl = new URL("/email-verified", appUrl);
+  const nextPath = authUrl.searchParams.get("callbackURL");
+
+  if (nextPath) {
+    completionUrl.searchParams.set("next", nextPath);
+  }
+
+  authUrl.searchParams.set("callbackURL", completionUrl.toString());
+
+  return authUrl.toString();
+}
+
 export async function sendAuthEmail(message: Message): Promise<void> {
   const transport = nodemailer.createTransport({
     host: required("SMTP_HOST"),
@@ -91,7 +108,6 @@ export async function sendAuthEmail(message: Message): Promise<void> {
   const heading = escapeHTML(message.heading);
   const body = escapeHTML(message.text);
   const action = escapeHTML(message.action);
-  const url = escapeHTML(message.url);
   const userName = message.userName ? escapeHTML(message.userName) : null;
   const subtext = message.subtext ? escapeHTML(message.subtext) : null;
   const preview = escapeHTML(message.previewText || message.heading);
@@ -117,6 +133,10 @@ export async function sendAuthEmail(message: Message): Promise<void> {
     siteConfig.appUrl;
   const supportEmail =
     process.env.NEXT_PUBLIC_SUPPORT_EMAIL || siteConfig.supportEmail;
+  const actionUrl =
+    templateType === "verification"
+      ? createVerificationRedirectUrl(message.url, appUrl)
+      : message.url;
 
   const html = renderTemplate(rawTemplate, {
     SUBJECT: escapeHTML(message.subject),
@@ -125,7 +145,7 @@ export async function sendAuthEmail(message: Message): Promise<void> {
     HEADING: heading,
     BODY: body,
     ACTION_TEXT: action,
-    ACTION_URL: url,
+    ACTION_URL: escapeHTML(actionUrl),
     SUBTEXT: subtextHtml,
     APP_NAME: escapeHTML(appName),
     APP_TAGLINE: escapeHTML(appTagline),
@@ -142,7 +162,7 @@ export async function sendAuthEmail(message: Message): Promise<void> {
     from: required("EMAIL_FROM"),
     to: message.to,
     subject: message.subject,
-    text: `${plainGreeting}${message.heading}\n\n${message.text}\n\n${message.action}: ${message.url}${plainSubtext}\n\nIf you did not request this email, you can safely ignore it.`,
+    text: `${plainGreeting}${message.heading}\n\n${message.text}\n\n${message.action}: ${actionUrl}${plainSubtext}\n\nIf you did not request this email, you can safely ignore it.`,
     html,
   });
 }

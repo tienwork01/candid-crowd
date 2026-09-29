@@ -1,5 +1,5 @@
 import { createParser, type EventSourceMessage } from "eventsource-parser";
-import { getAuthToken } from "@/lib/api-client";
+import { clearAuthTokenCache, getAuthToken } from "@/lib/api-client";
 
 /**
  * Server-sent events transport.
@@ -30,6 +30,10 @@ export type EventStreamOptions = EventStreamHandlers & {
 /** Matches the server's `retry:` hint; also the floor for backoff. */
 const BASE_RETRY_MS = 3_000;
 const MAX_RETRY_MS = 60_000;
+// A stream that is cut off almost immediately is usually a proxy/backend
+// configuration issue, not a healthy server rotation. Do not retry those at
+// the rapid cadence reserved for long-lived connections.
+const STABLE_CONNECTION_MS = 30_000;
 
 /**
  * Full jitter. A venue-wide Wi-Fi blip drops every guest at once, and without
@@ -149,12 +153,16 @@ function connectWithEventSource(options: EventStreamOptions): Promise<void> {
 
 async function connectWithFetch(options: EventStreamOptions): Promise<void> {
   let attempt = 0;
+  let shouldRefreshToken = false;
 
   while (!options.signal.aborted) {
     let opened = false;
+    let openedAt = 0;
 
     try {
-      const token = await getAuthToken(attempt > 0);
+      const token = await getAuthToken(shouldRefreshToken);
+
+      shouldRefreshToken = false;
 
       if (!token) {
         // Not signed in. Retrying cannot fix that, so stop rather than spin.
@@ -171,8 +179,12 @@ async function connectWithFetch(options: EventStreamOptions): Promise<void> {
       });
 
       if (response.status === 401) {
-        // Force a token refresh on the next attempt before giving up.
+        // A reconnect does not imply an expired token. Refresh only after the
+        // API explicitly rejects it, otherwise every short-lived SSE stream
+        // needlessly calls Better Auth's `/token` endpoint.
         if (attempt > 0) break;
+        clearAuthTokenCache();
+        shouldRefreshToken = true;
         attempt += 1;
         continue;
       }
@@ -182,6 +194,7 @@ async function connectWithFetch(options: EventStreamOptions): Promise<void> {
       }
 
       opened = true;
+      openedAt = Date.now();
       attempt = 0;
       options.onOpen?.();
 
@@ -214,10 +227,13 @@ async function connectWithFetch(options: EventStreamOptions): Promise<void> {
 
     if (options.signal.aborted) break;
 
-    // The server closes streams on purpose once they reach their maximum age,
-    // so a clean end is expected rather than a failure. Only repeated failures
-    // before the stream ever opened should back off hard.
-    attempt = opened ? 0 : Math.min(attempt + 1, 6);
+    // The server may close a long-lived stream intentionally once it reaches
+    // its maximum age. A response that dies immediately, however, must use
+    // exponential backoff too; otherwise each quick 200 response becomes a
+    // new fetch within a few seconds forever.
+    const wasStable = opened && Date.now() - openedAt >= STABLE_CONNECTION_MS;
+
+    attempt = wasStable ? 0 : Math.min(attempt + 1, 6);
     await sleep(backoffDelay(attempt), options.signal);
   }
 }

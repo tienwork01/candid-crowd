@@ -433,6 +433,12 @@
       "successPasswordRenewed": "Senha alterada com sucesso.",
       "successResetLinkBody": "Se existir uma conta para esse e-mail, um link seguro de redefinição chegará em breve.",
       "successPasswordRenewedBody": "Sua senha foi alterada. Agora você pode entrar com sua nova senha.",
+      "emailVerifiedTitle": "Seu e-mail foi verificado.",
+      "emailVerifiedBody": "Sua conta está pronta. Você pode começar a criar seu evento quando quiser.",
+      "continueToDashboard": "Continuar para seu evento",
+      "verificationLinkInvalidEyebrow": "LINK INDISPONÍVEL",
+      "emailVerificationFailedTitle": "Este link de verificação não é mais válido.",
+      "emailVerificationFailedBody": "Ele pode ter expirado ou já ter sido usado. Entre para solicitar um novo link.",
       "tryAnotherEmail": "Tentar outro e-mail",
       "continueToLogIn": "Continuar para entrar"
     },
@@ -451,7 +457,8 @@
       "registerMetaTitle": "Criar uma conta — CandidCrowd",
       "forgotPasswordMetaTitle": "Esqueci a senha — CandidCrowd",
       "resetPasswordMetaTitle": "Redefinir senha — CandidCrowd",
-      "verifyEmailMetaTitle": "Verificar e-mail — CandidCrowd"
+      "verifyEmailMetaTitle": "Verificar e-mail — CandidCrowd",
+      "emailVerifiedMetaTitle": "E-mail verificado — CandidCrowd"
     }
   },
   "event": {

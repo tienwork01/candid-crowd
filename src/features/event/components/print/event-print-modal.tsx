@@ -23,9 +23,7 @@ import {
 } from "@/components/ui";
 import type { CandidEvent } from "../../types/event";
 import { getEventPublicCode } from "../../types/event";
-import { loadQRConfig } from "../../lib/qr-customize-storage";
 import { generateHighResQRDataUrl } from "../../lib/qr-generator";
-import { loadGuestThemeConfig } from "../../lib/guest-theme-storage";
 import type { QRCustomizeState } from "../qr-customize/qr-customize-types";
 import {
   PRINT_DIMENSIONS,
@@ -57,7 +55,7 @@ const PRESET_TO_PRINT_THEME: Record<string, PrintTheme> = {
 };
 
 function getInitialPrintTheme(event: CandidEvent): PrintTheme {
-  const guestTheme = event.guest_theme || loadGuestThemeConfig(event.id);
+  const guestTheme = event.guest_theme;
 
   if (guestTheme?.presetId && PRESET_TO_PRINT_THEME[guestTheme.presetId]) {
     return PRESET_TO_PRINT_THEME[guestTheme.presetId];
@@ -165,8 +163,7 @@ export function EventPrintModal({
     if (!isOpen) return;
 
     let active = true;
-    const currentCustomConfig =
-      propConfig ?? event.qr_config ?? loadQRConfig(event.id);
+    const currentCustomConfig = propConfig ?? event.qr_config ?? null;
 
     void generateHighResQRDataUrl(targetGuestUrl, currentCustomConfig, 1400)
       .then((url) => {

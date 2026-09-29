@@ -669,12 +669,12 @@ export function PrivacyBodyVi({ t }: PrivacyBodyProps) {
             nghệ này được sử dụng để: lưu trữ tạm thời các tệp tin đang chờ tải
             lên (IndexedDB) nhằm đảm bảo khả năng phục hồi khi mạng Wi-Fi tại
             địa điểm sự kiện không ổn định; ghi nhớ tên hiển thị tùy chọn của
-            khách mời (localStorage); duy trì mã phiên khách mời
-            (sessionStorage); và lưu đệm thông tin sự kiện của Chủ tiệc để truy
-            cập ngoại tuyến. Dữ liệu tải lên trong IndexedDB sẽ tự động được xóa
-            sau khi tải lên thành công. Bộ điều phối Service Worker cũng có thể
-            lưu đệm nội dung trang và hình ảnh trên thiết bị của bạn nhằm cải
-            thiện tốc độ tải.
+            khách mời (localStorage); và duy trì mã phiên khách mời
+            (sessionStorage). Dữ liệu tài khoản và sự kiện của Chủ tiệc không
+            được lưu trong bộ nhớ trình duyệt. Dữ liệu tải lên trong IndexedDB
+            sẽ tự động được xóa sau khi tải lên thành công. Bộ điều phối Service
+            Worker cũng có thể lưu đệm nội dung trang và hình ảnh trên thiết bị
+            của bạn nhằm cải thiện tốc độ tải.
           </p>
           <h3 className="legal-section__subtitle">Cookie phân tích</h3>
           <p>

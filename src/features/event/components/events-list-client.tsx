@@ -14,7 +14,7 @@ import {
   WarningCircle,
 } from "@phosphor-icons/react";
 import { useLocale, useTranslations } from "next-intl";
-import { useEventListParams, useEvents, useEventsTotals } from "../hooks";
+import { useEventListParams, useEvents } from "../hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/i18n/format";
 import type { AppLocale } from "@/i18n/locales";
@@ -53,15 +53,19 @@ export function EventsListClient() {
   // Paginated query
   const { data, isLoading, isFetching, isError, error } = useEvents(params);
 
-  // Global totals (all events, independent of current filter/page)
-  const { totalEvents, totalMemories, totalContributors } = useEventsTotals();
-
   const events = data?.data ?? [];
   const pagination = data?.pagination;
-  const effectiveTotalEvents = Math.max(
-    totalEvents,
-    pagination?.total ?? 0,
-    events.length,
+  const effectiveTotalEvents = pagination?.total ?? events.length;
+  const totalMemories = events.reduce(
+    (sum, event) =>
+      sum +
+      (event.metrics?.photos_count || 0) +
+      (event.metrics?.videos_count || 0),
+    0,
+  );
+  const totalContributors = events.reduce(
+    (sum, event) => sum + (event.metrics?.contributors_count || 0),
+    0,
   );
 
   const hasActiveSearch = Boolean(params.q?.trim()) || Boolean(params.type);

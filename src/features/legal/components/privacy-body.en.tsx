@@ -577,11 +577,12 @@ export function PrivacyBodyEn({ t }: PrivacyBodyProps) {
             technologies including localStorage, sessionStorage, and IndexedDB.
             These technologies are used to: temporarily store media pending
             upload (IndexedDB) to ensure resilience on unstable venue Wi-Fi;
-            remember optional guest display names (localStorage); maintain guest
-            session tokens (sessionStorage); and cache host event data for
-            offline access. IndexedDB upload data is automatically cleared after
-            successful upload. A Service Worker may also cache page content and
-            images on your device to improve performance.
+            remember optional guest display names (localStorage); and maintain
+            guest session tokens (sessionStorage). Host account and event data
+            is not persisted in browser storage. IndexedDB upload data is
+            automatically cleared after successful upload. A Service Worker may
+            also cache page content and images on your device to improve
+            performance.
           </p>
           <h3 className="legal-section__subtitle">Analytics cookies</h3>
           <p>

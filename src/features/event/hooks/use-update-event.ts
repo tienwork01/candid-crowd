@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { privateClient } from "@/lib/api-client";
 import { QUERY_KEYS } from "@/lib/cache-config";
 import type { CandidEvent } from "../types/event";
-import { updateStoredEvent } from "../lib/event-store";
 
 export type UpdateEventInput = {
   id: string;
@@ -40,8 +39,6 @@ export function useUpdateEvent() {
       if (!response.data?.id) {
         throw new Error("event_update_invalid_response");
       }
-
-      updateStoredEvent(id, response.data);
 
       return response.data;
     },

@@ -49,7 +49,6 @@ import { APIError } from "@/lib/api-client";
 import { useGuestUpload, type UploadStage } from "@/features/upload/hooks";
 import { usePWA } from "@/features/pwa/components";
 import { usePublicEventRealtime, usePublicMedia } from "../hooks";
-import { loadGuestThemeConfig } from "../lib/guest-theme-storage";
 import type { GuestThemeConfig } from "./guest-theme";
 import {
   getGuestThemeStyles,
@@ -236,9 +235,10 @@ export function GuestEventView({ event, isTest = false }: GuestEventViewProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
 
-  const guestTheme = useMemo<GuestThemeConfig | null>(() => {
-    return event.guest_theme || loadGuestThemeConfig(event.id);
-  }, [event.guest_theme, event.id]);
+  const guestTheme = useMemo<GuestThemeConfig | null>(
+    () => event.guest_theme || null,
+    [event.guest_theme],
+  );
 
   const displayTitle = guestTheme?.eventTitleOverride?.trim() || event.name;
 

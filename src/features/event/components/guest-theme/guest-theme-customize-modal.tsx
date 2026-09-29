@@ -24,11 +24,7 @@ import {
   GUEST_THEME_PRESETS,
   type GuestThemeConfig,
 } from "./guest-theme-types";
-import {
-  loadGuestThemeConfig,
-  saveGuestThemeConfig,
-  generateDefaultMonogram,
-} from "../../lib/guest-theme-storage";
+import { generateDefaultMonogram } from "../../lib/guest-theme-utils";
 import { GuestPhoneMockup } from "./guest-phone-mockup";
 import { GuestThemePresetsTab } from "./guest-theme-presets-tab";
 import { GuestThemeBrandingTab } from "./guest-theme-branding-tab";
@@ -39,7 +35,7 @@ interface GuestThemeCustomizeModalProps {
   event: CandidEvent;
   isOpen: boolean;
   onClose: () => void;
-  onApplied?: (config: GuestThemeConfig) => void;
+  onApplied?: (config: GuestThemeConfig) => Promise<void> | void;
 }
 
 type TabType = "presets" | "branding" | "content" | "experience";
@@ -58,7 +54,7 @@ export function GuestThemeCustomizeModal({
   );
 
   const [config, setConfig] = useState<GuestThemeConfig>(() => {
-    const loaded = event.guest_theme || loadGuestThemeConfig(event.id);
+    const loaded = event.guest_theme;
 
     if (loaded) {
       return {
@@ -116,11 +112,14 @@ export function GuestThemeCustomizeModal({
     toast.success(t("guestTheme.resetSuccess"));
   };
 
-  const handleApply = () => {
-    saveGuestThemeConfig(event.id, config);
-    onApplied?.(config);
-    toast.success(t("guestTheme.saveSuccess"));
-    onClose();
+  const handleApply = async () => {
+    try {
+      await onApplied?.(config);
+      toast.success(t("guestTheme.saveSuccess"));
+      onClose();
+    } catch {
+      toast.error(tCommon("actions.retry"));
+    }
   };
 
   return (

@@ -1158,29 +1158,16 @@ export function EventOverviewView({
         event={currentEvent}
         isOpen={isCustomizeGuestPageOpen}
         onClose={() => setIsCustomizeGuestPageOpen(false)}
-        onApplied={(themeConfig) => {
-          setCurrentEvent((prev) => ({
-            ...prev,
-            guest_theme: themeConfig,
-            setup_checklist: {
-              ...(prev.setup_checklist || {
-                eventCreated: true,
-                qrReady: true,
-                testedGuestExperience: false,
-                addedGuestCount: false,
-                customizedQr: false,
-                customizedPage: false,
-              }),
-              customizedPage: true,
-            },
-          }));
-          void updateEvent({
+        onApplied={async (themeConfig) => {
+          const updated = await updateEvent({
             id: currentEvent.id,
             guest_theme: themeConfig,
             setup_checklist: {
               customizedPage: true,
             },
           });
+
+          setCurrentEvent(updated);
         }}
       />
 

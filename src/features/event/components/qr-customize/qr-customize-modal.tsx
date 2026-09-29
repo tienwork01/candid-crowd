@@ -20,7 +20,6 @@ import { QRStyledPreview } from "./qr-styled-preview";
 import { QRColorPresets } from "./qr-color-presets";
 import { QRStyleSelector } from "./qr-style-selector";
 import { QRLogoUpload } from "./qr-logo-upload";
-import { loadQRConfig, saveQRConfig } from "../../lib/qr-customize-storage";
 
 interface QRCustomizeModalProps {
   event: CandidEvent;
@@ -43,9 +42,7 @@ export function QRCustomizeModal({
   const tCommon = useTranslations("common");
 
   const [config, setConfig] = useState<QRCustomizeState>(() => {
-    return (
-      event.qr_config || loadQRConfig(event.id) || DEFAULT_QR_CUSTOMIZE_STATE
-    );
+    return event.qr_config || DEFAULT_QR_CUSTOMIZE_STATE;
   });
   const [isApplying, setIsApplying] = useState(false);
 
@@ -80,7 +77,6 @@ export function QRCustomizeModal({
 
     try {
       await onApplied?.(config);
-      saveQRConfig(event.id, config);
       toast.success(t("applied"));
       onClose();
     } catch {

@@ -16,7 +16,6 @@ import { toast } from "sonner";
 import type { CandidEvent } from "../types/event";
 import { Button } from "@/components/ui";
 import { QRStyledPreview, type QRCustomizeState } from "./qr-customize";
-import { loadQRConfig } from "../lib/qr-customize-storage";
 
 type EventReadyCardProps = {
   event: CandidEvent;
@@ -42,7 +41,7 @@ export function EventReadyCard({
   );
   const [copied, setCopied] = useState(false);
   const [customConfig, setCustomConfig] = useState<QRCustomizeState | null>(
-    () => propConfig || event.qr_config || loadQRConfig(event.id),
+    () => propConfig || event.qr_config || null,
   );
   const [prevEventKey, setPrevEventKey] = useState(
     () => `${event.id}-${configVersion ?? 0}`,
@@ -59,7 +58,7 @@ export function EventReadyCard({
     }
   } else if (currentEventKey !== prevEventKey) {
     setPrevEventKey(currentEventKey);
-    setCustomConfig(event.qr_config || loadQRConfig(event.id));
+    setCustomConfig(event.qr_config || null);
   }
 
   const canShare =

@@ -433,6 +433,12 @@
       "successPasswordRenewed": "Votre mot de passe a été modifié avec succès.",
       "successResetLinkBody": "Si un compte existe pour cet e-mail, un lien de réinitialisation sécurisé arrivera sous peu.",
       "successPasswordRenewedBody": "Votre mot de passe a été modifié. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+      "emailVerifiedTitle": "Votre e-mail est vérifié.",
+      "emailVerifiedBody": "Votre compte est prêt. Vous pouvez créer votre événement dès que vous le souhaitez.",
+      "continueToDashboard": "Continuer vers votre événement",
+      "verificationLinkInvalidEyebrow": "LIEN INDISPONIBLE",
+      "emailVerificationFailedTitle": "Ce lien de vérification n’est plus valide.",
+      "emailVerificationFailedBody": "Il a peut-être expiré ou a déjà été utilisé. Connectez-vous pour demander un nouveau lien.",
       "tryAnotherEmail": "Essayer un autre e-mail",
       "continueToLogIn": "Continuer vers la connexion"
     },
@@ -451,7 +457,8 @@
       "registerMetaTitle": "Créer un compte — CandidCrowd",
       "forgotPasswordMetaTitle": "Mot de passe oublié — CandidCrowd",
       "resetPasswordMetaTitle": "Réinitialiser le mot de passe — CandidCrowd",
-      "verifyEmailMetaTitle": "Vérifier l'e-mail — CandidCrowd"
+      "verifyEmailMetaTitle": "Vérifier l'e-mail — CandidCrowd",
+      "emailVerifiedMetaTitle": "E-mail vérifié — CandidCrowd"
     }
   },
   "event": {

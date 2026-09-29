@@ -433,6 +433,12 @@
       "successPasswordRenewed": "Ihr Passwort wurde erfolgreich geändert.",
       "successResetLinkBody": "Falls ein Konto mit dieser E-Mail existiert, trifft in Kürze ein sicherer Link ein.",
       "successPasswordRenewedBody": "Ihr Passwort wurde geändert. Sie können sich jetzt mit Ihrem neuen Passwort anmelden.",
+      "emailVerifiedTitle": "Ihre E-Mail-Adresse ist bestätigt.",
+      "emailVerifiedBody": "Ihr Konto ist bereit. Sie können jetzt mit der Erstellung Ihrer Veranstaltung beginnen.",
+      "continueToDashboard": "Weiter zu Ihrer Veranstaltung",
+      "verificationLinkInvalidEyebrow": "LINK NICHT VERFÜGBAR",
+      "emailVerificationFailedTitle": "Dieser Bestätigungslink ist nicht mehr gültig.",
+      "emailVerificationFailedBody": "Er ist möglicherweise abgelaufen oder wurde bereits verwendet. Melden Sie sich an, um einen neuen Link anzufordern.",
       "tryAnotherEmail": "Andere E-Mail versuchen",
       "continueToLogIn": "Weiter zur Anmeldung"
     },
@@ -451,7 +457,8 @@
       "registerMetaTitle": "Konto erstellen — CandidCrowd",
       "forgotPasswordMetaTitle": "Passwort vergessen — CandidCrowd",
       "resetPasswordMetaTitle": "Passwort zurücksetzen — CandidCrowd",
-      "verifyEmailMetaTitle": "E-Mail bestätigen — CandidCrowd"
+      "verifyEmailMetaTitle": "E-Mail bestätigen — CandidCrowd",
+      "emailVerifiedMetaTitle": "E-Mail bestätigt — CandidCrowd"
     }
   },
   "event": {

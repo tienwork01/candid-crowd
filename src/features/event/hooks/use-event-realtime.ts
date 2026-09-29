@@ -43,6 +43,7 @@ export function useEventRealtime(
       ? "open"
       : "connecting";
   const refetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasOpenedStream = useRef(false);
 
   const refetchMedia = useCallback(
     (immediate = false) => {
@@ -77,6 +78,11 @@ export function useEventRealtime(
   useEffect(() => {
     if (!eventId) return;
 
+    // A route can transition directly between events without unmounting this
+    // hook. A connection for the new event therefore gets its own first-open
+    // behaviour.
+    hasOpenedStream.current = false;
+
     const controller = new AbortController();
 
     void connectEventStream({
@@ -85,10 +91,16 @@ export function useEventRealtime(
       signal: controller.signal,
       onOpen: () => {
         setIsOpen(true);
-        // Anything that changed while this client was away is invisible to
-        // it: the stream carries no history. Refetching on every connect is
-        // what makes that safe.
-        refetchMedia(true);
+
+        // The page's event and media queries already load on mount. Repeating
+        // them for every transport reconnect turned a short-lived SSE
+        // connection (for example, one closed by a proxy) into an API request
+        // loop. The server sends an explicit `resync` frame when cache data
+        // may have been missed, which remains the reconnect recovery path.
+        if (!hasOpenedStream.current) {
+          hasOpenedStream.current = true;
+          refetchMedia(true);
+        }
       },
       onClose: () => setIsOpen(false),
       onResync: () => refetchMedia(true),

@@ -12,32 +12,6 @@ export interface UserAccountItem {
   updatedAt?: string | Date;
 }
 
-const ACCOUNTS_CACHE_KEY = "candidcrowd_host_accounts_cache";
-
-function getCachedAccounts(): UserAccountItem[] | undefined {
-  if (typeof window === "undefined") return undefined;
-
-  try {
-    const raw = sessionStorage.getItem(ACCOUNTS_CACHE_KEY);
-
-    return raw ? (JSON.parse(raw) as UserAccountItem[]) : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-function setCachedAccounts(data: UserAccountItem[] | null) {
-  if (typeof window === "undefined") return;
-
-  try {
-    if (data) {
-      sessionStorage.setItem(ACCOUNTS_CACHE_KEY, JSON.stringify(data));
-    } else {
-      sessionStorage.removeItem(ACCOUNTS_CACHE_KEY);
-    }
-  } catch {}
-}
-
 export function useUserAccounts() {
   const queryClient = useQueryClient();
 
@@ -50,14 +24,8 @@ export function useUserAccounts() {
         throw response.error;
       }
 
-      const items = (response.data ?? []) as UserAccountItem[];
-
-      setCachedAccounts(items);
-
-      return items;
+      return (response.data ?? []) as UserAccountItem[];
     },
-    initialData: () => getCachedAccounts(),
-    initialDataUpdatedAt: () => 0,
     staleTime: CACHE_TIMES.STATIC.staleTime,
     gcTime: CACHE_TIMES.STATIC.gcTime,
     refetchOnWindowFocus: false,

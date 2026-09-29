@@ -8,6 +8,9 @@ const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL || undefined;
 
 let cachedToken: string | null = null;
 let tokenExpiresAt = 0;
+// Several protected queries often start in the same render. Share their
+// token request so a cold cache produces one `/token` call, not one per query.
+let tokenRequest: Promise<string | null> | null = null;
 
 export function clearAuthTokenCache(): void {
   cachedToken = null;
@@ -81,28 +84,34 @@ export async function getAuthToken(
     return cachedToken;
   }
 
-  try {
-    const { data, error } = await authClient.token({
-      fetchOptions: { cache: "no-store" },
-    });
+  if (!tokenRequest) {
+    tokenRequest = authClient
+      .token({ fetchOptions: { cache: "no-store" } })
+      .then(({ data, error }) => {
+        if (error || !data?.token) {
+          cachedToken = null;
+          tokenExpiresAt = 0;
 
-    if (error || !data?.token) {
-      cachedToken = null;
-      tokenExpiresAt = 0;
+          return null;
+        }
 
-      return null;
-    }
+        cachedToken = data.token;
+        tokenExpiresAt = Date.now() + 5 * 60 * 1000;
 
-    cachedToken = data.token;
-    tokenExpiresAt = now + 5 * 60 * 1000;
+        return cachedToken;
+      })
+      .catch(() => {
+        cachedToken = null;
+        tokenExpiresAt = 0;
 
-    return cachedToken;
-  } catch {
-    cachedToken = null;
-    tokenExpiresAt = 0;
-
-    return null;
+        return null;
+      })
+      .finally(() => {
+        tokenRequest = null;
+      });
   }
+
+  return tokenRequest;
 }
 
 /**

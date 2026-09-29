@@ -253,11 +253,13 @@ export function AccountRecovery({
 
           {mode === "verify-email" && (
             <div className="recovery-form__resend">
-              <span>{t("recovery.didntReceiveEmail")}</span>
-              <span>
-                <ArrowsClockwise size={14} aria-hidden="true" />{" "}
-                {t("recovery.resendGuidance")}
-              </span>
+              <p className="recovery-form__resend-question">
+                {t("recovery.didntReceiveEmail")}
+              </p>
+              <p className="recovery-form__resend-guidance">
+                <ArrowsClockwise size={14} aria-hidden="true" />
+                <span>{t("recovery.resendGuidance")}</span>
+              </p>
             </div>
           )}
 

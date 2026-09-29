@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import type { CandidEvent } from "../../types/event";
 import type { GuestThemeConfig } from "./guest-theme-types";
-import { generateDefaultMonogram } from "../../lib/guest-theme-storage";
+import { generateDefaultMonogram } from "../../lib/guest-theme-utils";
 import { Button, Input, Label } from "@/components/ui";
 
 type GuestThemeBrandingTabProps = {

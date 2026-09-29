@@ -1,12 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  APIError,
-  isBackendUnreachable,
-  privateClient,
-} from "@/lib/api-client";
+import { APIError, privateClient } from "@/lib/api-client";
 import { QUERY_KEYS } from "@/lib/cache-config";
 import type { CandidEvent, EventType } from "../types/event";
-import { createLocalEvent, saveStoredEvent } from "../lib/event-store";
 
 export type CreateEventInput = {
   name: string;
@@ -19,52 +14,25 @@ export type CreateEventInput = {
 export type CreateEventResponse = CandidEvent;
 
 /**
- * Mutation hook to create an event on the backend, with a local persistence
- * fallback for the offline/no-backend case only.
+ * Mutation hook to create an event on the backend.
  */
 export function useCreateEvent() {
   const queryClient = useQueryClient();
 
   return useMutation<CreateEventResponse, Error, CreateEventInput>({
     mutationFn: async (input) => {
-      try {
-        const response = await privateClient.post<CreateEventResponse>(
-          "/api/v1/events",
-          {
-            name: input.name.trim(),
-            event_type: input.event_type,
-            event_date: input.date_unknown ? null : input.event_date,
-            expected_guest_count: input.expected_guest_count ?? undefined,
-          },
-        );
-
-        if (response.data?.id) {
-          saveStoredEvent(response.data);
-
-          return response.data;
-        }
-      } catch (error) {
-        if (!isBackendUnreachable(error)) {
-          // Surface it. Swallowing this is how a misconfigured backend (an
-          // expired token, an unreachable JWKS URL) turns into an event that
-          // only ever works on the host's own machine.
-          console.error("[create-event] backend rejected the request", error);
-
-          throw error;
-        }
-
-        console.warn(
-          "[create-event] backend unreachable, creating a local-only event",
-          error,
-        );
-
-        return createLocalEvent({
-          name: input.name,
+      const response = await privateClient.post<CreateEventResponse>(
+        "/api/v1/events",
+        {
+          name: input.name.trim(),
           event_type: input.event_type,
-          event_date: input.event_date,
-          date_unknown: Boolean(input.date_unknown),
-          expected_guest_count: input.expected_guest_count,
-        });
+          event_date: input.date_unknown ? null : input.event_date,
+          expected_guest_count: input.expected_guest_count ?? undefined,
+        },
+      );
+
+      if (response.data?.id) {
+        return response.data;
       }
 
       throw new APIError(

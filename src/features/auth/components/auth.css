@@ -393,6 +393,8 @@
 }
 
 .auth-form__controls {
+  display: grid;
+  gap: 18px;
   min-width: 0;
   margin: 0;
   padding: 0;
@@ -695,6 +697,9 @@
   .auth-form__fields {
     gap: 16px;
   }
+  .auth-form__controls {
+    gap: 16px;
+  }
   .auth-form__field {
     gap: 6px;
   }
@@ -947,14 +952,31 @@
   font-weight: 600;
 }
 .recovery-form__resend {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 6px;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
   margin-top: 22px;
   color: var(--muted);
   font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+.recovery-form__resend-question,
+.recovery-form__resend-guidance {
+  margin: 0;
+}
+.recovery-form__resend-question {
+  color: var(--ink);
+  font-weight: 500;
+}
+.recovery-form__resend-guidance {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.recovery-form__resend-guidance svg {
+  flex: 0 0 auto;
 }
 .recovery-form__resend button,
 .recovery-form__secondary {
@@ -1003,6 +1025,10 @@
 .recovery-form__success-icon svg {
   width: 25px;
   height: 25px;
+}
+.recovery-form__success-icon--error {
+  background: color-mix(in srgb, var(--error) 12%, var(--surface));
+  color: var(--error);
 }
 .recovery-form__success-action {
   width: 100%;

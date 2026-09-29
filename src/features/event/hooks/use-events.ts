@@ -1,16 +1,10 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
-import {
-  APIError,
-  isBackendUnreachable,
-  privateClient,
-} from "@/lib/api-client";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { APIError, privateClient } from "@/lib/api-client";
 import { CACHE_TIMES, QUERY_KEYS } from "@/lib/cache-config";
 import { siteConfig } from "@/lib/config";
 import type { CandidEvent } from "../types/event";
 import type { EventListParams, EventListResponse } from "../types/event-list";
 import { DEFAULT_PER_PAGE } from "../types/event-list";
-import { saveStoredEvent, getStoredEvents } from "../lib/event-store";
-import { paginateLocalEvents } from "../lib/paginate-local";
 
 type BackendEvent = {
   id: string;
@@ -74,11 +68,7 @@ function normalizeEvent(be: BackendEvent): CandidEvent {
 
 /**
  * Fetches a paginated, searchable, filterable list of events.
- *
- * - Tries the backend API first (`/api/v1/events` with query params).
- * - Falls back to client-side pagination of localStorage data only when the
- *   backend cannot be reached; anything the API answered is surfaced as an error.
- * - Uses `keepPreviousData` so the UI doesn't flash blank between page transitions.
+ * The backend is the only source of truth for authenticated event data.
  */
 export function useEvents(params: EventListParams = {}) {
   const {
@@ -92,7 +82,6 @@ export function useEvents(params: EventListParams = {}) {
 
   const normalizedQ = q?.trim() || undefined;
   const normalizedType = type || undefined;
-
   const resolvedDirection =
     direction ||
     (sort === "oldest" || sort === "name" || sort === "upcoming"
@@ -109,112 +98,44 @@ export function useEvents(params: EventListParams = {}) {
       direction: resolvedDirection,
     }),
     queryFn: async (): Promise<EventListResponse> => {
-      try {
-        const response = await privateClient.get<BackendEventsResponse>(
-          "/api/v1/events",
-          {
-            params: {
-              page,
-              per_page,
-              ...(normalizedQ ? { q: normalizedQ } : {}),
-              ...(normalizedType ? { type: normalizedType } : {}),
-              sort,
-              direction: resolvedDirection,
-            },
+      const response = await privateClient.get<BackendEventsResponse>(
+        "/api/v1/events",
+        {
+          params: {
+            page,
+            per_page,
+            ...(normalizedQ ? { q: normalizedQ } : {}),
+            ...(normalizedType ? { type: normalizedType } : {}),
+            sort,
+            direction: resolvedDirection,
           },
-        );
+        },
+      );
 
-        if (response.data?.data) {
-          const events = response.data.data.map(normalizeEvent);
-
-          // Sync to local store as cache
-          for (const ev of events) {
-            saveStoredEvent(ev);
-          }
-
-          return {
-            data: events,
-            pagination: response.data.pagination ?? {
-              page,
-              per_page,
-              total: events.length,
-              total_pages: 1,
-              has_next: false,
-              has_prev: false,
-            },
-          };
-        }
-
+      if (!response.data?.data) {
         throw new APIError(
           502,
           "request_failed",
           "The events API returned no list.",
         );
-      } catch (error) {
-        if (!isBackendUnreachable(error)) {
-          console.error("[events] backend rejected the request", error);
+      }
 
-          throw error;
-        }
+      const events = response.data.data.map(normalizeEvent);
 
-        console.warn(
-          "[events] backend unreachable, listing locally stored events",
-          error,
-        );
-
-        return paginateLocalEvents({
+      return {
+        data: events,
+        pagination: response.data.pagination ?? {
           page,
           per_page,
-          q: normalizedQ,
-          type: normalizedType,
-          sort,
-          direction: resolvedDirection,
-        });
-      }
+          total: events.length,
+          total_pages: 1,
+          has_next: false,
+          has_prev: false,
+        },
+      };
     },
-    initialData: () => {
-      const local = paginateLocalEvents({
-        page,
-        per_page,
-        q: normalizedQ,
-        type: normalizedType,
-        sort,
-        direction: resolvedDirection,
-      });
-
-      if (local.data.length > 0) {
-        return local;
-      }
-
-      return undefined;
-    },
-    initialDataUpdatedAt: () => 0,
     placeholderData: keepPreviousData,
     staleTime: CACHE_TIMES.STANDARD.staleTime,
     gcTime: CACHE_TIMES.STANDARD.gcTime,
   });
-}
-
-/**
- * Returns the total count of all locally-stored events.
- * Used for global metrics strip (independent of current page/filter).
- */
-export function useEventsTotals() {
-  const events = Object.values(getStoredEvents());
-
-  const totalEvents = events.length;
-
-  const totalMemories = events.reduce((sum, ev) => {
-    const photos = ev.metrics?.photos_count || 0;
-    const videos = ev.metrics?.videos_count || 0;
-    const items = ev.media_items?.length || 0;
-
-    return sum + Math.max(photos + videos, items);
-  }, 0);
-
-  const totalContributors = events.reduce((sum, ev) => {
-    return sum + (ev.metrics?.contributors_count || 0);
-  }, 0);
-
-  return { totalEvents, totalMemories, totalContributors };
 }

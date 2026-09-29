@@ -433,6 +433,12 @@
       "successPasswordRenewed": "Your password is renewed.",
       "successResetLinkBody": "If an account exists for that email, a secure reset link will arrive shortly.",
       "successPasswordRenewedBody": "Your password has been changed. You can now log in with your new password.",
+      "emailVerifiedTitle": "Your email is verified.",
+      "emailVerifiedBody": "Your account is ready. Start creating your event whenever you’re ready.",
+      "continueToDashboard": "Continue to your event",
+      "verificationLinkInvalidEyebrow": "LINK UNAVAILABLE",
+      "emailVerificationFailedTitle": "This verification link is no longer valid.",
+      "emailVerificationFailedBody": "It may have expired or already been used. Log in to request a fresh link.",
       "tryAnotherEmail": "Try another email",
       "continueToLogIn": "Continue to log in"
     },
@@ -451,7 +457,8 @@
       "registerMetaTitle": "Create an account — CandidCrowd",
       "forgotPasswordMetaTitle": "Forgot password — CandidCrowd",
       "resetPasswordMetaTitle": "Reset password — CandidCrowd",
-      "verifyEmailMetaTitle": "Verify email — CandidCrowd"
+      "verifyEmailMetaTitle": "Verify email — CandidCrowd",
+      "emailVerifiedMetaTitle": "Email verified — CandidCrowd"
     }
   },
   "event": {

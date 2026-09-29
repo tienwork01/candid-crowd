@@ -433,6 +433,12 @@
       "successPasswordRenewed": "Đặt lại mật khẩu thành công.",
       "successResetLinkBody": "Nếu tài khoản tồn tại với email đó, liên kết đặt lại an toàn sẽ sớm được gửi đến.",
       "successPasswordRenewedBody": "Mật khẩu của bạn đã được thay đổi. Bây giờ bạn có thể đăng nhập bằng mật khẩu mới.",
+      "emailVerifiedTitle": "Email của bạn đã được xác minh.",
+      "emailVerifiedBody": "Tài khoản của bạn đã sẵn sàng. Hãy bắt đầu tạo sự kiện khi bạn sẵn sàng.",
+      "continueToDashboard": "Tiếp tục tạo sự kiện",
+      "verificationLinkInvalidEyebrow": "LIÊN KẾT KHÔNG KHẢ DỤNG",
+      "emailVerificationFailedTitle": "Liên kết xác minh này không còn hợp lệ.",
+      "emailVerificationFailedBody": "Liên kết có thể đã hết hạn hoặc đã được sử dụng. Đăng nhập để yêu cầu liên kết mới.",
       "tryAnotherEmail": "Thử một email khác",
       "continueToLogIn": "Tiếp tục đăng nhập"
     },
@@ -451,7 +457,8 @@
       "registerMetaTitle": "Tạo tài khoản — CandidCrowd",
       "forgotPasswordMetaTitle": "Quên mật khẩu — CandidCrowd",
       "resetPasswordMetaTitle": "Đặt lại mật khẩu — CandidCrowd",
-      "verifyEmailMetaTitle": "Xác minh email — CandidCrowd"
+      "verifyEmailMetaTitle": "Xác minh email — CandidCrowd",
+      "emailVerifiedMetaTitle": "Đã xác minh email — CandidCrowd"
     }
   },
   "event": {

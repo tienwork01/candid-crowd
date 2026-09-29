@@ -234,16 +234,14 @@ export function ReadyPageClient({ eventId }: ReadyPageClientProps) {
         event={event}
         isOpen={isCustomizeGuestPageOpen}
         onClose={() => setIsCustomizeGuestPageOpen(false)}
-        onApplied={(themeConfig) => {
-          if (event) {
-            void updateEvent({
-              id: event.id,
-              guest_theme: themeConfig,
-              setup_checklist: {
-                customizedPage: true,
-              },
-            });
-          }
+        onApplied={async (themeConfig) => {
+          await updateEvent({
+            id: event.id,
+            guest_theme: themeConfig,
+            setup_checklist: {
+              customizedPage: true,
+            },
+          });
         }}
       />
 
