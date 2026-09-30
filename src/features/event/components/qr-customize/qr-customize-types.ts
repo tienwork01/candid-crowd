@@ -17,7 +17,7 @@ export interface QRCustomizeState {
   cornerDotType: QRCornerDotType;
 
   // Logo (required for full completion)
-  logoDataUrl: string | null;
+  logoUrl: string | null;
   logoSize: number; // 0.15 - 0.30
 
   // Frame & CTA (legacy / optional)
@@ -112,7 +112,7 @@ export const DEFAULT_QR_CUSTOMIZE_STATE: QRCustomizeState = {
   dotType: "rounded",
   cornerSquareType: "extra-rounded",
   cornerDotType: "dot",
-  logoDataUrl: null,
+  logoUrl: null,
   logoSize: 0.25,
   showFrame: true,
   frameColor: "#dcded2",

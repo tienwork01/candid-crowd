@@ -26,7 +26,7 @@ Qua rà soát toàn bộ source code frontend, hệ thống ghi nhận **2 lỗi
 
 #### Hiện trạng code:
 
-1. Khi Host tùy biến mã QR (chọn màu sắc `primaryColor`, kiểu chấm `dotStyle`, kiểu góc `cornerStyle`, khung `frameStyle`, logo `logoDataUrl`), modal gọi:
+1. Khi Host tùy biến mã QR (chọn màu sắc `primaryColor`, kiểu chấm `dotStyle`, kiểu góc `cornerStyle`, khung `frameStyle`, logo `logoUrl`), modal gọi:
    ```typescript
    // qr-customize-modal.tsx: dòng 76
    saveQRConfig(event.id, config);

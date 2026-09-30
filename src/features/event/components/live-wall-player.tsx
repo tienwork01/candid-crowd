@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, RefObject, SyntheticEvent } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { toDataURL } from "qrcode";
 import { publicClient } from "@/lib/api-client";
@@ -29,6 +30,7 @@ type Presentation = {
   slide_duration_seconds?: number;
   qr_strategy?: "interval" | "always" | "empty_only" | "hidden";
   arrival_behavior?: "queue" | "next";
+  transition_mode?: "classic" | "cinematic" | "float_3d" | "flash";
 };
 
 type PresentationMessage = Partial<Presentation> & {
@@ -163,6 +165,7 @@ function LiveWallStage({
   onImageLoaded,
   isPortrait,
   retryAttempt,
+  transitionMode = "cinematic",
   qrBadgeUrl,
   qrBadgeLabel,
 }: {
@@ -178,11 +181,18 @@ function LiveWallStage({
   ) => void;
   isPortrait: boolean;
   retryAttempt: number;
+  transitionMode?: "classic" | "cinematic" | "float_3d" | "flash";
   qrBadgeUrl?: string;
   qrBadgeLabel?: string;
 }) {
+  const reduceMotion = useReducedMotion();
   const showBackdrop = !item.is_video && isPortrait;
   const mediaURL = getMediaRequestURL(item.url, retryAttempt);
+  const transition = reduceMotion
+    ? { duration: 0 }
+    : item.is_video
+      ? { duration: 0.48, ease: [0.22, 1, 0.36, 1] as const }
+      : { type: "spring" as const, stiffness: 185, damping: 23, mass: 0.8 };
 
   return (
     <div
@@ -197,34 +207,77 @@ function LiveWallStage({
           <img className="live-wall-player__backdrop" src={mediaURL} alt="" />
         </div>
       )}
-      <div
-        key={`${item.id}-${retryAttempt}`}
-        className={`live-wall-player__media-shell${item.is_video ? " live-wall-player__media-shell--video" : ""}`}
-      >
-        {item.is_video ? (
-          <video
-            ref={videoRef}
-            src={mediaURL}
-            autoPlay={isPlaying}
-            muted
-            playsInline
-            preload="metadata"
-            onEnded={onVideoEnded}
-            onError={() => onMediaError(item.id)}
-            className="live-wall-player__media live-wall-player__media--video"
-          />
-        ) : (
-          // Signed media URLs must bypass the Next image optimizer.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={mediaURL}
-            alt={eventName}
-            onLoad={(event) => onImageLoaded(item.id, event)}
-            onError={() => onMediaError(item.id)}
-            className="live-wall-player__media live-wall-player__media--image"
-          />
-        )}
-      </div>
+      <AnimatePresence initial={false} mode="sync">
+        <motion.div
+          key={`${item.id}-${retryAttempt}`}
+          className={`live-wall-player__media-shell${item.is_video ? " live-wall-player__media-shell--video" : ""}`}
+          data-transition={transitionMode}
+          initial={
+            reduceMotion
+              ? { opacity: 1 }
+              : transitionMode === "flash"
+                ? { opacity: 0, scale: 1.08 }
+                : transitionMode === "classic"
+                  ? { opacity: 0, scale: 1.01 }
+                  : transitionMode === "float_3d"
+                    ? {
+                        opacity: 0,
+                        y: 110,
+                        scale: 0.82,
+                        rotateX: 14,
+                        rotateY: -9,
+                        rotateZ: -3,
+                      }
+                    : {
+                        opacity: 0,
+                        y: 72,
+                        scale: 0.925,
+                        rotateX: 5,
+                        rotateZ: -1.4,
+                      }
+          }
+          animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0, rotateZ: 0 }}
+          exit={
+            reduceMotion
+              ? { opacity: 0 }
+              : transitionMode === "classic"
+                ? { opacity: 0 }
+                : {
+                    opacity: 0,
+                    y: -28,
+                    scale: 1.025,
+                    rotateX: -1,
+                    rotateZ: 0.7,
+                  }
+          }
+          transition={transition}
+          style={{ transformPerspective: 1600 }}
+        >
+          {item.is_video ? (
+            <video
+              ref={videoRef}
+              src={mediaURL}
+              autoPlay={isPlaying}
+              muted
+              playsInline
+              preload="metadata"
+              onEnded={onVideoEnded}
+              onError={() => onMediaError(item.id)}
+              className="live-wall-player__media live-wall-player__media--video"
+            />
+          ) : (
+            // Signed media URLs must bypass the Next image optimizer.
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={mediaURL}
+              alt={eventName}
+              onLoad={(event) => onImageLoaded(item.id, event)}
+              onError={() => onMediaError(item.id)}
+              className="live-wall-player__media live-wall-player__media--image"
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
       {qrBadgeUrl && (
         <aside
           className="live-wall-player__corner-badge"
@@ -660,12 +713,14 @@ export function LiveWallPlayer({ token }: { token: string }) {
       !presentation.is_playing ||
       isInvitationVisible ||
       isFinalSlide ||
-      presentation.is_blackout ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      presentation.is_blackout
     ) {
       return;
     }
 
+    // A Live Wall is an unattended presentation, so it must continue
+    // advancing even when the display device requests reduced motion. The
+    // corresponding CSS media query removes the visual transition instead.
     const timer = window.setTimeout(
       advanceMedia,
       getSlideDuration(presentation.slide_duration_seconds) * 1000,
@@ -865,6 +920,7 @@ export function LiveWallPlayer({ token }: { token: string }) {
             onImageLoaded={handleImageLoaded}
             isPortrait={isPortrait}
             retryAttempt={mediaRetryAttempts.get(current.id) ?? 0}
+            transitionMode={presentation.transition_mode}
             qrBadgeUrl={qrStrategy === "always" ? qrDataUrl : undefined}
             qrBadgeLabel={t("liveWall.scanPrompt")}
           />

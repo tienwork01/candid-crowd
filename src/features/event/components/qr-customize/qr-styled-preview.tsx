@@ -31,6 +31,48 @@ export function QRStyledPreview({
   const containerRef = useRef<HTMLDivElement>(null);
   const qrInstanceRef = useRef<QRCodeStyling | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [logoResource, setLogoResource] = useState<{
+    source: string;
+    objectUrl: string;
+  } | null>(null);
+
+  // qr-code-styling reloads its `image` on every update, even if only a
+  // colour or logo-size option changed. Keep one in-memory URL for the modal
+  // session so those redraws do not repeatedly wait on the logo API/R2.
+  useEffect(() => {
+    if (!config.logoUrl) return;
+
+    let active = true;
+    const controller = new AbortController();
+    let objectUrl: string | null = null;
+
+    void fetch(config.logoUrl, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("QR logo could not be loaded");
+
+        const blob = await response.blob();
+
+        objectUrl = URL.createObjectURL(blob);
+
+        if (active) {
+          setLogoResource({ source: config.logoUrl!, objectUrl });
+        }
+      })
+      .catch(() => {
+        // The QR still renders without a centre logo if its image is missing.
+      });
+
+    return () => {
+      active = false;
+      controller.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [config.logoUrl]);
+
+  const logoUrl =
+    logoResource?.source === config.logoUrl
+      ? logoResource.objectUrl
+      : config.logoUrl || undefined;
 
   useEffect(() => {
     let active = true;
@@ -46,7 +88,7 @@ export function QRStyledPreview({
         width: size,
         height: size,
         data: url,
-        image: config.logoDataUrl || undefined,
+        image: logoUrl,
         dotsOptions: {
           color: config.fgColor,
           type: config.dotType,
@@ -107,7 +149,7 @@ export function QRStyledPreview({
     return () => {
       active = false;
     };
-  }, [url, config, eventName, size, onDownloadReady]);
+  }, [url, config, eventName, size, onDownloadReady, logoUrl]);
 
   return (
     <div

@@ -5,6 +5,7 @@ import {
   ERROR_MESSAGES,
   getErrorMessage,
   normalizeErrorCode,
+  resolveErrorCode,
 } from "@/lib/errors";
 
 test.describe("Frontend Error Architecture", () => {
@@ -43,6 +44,8 @@ test.describe("Frontend Error Architecture", () => {
     expect(getErrorMessage("DISPOSABLE_EMAIL_NOT_ALLOWED")).toBe(
       ERROR_MESSAGES.disposable_email_not_allowed,
     );
+    expect(resolveErrorCode("INTERNAL_ERROR")).toBe("SERVER_ERROR");
+    expect(getErrorMessage("INTERNAL_ERROR")).toBe(ERROR_MESSAGES.server_error);
   });
 
   test("falls back to DEFAULT_ERROR_MESSAGE when error code is unknown", () => {

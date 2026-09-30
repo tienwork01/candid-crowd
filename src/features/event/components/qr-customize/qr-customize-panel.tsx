@@ -71,12 +71,13 @@ export function QRCustomizePanel({
         className="p-4 sm:p-5 bg-surface border-2 border-primary/25 rounded-2xl shadow-xs transition-all hover:border-primary/40"
       >
         <QRLogoUpload
-          logoDataUrl={config.logoDataUrl}
+          key={`${config.logoUrl ?? "none"}-${config.logoSize}`}
+          logoUrl={config.logoUrl}
           logoSize={config.logoSize}
-          onChange={({ logoDataUrl, logoSize }) =>
+          onChange={({ logoUrl, logoSize }) =>
             onChange({
               ...config,
-              logoDataUrl,
+              logoUrl,
               logoSize: logoSize !== undefined ? logoSize : config.logoSize,
             })
           }

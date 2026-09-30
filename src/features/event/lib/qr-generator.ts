@@ -19,7 +19,7 @@ export async function generateHighResQRDataUrl(
         width: size,
         height: size,
         data: url,
-        image: config.logoDataUrl || undefined,
+        image: config.logoUrl || undefined,
         dotsOptions: {
           color: config.fgColor,
           type: config.dotType,

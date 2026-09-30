@@ -69,7 +69,7 @@ export function QRCustomizeModal({
   };
 
   const handleApply = async () => {
-    if (!config.logoDataUrl) {
+    if (!config.logoUrl) {
       toast.warning(t("noLogoWarning"));
     }
 
@@ -154,7 +154,7 @@ export function QRCustomizeModal({
               />
             </div>
 
-            {!config.logoDataUrl && (
+            {!config.logoUrl && (
               <p className="text-[11px] text-amber-700 dark:text-amber-400 text-center max-w-[280px]">
                 {t("noLogoWarning")}
               </p>
@@ -189,12 +189,14 @@ export function QRCustomizeModal({
               className="p-4 sm:p-5 bg-surface border-2 border-primary/25 rounded-2xl shadow-xs"
             >
               <QRLogoUpload
-                logoDataUrl={config.logoDataUrl}
+                key={`${config.logoUrl ?? "none"}-${config.logoSize}`}
+                eventId={event.id}
+                logoUrl={config.logoUrl}
                 logoSize={config.logoSize}
-                onChange={({ logoDataUrl, logoSize }) =>
+                onChange={({ logoUrl, logoSize }) =>
                   setConfig((prev) => ({
                     ...prev,
-                    logoDataUrl,
+                    logoUrl,
                     logoSize: logoSize !== undefined ? logoSize : prev.logoSize,
                   }))
                 }

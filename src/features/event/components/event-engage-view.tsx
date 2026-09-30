@@ -52,11 +52,13 @@ type EventEngageViewProps = {
   liveWallSlideDuration?: number;
   liveWallQRStrategy?: "interval" | "always" | "empty_only" | "hidden";
   liveWallArrivalBehavior?: "queue" | "next";
+  liveWallTransitionMode?: "classic" | "cinematic" | "float_3d" | "flash";
   onLiveWallPresentationChange?: (patch: {
     layout_mode?: "spotlight" | "mosaic" | "featured";
     slide_duration_seconds?: number;
     qr_strategy?: "interval" | "always" | "empty_only" | "hidden";
     arrival_behavior?: "queue" | "next";
+    transition_mode?: "classic" | "cinematic" | "float_3d" | "flash";
   }) => void;
 };
 
@@ -84,6 +86,7 @@ export function EventEngageView({
   liveWallSlideDuration = 5,
   liveWallQRStrategy = "interval",
   liveWallArrivalBehavior = "queue",
+  liveWallTransitionMode = "cinematic",
   onLiveWallPresentationChange,
 }: EventEngageViewProps) {
   const t = useTranslations("event");
@@ -106,6 +109,12 @@ export function EventEngageView({
     { seconds: 5, label: t("liveWall.slide5") },
     { seconds: 8, label: t("liveWall.slide8") },
     { seconds: 12, label: t("liveWall.slide12") },
+  ];
+  const transitionOptions = [
+    { mode: "classic" as const, label: "Classic" },
+    { mode: "cinematic" as const, label: "Cinematic" },
+    { mode: "float_3d" as const, label: "3D Float" },
+    { mode: "flash" as const, label: "Flash" },
   ];
 
   return (
@@ -480,6 +489,32 @@ export function EventEngageView({
                         onLiveWallPresentationChange({
                           arrival_behavior: behavior,
                         })
+                      }
+                      disabled={isControllingLiveWall}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+                <div
+                  className="flex flex-wrap items-center gap-2"
+                  role="group"
+                  aria-label="Photo transition"
+                >
+                  <span className="text-xs font-medium text-muted-foreground">
+                    Photo transition
+                  </span>
+                  {transitionOptions.map(({ mode, label }) => (
+                    <Button
+                      key={mode}
+                      type="button"
+                      size="sm"
+                      variant={
+                        liveWallTransitionMode === mode ? "default" : "outline"
+                      }
+                      aria-pressed={liveWallTransitionMode === mode}
+                      onClick={() =>
+                        onLiveWallPresentationChange({ transition_mode: mode })
                       }
                       disabled={isControllingLiveWall}
                     >

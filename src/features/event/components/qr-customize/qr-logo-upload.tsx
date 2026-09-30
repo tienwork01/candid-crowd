@@ -11,18 +11,18 @@ import {
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
+import { privateClient } from "@/lib/api-client";
 
 interface QRLogoUploadProps {
-  logoDataUrl: string | null;
+  eventId?: string;
+  logoUrl: string | null;
   logoSize: number;
-  onChange: (updates: {
-    logoDataUrl: string | null;
-    logoSize?: number;
-  }) => void;
+  onChange: (updates: { logoUrl: string | null; logoSize?: number }) => void;
 }
 
 export function QRLogoUpload({
-  logoDataUrl,
+  eventId,
+  logoUrl,
   logoSize,
   onChange,
 }: QRLogoUploadProps) {
@@ -30,13 +30,19 @@ export function QRLogoUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [draftLogoSize, setDraftLogoSize] = useState(logoSize);
+
+  const commitLogoSize = () => {
+    if (draftLogoSize !== logoSize) {
+      onChange({ logoUrl, logoSize: draftLogoSize });
+    }
+  };
 
   const processFile = async (file: File) => {
     // Validate format
     const validTypes = [
       "image/png",
       "image/jpeg",
-      "image/jpg",
       "image/svg+xml",
       "image/webp",
     ];
@@ -59,7 +65,7 @@ export function QRLogoUpload({
     try {
       let targetFile = file;
 
-      // Compress bitmap images to keep base64 fast and lightweight (under 250px)
+      // Keep the stored branding asset compact without embedding it in JSON.
       if (file.type !== "image/svg+xml") {
         try {
           targetFile = await imageCompression(file, {
@@ -72,26 +78,28 @@ export function QRLogoUpload({
         }
       }
 
-      // Convert to Base64
-      const reader = new FileReader();
+      if (!eventId) throw new Error("QR logo upload requires an event");
 
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
+      const formData = new FormData();
 
-        onChange({ logoDataUrl: result });
-        setIsProcessing(false);
-        toast.success(t("logoUploaded"));
-      };
+      formData.append("file", targetFile, targetFile.name);
 
-      reader.onerror = () => {
-        setIsProcessing(false);
-        toast.error(t("uploadLogo"));
-      };
+      const uploaded = await privateClient.post<{ logo_url: string }>(
+        `/api/v1/events/${encodeURIComponent(eventId)}/qr-logo`,
+        formData,
+        {
+          // Override the client's JSON default. Axios then lets the browser
+          // attach the multipart boundary required by Gin's FormFile parser.
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      );
 
-      reader.readAsDataURL(targetFile);
+      onChange({ logoUrl: uploaded.data.logo_url });
+      toast.success(t("logoUploaded"));
     } catch {
-      setIsProcessing(false);
       toast.error(t("uploadLogo"));
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -121,7 +129,7 @@ export function QRLogoUpload({
 
   const handleRemove = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange({ logoDataUrl: null });
+    onChange({ logoUrl: null });
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -137,7 +145,7 @@ export function QRLogoUpload({
             {t("requiredBadge")}
           </span>
         </div>
-        {logoDataUrl ? (
+        {logoUrl ? (
           <span className="text-xs text-primary font-medium flex items-center gap-1">
             <CheckCircle size={14} weight="fill" />
             <span>{t("logoAdded")}</span>
@@ -167,7 +175,7 @@ export function QRLogoUpload({
         className={`relative rounded-xl border-2 border-dashed p-4 flex flex-col items-center justify-center text-center cursor-pointer transition-all ${
           isDragging
             ? "border-primary bg-primary/10"
-            : logoDataUrl
+            : logoUrl
               ? "border-primary/40 bg-surface hover:border-primary"
               : "border-line hover:border-line-hover bg-surface hover:bg-surface-raised"
         }`}
@@ -175,17 +183,17 @@ export function QRLogoUpload({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
+          accept="image/png,image/jpeg,image/svg+xml,image/webp"
           className="hidden"
           onChange={handleFileChange}
         />
 
-        {logoDataUrl ? (
+        {logoUrl ? (
           <div className="flex items-center justify-between w-full px-2">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-lg border border-line bg-white p-1 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
                 <Image
-                  src={logoDataUrl}
+                  src={logoUrl}
                   alt={t("logoAlt")}
                   width={44}
                   height={44}
@@ -229,14 +237,14 @@ export function QRLogoUpload({
       </div>
 
       {/* Logo Size Control (Slider) */}
-      {logoDataUrl && (
+      {logoUrl && (
         <div className="pt-2 animate-in fade-in duration-200">
           <div className="flex items-center justify-between text-xs mb-1.5">
             <span className="text-muted-foreground font-medium">
               {t("logoSize")}
             </span>
             <span className="font-mono text-ink text-[11px]">
-              {Math.round(logoSize * 100)}%
+              {Math.round(draftLogoSize * 100)}%
             </span>
           </div>
           <input
@@ -244,10 +252,18 @@ export function QRLogoUpload({
             min={0.15}
             max={0.3}
             step={0.01}
-            value={logoSize}
-            onChange={(e) =>
-              onChange({ logoDataUrl, logoSize: parseFloat(e.target.value) })
-            }
+            value={draftLogoSize}
+            onChange={(e) => setDraftLogoSize(parseFloat(e.target.value))}
+            onPointerUp={commitLogoSize}
+            onBlur={commitLogoSize}
+            onKeyUp={(e) => {
+              if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) {
+                onChange({
+                  logoUrl,
+                  logoSize: parseFloat(e.currentTarget.value),
+                });
+              }
+            }}
             className="w-full accent-primary h-1.5 bg-line rounded-lg cursor-pointer"
             aria-label={t("logoSize")}
           />

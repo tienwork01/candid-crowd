@@ -69,6 +69,7 @@ type LiveWallContentPolicy = "featured_only" | "auto_approved";
 type LiveWallLayoutMode = "spotlight" | "mosaic" | "featured";
 type LiveWallQRStrategy = "interval" | "always" | "empty_only" | "hidden";
 type LiveWallArrivalBehavior = "queue" | "next";
+type LiveWallTransitionMode = "classic" | "cinematic" | "float_3d" | "flash";
 
 type LiveWallSessionState = {
   id: string;
@@ -81,6 +82,7 @@ type LiveWallSessionState = {
   slideDuration: number;
   qrStrategy: LiveWallQRStrategy;
   arrivalBehavior: LiveWallArrivalBehavior;
+  transitionMode: LiveWallTransitionMode;
   revision: number;
 };
 
@@ -253,6 +255,7 @@ export function EventOverviewView({
         slide_duration_seconds?: number;
         qr_strategy?: LiveWallQRStrategy;
         arrival_behavior?: LiveWallArrivalBehavior;
+        transition_mode?: LiveWallTransitionMode;
         revision?: number;
       }>(
         `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(sessionId)}`,
@@ -287,6 +290,8 @@ export function EventOverviewView({
               qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
               arrivalBehavior:
                 response.data.arrival_behavior ?? current.arrivalBehavior,
+              transitionMode:
+                response.data.transition_mode ?? current.transitionMode,
               revision: response.data.revision ?? current.revision,
             };
 
@@ -343,6 +348,7 @@ export function EventOverviewView({
         slide_duration_seconds?: number;
         qr_strategy?: LiveWallQRStrategy;
         arrival_behavior?: LiveWallArrivalBehavior;
+        transition_mode?: LiveWallTransitionMode;
         revision?: number;
       }>(
         `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions`,
@@ -362,6 +368,7 @@ export function EventOverviewView({
         slideDuration: response.data.slide_duration_seconds ?? 5,
         qrStrategy: response.data.qr_strategy ?? "interval",
         arrivalBehavior: response.data.arrival_behavior ?? "queue",
+        transitionMode: response.data.transition_mode ?? "cinematic",
         revision: response.data.revision ?? 0,
       };
 
@@ -517,6 +524,7 @@ export function EventOverviewView({
       slide_duration_seconds: number;
       qr_strategy: LiveWallQRStrategy;
       arrival_behavior: LiveWallArrivalBehavior;
+      transition_mode: LiveWallTransitionMode;
     }>,
   ) => {
     if (!liveWallSession) return;
@@ -528,6 +536,7 @@ export function EventOverviewView({
         slide_duration_seconds?: number;
         qr_strategy?: LiveWallQRStrategy;
         arrival_behavior?: LiveWallArrivalBehavior;
+        transition_mode?: LiveWallTransitionMode;
         revision?: number;
       }>(
         `/api/v1/events/${encodeURIComponent(currentEvent.id)}/live-wall-sessions/${encodeURIComponent(liveWallSession.id)}`,
@@ -545,6 +554,8 @@ export function EventOverviewView({
           qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
           arrivalBehavior:
             response.data.arrival_behavior ?? current.arrivalBehavior,
+          transitionMode:
+            response.data.transition_mode ?? current.transitionMode,
           revision: response.data.revision ?? current.revision + 1,
         };
 
@@ -673,6 +684,7 @@ export function EventOverviewView({
         slide_duration_seconds?: number;
         qr_strategy?: LiveWallQRStrategy;
         arrival_behavior?: LiveWallArrivalBehavior;
+        transition_mode?: LiveWallTransitionMode;
         cta_every_media?: number;
         revision?: number;
       }>(
@@ -691,6 +703,8 @@ export function EventOverviewView({
           qrStrategy: response.data.qr_strategy ?? current.qrStrategy,
           arrivalBehavior:
             response.data.arrival_behavior ?? current.arrivalBehavior,
+          transitionMode:
+            response.data.transition_mode ?? current.transitionMode,
           ctaEveryMedia: response.data.cta_every_media ?? current.ctaEveryMedia,
           revision: response.data.revision ?? current.revision + 1,
         };
@@ -964,6 +978,7 @@ export function EventOverviewView({
             liveWallSlideDuration={liveWallSession?.slideDuration}
             liveWallQRStrategy={liveWallSession?.qrStrategy}
             liveWallArrivalBehavior={liveWallSession?.arrivalBehavior}
+            liveWallTransitionMode={liveWallSession?.transitionMode}
             onLiveWallPresentationChange={updateLiveWallPresentation}
           />
         </div>
