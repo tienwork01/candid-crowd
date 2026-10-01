@@ -7,10 +7,14 @@ const MEDIA_URL = "https://media.live-wall.test/new-memory.svg";
 type MockMedia = {
   id: string;
   url: string;
+  thumbnail_url?: string;
   status: "ready";
 };
 
-function liveWallPayload(media: MockMedia[]) {
+function liveWallPayload(
+  media: MockMedia[],
+  transitionMode: "classic" | "cinematic" | "float_3d" | "flash" = "cinematic",
+) {
   return {
     event: { name: "Live Wall E2E", slug: TEST_SLUG },
     data: media,
@@ -25,6 +29,7 @@ function liveWallPayload(media: MockMedia[]) {
       slide_duration_seconds: 5,
       qr_strategy: "hidden",
       arrival_behavior: "next",
+      transition_mode: transitionMode,
     },
   };
 }
@@ -102,6 +107,145 @@ async function installMockEventSource(page: Page) {
 }
 
 test.describe("Live Wall guest contribution", () => {
+  test("renders cross-origin photos in the 3D cloud without CORS errors", async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({ ignoreHTTPSErrors: true });
+    const player = await context.newPage();
+    const browserErrors: string[] = [];
+    const media = Array.from({ length: 6 }, (_, index) => ({
+      id: `cloud-memory-${index}`,
+      url: `https://media.live-wall.test/cloud-memory-${index}.svg`,
+      thumbnail_url: `https://media.live-wall.test/cloud-memory-${index}-preview.svg`,
+      status: "ready" as const,
+    }));
+    let visibleMedia = media.slice(0, 3);
+
+    player.on("pageerror", (error) => browserErrors.push(error.message));
+    player.on("console", (message) => {
+      if (message.type() === "error") browserErrors.push(message.text());
+    });
+
+    await context.route(
+      `**/api/v1/public/live-wall-sessions/${TEST_TOKEN}?**`,
+      (route) =>
+        route.fulfill({
+          contentType: "application/json",
+          body: JSON.stringify(liveWallPayload(visibleMedia, "float_3d")),
+        }),
+    );
+    await context.route("https://media.live-wall.test/**", (route) => {
+      const label =
+        route
+          .request()
+          .url()
+          .match(/cloud-memory-(\d)/)?.[1] ?? "?";
+      const colors = [
+        "#7a4f34",
+        "#315f54",
+        "#58446f",
+        "#8a5c24",
+        "#3f5d79",
+        "#754b58",
+      ];
+      const color = colors[Number(label)] ?? colors[0];
+
+      return route.fulfill({
+        contentType: "image/svg+xml",
+        body: `<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="3" opacity=".5"/></pattern></defs><rect width="100%" height="100%" fill="${color}"/><rect width="100%" height="100%" fill="url(#grid)"/><text x="800" y="500" fill="white" font-family="Arial" font-weight="700" font-size="240" text-anchor="middle">${label}</text></svg>`,
+      });
+    });
+    await installMockEventSource(player);
+
+    await player.goto(`${baseURL}/live-wall/${TEST_TOKEN}`);
+
+    const portal = player.locator(".live-wall-player__portal");
+
+    await expect(portal).toHaveAttribute("data-ready", "true", {
+      timeout: 15_000,
+    });
+    await expect
+      .poll(() =>
+        portal.evaluate((element) => {
+          const bounds = element.getBoundingClientRect();
+
+          return (
+            bounds.width > 0 &&
+            bounds.height > 0 &&
+            element.childElementCount > 0
+          );
+        }),
+      )
+      .toBe(true);
+
+    visibleMedia = media;
+    await player.evaluate(() => {
+      (
+        window as unknown as {
+          __emitLiveWallTestEvent: (kind: string) => void;
+        }
+      ).__emitLiveWallTestEvent("media.created");
+    });
+
+    const arrivingCard = portal.locator('[data-media-id="cloud-memory-3"]');
+
+    await expect(arrivingCard).toHaveAttribute("data-quality", "full");
+    await expect(arrivingCard).toHaveAttribute("data-state", "arrival");
+    await expect(
+      portal.locator('[data-media-id="cloud-memory-4"]'),
+    ).toHaveAttribute("data-state", "reveal");
+    await expect(
+      portal.locator('[data-media-id="cloud-memory-5"]'),
+    ).toHaveAttribute("data-state", "reveal");
+    await expect(portal.locator('[data-state="arrival"]')).toHaveCount(1);
+    await player.waitForTimeout(300);
+
+    const backgroundFilters = await portal
+      .locator(
+        '.live-wall-player__portal-card:not([data-media-id="cloud-memory-3"])',
+      )
+      .evaluateAll((cards) =>
+        cards.map((card) => (card as HTMLElement).style.filter),
+      );
+
+    expect(backgroundFilters).not.toHaveLength(0);
+    expect(new Set(backgroundFilters)).toEqual(new Set(["none"]));
+
+    await expect(
+      arrivingCard.locator(".live-wall-player__portal-image"),
+    ).toHaveCSS("filter", "none");
+    await expect(portal.locator(".live-wall-player__portal-glow")).toHaveCSS(
+      "mix-blend-mode",
+      "normal",
+    );
+
+    await player.waitForTimeout(1_300);
+
+    const backgroundImageFilters = await portal
+      .locator(
+        '.live-wall-player__portal-card:not([data-state="arrival"]) .live-wall-player__portal-image',
+      )
+      .evaluateAll((images) =>
+        images.map((image) => getComputedStyle(image).filter),
+      );
+
+    expect(backgroundImageFilters.some((filter) => filter !== "none")).toBe(
+      true,
+    );
+    await expect(arrivingCard).toHaveCSS("filter", "none");
+
+    await player.reload();
+    await expect(player.locator(".live-wall-player__portal")).toHaveAttribute(
+      "data-ready",
+      "true",
+      { timeout: 15_000 },
+    );
+    await player.waitForTimeout(100);
+    expect(browserErrors).toEqual([]);
+    await context.close();
+  });
+
   test("shows a completed guest upload after a media.created stream event", async ({
     browser,
     baseURL,

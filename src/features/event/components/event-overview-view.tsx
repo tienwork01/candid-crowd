@@ -88,6 +88,24 @@ type LiveWallSessionState = {
 
 const LIVE_WALL_SESSION_STORAGE_PREFIX = "candid_live_wall_session_";
 
+function navigateLiveWallWindow(
+  playerWindow: Window | null,
+  destination: string,
+): boolean {
+  try {
+    if (playerWindow && !playerWindow.closed) {
+      playerWindow.location.replace(destination);
+
+      return true;
+    }
+  } catch {
+    // The launch screen has its own timeout fallback. If the browser severs
+    // the popup reference, continue in the dashboard tab instead.
+  }
+
+  return false;
+}
+
 function getStoredLiveWallSession(
   eventId: string,
 ): LiveWallSessionState | null {
@@ -375,16 +393,15 @@ export function EventOverviewView({
       setLiveWallSession(newSession);
       saveStoredLiveWallSession(currentEvent.id, newSession);
 
-      if (playerWindow) {
-        playerWindow.location.replace(playerURL);
-      } else {
+      if (!navigateLiveWallWindow(playerWindow, playerURL)) {
         router.push(playerURL);
       }
     } catch (error) {
       const errorCode =
         error instanceof APIError ? error.code : "request_failed";
 
-      playerWindow?.location.replace(
+      navigateLiveWallWindow(
+        playerWindow,
         `/live-wall/launching?error=${encodeURIComponent(errorCode)}`,
       );
       toast.error(t("gallery.actionFailed"));

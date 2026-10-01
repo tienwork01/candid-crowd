@@ -2658,6 +2658,10 @@
   line-height: 1.5;
 }
 
+.live-wall-launch__action {
+  margin-top: 1.5rem;
+}
+
 @keyframes live-wall-launch-spin {
   to {
     transform: rotate(360deg);
@@ -2882,6 +2886,14 @@
   transform: scale(1.08);
 }
 
+/* The portrait ambience belongs to the flat slideshow only. Keeping this
+   blur layer below CSS3D can make the full scene appear soft while Chrome
+   rebuilds compositor layers for an incoming photo. */
+.live-wall-player__media-stage[data-transition="float_3d"]
+  .live-wall-player__backdrop-frame {
+  display: none;
+}
+
 .live-wall-player__media-shell {
   position: absolute;
   inset: clamp(6px, 0.8vw, 14px);
@@ -2896,8 +2908,8 @@
   overflow: hidden;
 }
 
-/* A quick, low-opacity light sweep gives each incoming memory a tangible
-   "just captured" moment without competing with the photo itself. */
+/* Only Cinematic uses a directional highlight. Applying it to every preset
+   made Classic, Flash and 3D Portal all look like the same left-to-right slide. */
 .live-wall-player__media-shell::after {
   position: absolute;
   z-index: 2;
@@ -2918,8 +2930,21 @@
   mix-blend-mode: screen;
   opacity: 0;
   transform: skewX(-12deg);
+  animation: none;
+}
+
+.live-wall-player__media-shell[data-transition="cinematic"]::after {
   animation: live-wall-media-light-sweep 900ms cubic-bezier(0.16, 1, 0.3, 1)
     90ms both;
+}
+
+.live-wall-player__media-shell[data-transition="flash"]::after {
+  inset: 0;
+  width: auto;
+  background: rgba(255, 248, 225, 0.92);
+  mix-blend-mode: screen;
+  transform: none;
+  animation: live-wall-media-flash 460ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .live-wall-player__media {
@@ -2946,6 +2971,118 @@
 
 .live-wall-player__media--video {
   background: #050505;
+}
+
+/* Three.js is an opt-in enhancement: the accessible DOM image remains below
+   this CSS3D scene and is immediately visible if the scene cannot start. */
+.live-wall-player__portal {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  contain: layout paint;
+  transform-style: preserve-3d;
+  transition: opacity 220ms ease;
+}
+
+.live-wall-player__portal[data-ready] {
+  opacity: 1;
+  background: radial-gradient(
+    circle at 50% 42%,
+    #171a14 0%,
+    #090b09 58%,
+    #030403 100%
+  );
+}
+
+.live-wall-player__portal-scene {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+}
+
+.live-wall-player__portal-atmosphere {
+  position: absolute;
+  z-index: 0;
+  inset: -8%;
+  pointer-events: none;
+  background-position: center, center, center;
+  background-repeat: no-repeat;
+  background-size:
+    auto,
+    auto,
+    360% 360%;
+  opacity: 0;
+  transform: scale(1.08);
+  transition: opacity 2400ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.live-wall-player__portal-card {
+  isolation: isolate;
+  overflow: hidden;
+  pointer-events: none;
+  background: #fffaf0;
+  border: 8px solid rgba(255, 252, 244, 0.98);
+  border-radius: 12px;
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.48),
+    0 4px 18px rgba(0, 0, 0, 0.3),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.56);
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  filter: none;
+  will-change: transform, opacity;
+}
+
+.live-wall-player__portal-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  object-fit: cover;
+  filter: none;
+  transition: filter 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+}
+
+/* Keep optical falloff scoped to each image, never the transformed CSS3D
+   card. This avoids Chromium flattening the whole cloud into a soft layer. */
+.live-wall-player__portal-card[data-falloff="true"]
+  .live-wall-player__portal-image {
+  filter: blur(0.42px) brightness(0.87) contrast(0.94) saturate(0.92);
+}
+
+.live-wall-player__portal-falloff {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  background: rgba(4, 7, 5, 0.9);
+  opacity: 0;
+}
+
+.live-wall-player__portal-glow {
+  width: 180px;
+  height: 180px;
+  pointer-events: none;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 247, 214, 0.96) 0%,
+    rgba(255, 218, 145, 0.68) 18%,
+    rgba(255, 199, 105, 0.18) 52%,
+    transparent 74%
+  );
+  filter: none;
+  /* Blend modes flatten nearby CSS3D siblings into one raster surface in
+     Chromium. While the arrival glow was visible that surface was sampled at
+     an intermediate scale, making every photo look blurred. The gradient is
+     already self-luminous, so normal compositing preserves the same cue. */
+  mix-blend-mode: normal;
+  will-change: transform, opacity;
 }
 
 .live-wall-player__media-stage[data-portrait] .live-wall-player__media {
@@ -3153,6 +3290,20 @@
   }
 }
 
+@keyframes live-wall-media-flash {
+  0% {
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.76;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes live-wall-chrome-fade {
   to {
     opacity: 0;
@@ -3220,6 +3371,7 @@
   .live-wall-player__header,
   .live-wall-player__media-shell,
   .live-wall-player__media-shell::after,
+  .live-wall-player__portal,
   .live-wall-player__mosaic-tile,
   .live-wall-player__qr-loading {
     animation: none;

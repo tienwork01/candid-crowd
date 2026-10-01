@@ -113,7 +113,7 @@ export function EventEngageView({
   const transitionOptions = [
     { mode: "classic" as const, label: "Classic" },
     { mode: "cinematic" as const, label: "Cinematic" },
-    { mode: "float_3d" as const, label: "3D Float" },
+    { mode: "float_3d" as const, label: "3D Photo Cloud" },
     { mode: "flash" as const, label: "Flash" },
   ];
 

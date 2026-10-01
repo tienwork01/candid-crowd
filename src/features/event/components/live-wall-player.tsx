@@ -8,12 +8,14 @@ import { toDataURL } from "qrcode";
 import { publicClient } from "@/lib/api-client";
 import { connectEventStream } from "@/lib/event-stream";
 import type { GuestThemeConfig } from "./guest-theme";
+import { LiveWallPortal, type LiveWallPortalPhoto } from "./live-wall-portal";
 import "./event.css";
 
 type PlayerMedia = {
   id: string;
   url: string;
   thumbnail_url?: string;
+  dominant_color?: string;
   is_video?: boolean;
   status: "ready" | "featured" | "hidden";
 };
@@ -157,6 +159,7 @@ function LiveWallInvitation({
 
 function LiveWallStage({
   item,
+  cloudItems,
   eventName,
   isPlaying,
   videoRef,
@@ -170,6 +173,7 @@ function LiveWallStage({
   qrBadgeLabel,
 }: {
   item: PlayerMedia;
+  cloudItems: PlayerMedia[];
   eventName: string;
   isPlaying: boolean;
   videoRef: RefObject<HTMLVideoElement | null>;
@@ -188,16 +192,34 @@ function LiveWallStage({
   const reduceMotion = useReducedMotion();
   const showBackdrop = !item.is_video && isPortrait;
   const mediaURL = getMediaRequestURL(item.url, retryAttempt);
+  const cloudPhotos = useMemo<LiveWallPortalPhoto[]>(
+    () =>
+      cloudItems
+        .filter((media) => !media.is_video)
+        .map((media) => ({
+          id: media.id,
+          url:
+            media.id === item.id ? mediaURL : media.thumbnail_url || media.url,
+          focusUrl: media.id === item.id ? mediaURL : media.url,
+          dominantColor: media.dominant_color,
+        })),
+    [cloudItems, item.id, mediaURL],
+  );
   const transition = reduceMotion
     ? { duration: 0 }
     : item.is_video
       ? { duration: 0.48, ease: [0.22, 1, 0.36, 1] as const }
-      : { type: "spring" as const, stiffness: 185, damping: 23, mass: 0.8 };
+      : transitionMode === "classic"
+        ? { duration: 0.28, ease: "easeOut" as const }
+        : transitionMode === "flash"
+          ? { duration: 0.46, ease: [0.16, 1, 0.3, 1] as const }
+          : { type: "spring" as const, stiffness: 185, damping: 23, mass: 0.8 };
 
   return (
     <div
       className="live-wall-player__media-stage"
       data-portrait={showBackdrop || undefined}
+      data-transition={transitionMode}
     >
       {showBackdrop && (
         <div className="live-wall-player__backdrop-frame" aria-hidden="true">
@@ -216,17 +238,15 @@ function LiveWallStage({
             reduceMotion
               ? { opacity: 1 }
               : transitionMode === "flash"
-                ? { opacity: 0, scale: 1.08 }
+                ? { opacity: 0, scale: 1.035, filter: "brightness(2.4)" }
                 : transitionMode === "classic"
-                  ? { opacity: 0, scale: 1.01 }
+                  ? { opacity: 0 }
                   : transitionMode === "float_3d"
                     ? {
                         opacity: 0,
-                        y: 110,
-                        scale: 0.82,
-                        rotateX: 14,
-                        rotateY: -9,
-                        rotateZ: -3,
+                        scale: 0.94,
+                        rotateX: 8,
+                        rotateY: -3,
                       }
                     : {
                         opacity: 0,
@@ -236,19 +256,31 @@ function LiveWallStage({
                         rotateZ: -1.4,
                       }
           }
-          animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0, rotateZ: 0 }}
+          animate={{
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            rotateX: 0,
+            rotateY: 0,
+            rotateZ: 0,
+            filter: "brightness(1)",
+          }}
           exit={
             reduceMotion
               ? { opacity: 0 }
               : transitionMode === "classic"
                 ? { opacity: 0 }
-                : {
-                    opacity: 0,
-                    y: -28,
-                    scale: 1.025,
-                    rotateX: -1,
-                    rotateZ: 0.7,
-                  }
+                : transitionMode === "flash"
+                  ? { opacity: 0, scale: 1.01, filter: "brightness(1.8)" }
+                  : transitionMode === "float_3d"
+                    ? { opacity: 0, scale: 1.035, rotateY: 4, rotateX: -3 }
+                    : {
+                        opacity: 0,
+                        y: -28,
+                        scale: 1.025,
+                        rotateX: -1,
+                        rotateZ: 0.7,
+                      }
           }
           transition={transition}
           style={{ transformPerspective: 1600 }}
@@ -278,6 +310,13 @@ function LiveWallStage({
           )}
         </motion.div>
       </AnimatePresence>
+      {transitionMode === "float_3d" && !reduceMotion && !item.is_video && (
+        <LiveWallPortal
+          photos={cloudPhotos}
+          focusedId={item.id}
+          active={isPlaying}
+        />
+      )}
       {qrBadgeUrl && (
         <aside
           className="live-wall-player__corner-badge"
@@ -912,6 +951,7 @@ export function LiveWallPlayer({ token }: { token: string }) {
         ) : current ? (
           <LiveWallStage
             item={current}
+            cloudItems={media}
             eventName={presentationEventName}
             isPlaying={presentation.is_playing}
             videoRef={videoRef}

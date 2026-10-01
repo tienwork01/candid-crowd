@@ -8,6 +8,7 @@ const apiBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL || undefined;
 
 let cachedToken: string | null = null;
 let tokenExpiresAt = 0;
+const AUTH_TOKEN_TIMEOUT_MS = 10_000;
 // Several protected queries often start in the same render. Share their
 // token request so a cold cache produces one `/token` call, not one per query.
 let tokenRequest: Promise<string | null> | null = null;
@@ -85,8 +86,16 @@ export async function getAuthToken(
   }
 
   if (!tokenRequest) {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(
+      () => controller.abort(),
+      AUTH_TOKEN_TIMEOUT_MS,
+    );
+
     tokenRequest = authClient
-      .token({ fetchOptions: { cache: "no-store" } })
+      .token({
+        fetchOptions: { cache: "no-store", signal: controller.signal },
+      })
       .then(({ data, error }) => {
         if (error || !data?.token) {
           cachedToken = null;
@@ -107,6 +116,7 @@ export async function getAuthToken(
         return null;
       })
       .finally(() => {
+        window.clearTimeout(timeoutId);
         tokenRequest = null;
       });
   }
